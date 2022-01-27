@@ -1,0 +1,13 @@
+<div {% if class %}class="{{class}}" {% else %} class=imageClass {% endif %}>
+    <figure {% if figClass %}class="{{figClass}}" {% else %} class=center {% endif %}>
+        <img src="{{src}}" {% if alt %}alt="{{ alt | safe }}" {% endif %} 
+            {% if imgStyle %} style="{{ imgStyle | safeCSS }}" {% endif %}
+            {% if position %} class="{{position}}" {% else %} class=center {% endif %} />
+        {% if caption %}
+            <figcaption {% if figcaptionClass %} class="{{figcaptionClass}}" {% else %} class=center {% endif %} 
+                {% if figcaptionStyle %} style="{{ figcaptionStyle | safeCSS }}" {% endif %}>
+                {{ caption | safe }}
+            </figcaption>
+        {% endif %}
+    </figure>
+</div>

@@ -1,0 +1,27 @@
+base_url = "https://beta.wantguns.dev"
+description = "Welcome to wantguns' a.k.a. Gunwant's Blog"
+title = "Gunwant Jain"
+
+compile_sass = true
+generate_feed = true
+
+[markdown]
+extra_syntaxes_and_themes = [
+  "highlight_theme",
+]
+
+highlight_code = true
+highlight_theme = "base16-black-metal-bathory"
+
+[extra]
+author = "Gunwant Jain"
+keywords = "Gunwant Jain, wantguns, Gunwant, WantGuns"
+seo = true
+
+nav_links = [
+  {url = "$BASE_URL/about", name = "about"},
+  {url = "$BASE_URL/", name = "blog"},
+  {url = "$BASE_URL/projects", name = "projects"},
+  {url = "https://bin.wantguns.dev/cv", name = "resume"},
+  {url = "$BASE_URL/atom.xml", name = "rss"},
+]
