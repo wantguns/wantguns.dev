@@ -5,12 +5,13 @@
         <div class="taxonomies__title">
             {{ terms | length }} tags in total
         </div>
-        <div class="taxonomies__items">
+        <div class="taxonomies__list">
             {% for tag in terms %}
+            <li>
                 <a href="{{ tag.permalink }}">
-                    {{ tag.name }}
-                    <span class="count">{{ tag.pages | length }}</span>
+                    #{{ tag.name }}
                 </a>
+            </li>
             {% endfor %}
         </div>
     </div>

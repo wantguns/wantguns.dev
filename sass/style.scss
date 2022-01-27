@@ -48,8 +48,7 @@ h1.page_title {
 	font-size: 250%;
 	line-height: normal;
 	color: $uLinkColor;
-	padding-bottom: 0rem;
-	margin-bottom: 0rem;
+	margin-bottom: 1rem;
 }
 
 a {
@@ -106,7 +105,8 @@ time.site_time {
 	color: $greyColor;
 }
 
-p.page_time {
+span.page_time {
+	padding: 1.2rem auto;
 	color: $greyColor;
 }
 
@@ -177,7 +177,8 @@ img {
 	max-width: 100%;
 }
 
-.homepage-list {
+.homepage-list,
+.taxonomies__list {
 	list-style: none;
 	padding: 1rem 0;
 
@@ -265,5 +266,31 @@ footer {
 			white-space: nowrap;
 			text-overflow: ellipsis;
 		}
+	}
+}
+
+.time_tag_sep {
+	padding: 0.5rem;
+	color: $greyColor;
+	user-select: none;
+}
+
+.post_tags {
+	a {
+		padding: 0 0.5rem 0 0;
+		color: $greyColor;
+		text-decoration: none;
+		&:hover {
+			color: $uLinkColor;
+		}
+	}
+}
+
+.taxonomies__title {
+	color: $greyColor;
+}
+.taxonomies__list {
+	a {
+		text-decoration: none;
 	}
 }

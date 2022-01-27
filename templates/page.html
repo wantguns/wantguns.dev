@@ -18,13 +18,14 @@
   <h1 class="page_title">{{ page.title }}</h1>
 
   {% if page.date %}
-    <p class="page_time">Posted on <time datetime="{{ page.date | date(format="%+") }}">{{ page.date | date(format="%B %d, %Y") }}</time></p>
+    <span class="page_time">Posted on <time datetime="{{ page.date | date(format="%+") }}">{{ page.date | date(format="%B %d, %Y") }}</time></span>
     {% if page.taxonomies.tags %}
-      <div class="post-tags">
-          {% for tag in page.taxonomies.tags %}
-              <a href="{{ get_taxonomy_url(kind="tags", name=tag) }}">#{{ tag }}</a>
-          {% endfor %}
-      </div>
+    <span class="time_tag_sep">&middot;</span>
+    <span class="post_tags">
+        {% for tag in page.taxonomies.tags %}
+            <a href="{{ get_taxonomy_url(kind="tags", name=tag) }}">#{{ tag }}</a>
+        {% endfor %}
+    </span>
     {% endif %}
   {% endif %}
 
