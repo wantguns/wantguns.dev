@@ -1,8 +1,9 @@
 +++
 title = "Starting System-as-Root Android in a LXC container"
-tags = ["android", "gsoc2020", "sharkbait"]
-date = "2020-06-23"
 description = "As I progress in my GSoC journey, my next task is to boot System-As-Root based Android in an LXC container inside Gentoo."
+date = "2020-06-23"
+[taxonomies]
+tags = ["android", "gsoc2020", "sharkbait"]
 +++
 
 As I progress in my GSoC journey, my next task is to boot System-As-Root based Android in an LXC container inside Gentoo. As the name suggests, SAR devices use /system as their rootdir instead of /boot. SharkBait was based on the older booting mechanism.

@@ -1,8 +1,9 @@
 +++
 title = "Final Report - GSoC 2020"
 description = "Spoiler alert, its not over yet"
-tags = ["android", "gsoc2020", "sharkbait"]
 date = "2020-08-26"
+[taxonomies]
+tags = ["android", "gsoc2020", "sharkbait"]
 +++
 
 Its almost 3 months since I have been officially working with the

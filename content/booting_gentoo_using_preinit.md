@@ -1,8 +1,9 @@
 +++
 title = "Booting Gentoo from SAR-Preinit; or Debugging the init, the Hard Way"
 description = "As you would know from my previous [blog](@/uart_on_lavender/index.md), I couldn't make the UART work for my phone. Since without a serial console, the boot-up process is no less than a black-box, I decided to use some hacky debugs for finding out what went wrong with the original `preinit`."
-tags = ["android", "gsoc2020", "sharkbait"]
 date = "2020-06-06"
+[taxonomies]
+tags = ["android", "gsoc2020", "sharkbait"]
 +++
 
 As you would know from my previous [blog](@/uart_on_lavender/index.md), I couldn't make the UART work for my phone. Since without a serial console, the boot-up process is no less than a black-box, I decided to use some hacky debugs for finding out what went wrong with the original `preinit`. If you're not in for the process of going through it and just want to cut to the chase, jump onto this [section](@/booting_gentoo_using_preinit.md#final-comments-and-what-to-follow-next). 

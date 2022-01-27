@@ -19,6 +19,13 @@
 
   {% if page.date %}
     <p class="page_time">Posted on <time datetime="{{ page.date | date(format="%+") }}">{{ page.date | date(format="%B %d, %Y") }}</time></p>
+    {% if page.taxonomies.tags %}
+      <div class="post-tags">
+          {% for tag in page.taxonomies.tags %}
+              <a href="{{ get_taxonomy_url(kind="tags", name=tag) }}">#{{ tag }}</a>
+          {% endfor %}
+      </div>
+    {% endif %}
   {% endif %}
 
   {{ page.content | safe }}

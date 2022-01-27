@@ -5,6 +5,10 @@ title = "Gunwant Jain"
 compile_sass = true
 generate_feed = true
 
+taxonomies = [
+    {name = "tags", feed = true},
+]
+
 [markdown]
 extra_syntaxes_and_themes = [
   "highlight_theme",

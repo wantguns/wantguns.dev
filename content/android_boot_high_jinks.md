@@ -1,8 +1,9 @@
 +++
 title = "Android Boot High Jinks: And What it Means for SharkBait"
 description = "Attempts at finding measures and ways we could use to deal with System-As-Root devices for SharkBaitOS"
-tags = ["android", "gsoc2020", "sharkbait"]
 date = "2020-06-01"
+[taxonomies]
+tags = ["android", "gsoc2020", "sharkbait"]
 +++
 
 Presently, SharkBait aims at devices launching with Android version lower than 9. I will discuss few ways we could the port this setup to newer devices, whose boot mechanisms are different. We shall also address the boot process of SharkBait and what System-As-Root actually is.

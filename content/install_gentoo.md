@@ -1,8 +1,9 @@
 +++
 title = "Installing Gentoo on Android"
-tags = ["android", "gsoc2020", "sharkbait"]
 description = "I am tired of re-installing gentoo on my phone by connecting parts from different resources and so here is the guide to do it all in a go."
 date = "2020-04-15"
+[taxonomies]
+tags = ["android", "gsoc2020", "sharkbait"]
 +++
 
 I am tired of re-installing gentoo (from an chroot approach) on my phone by connecting parts from different resources and so here is the guide to do it all in a go.

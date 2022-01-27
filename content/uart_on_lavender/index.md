@@ -1,8 +1,9 @@
 +++
 title = "UART on Xiaomi Redmi Note 7"
 description = "This blog describes the state of UART on Redmi Note 7 (codename: lavender) and my journey chasing it."
-tags = ["android", "gsoc2020", "sharkbait"]
 date = "2020-06-02"
+[taxonomies]
+tags = ["android", "gsoc2020", "sharkbait"]
 +++
 
 This blog is a short sequel to my previous [blog](@/android_boot_high_jinks.md) where I discussed why I needed to access a serial console on Redmi Note 7 (I'll refer to it using its codename, lavender here onwards). I should give a disclaimer that this blog is one dead-end in the GSoC2020 series. But it could always help newcomers and other curious souls.

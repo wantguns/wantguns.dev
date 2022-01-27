@@ -1,8 +1,9 @@
 +++
 title = "Building Android: BTS"
 description = "So you've successfully compiled AOSP. But you are still not entertained and rather inquisitive about how things worked under the hood after you hit `make bacon` or `brunch` on your Lineage tree"
-tags = ["android", "gsoc2020", "sharkbait"]
 date = "2020-07-13"
+[taxonomies]
+tags = ["android", "gsoc2020", "sharkbait"]
 +++
 
 So you've successfully compiled AOSP. But you are still not entertained
