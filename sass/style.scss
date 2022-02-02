@@ -308,6 +308,9 @@ footer {
 			color: $uLinkColor;
 		}
 	}
+	ul {
+		padding-left: 1rem;
+	}
 	li li {
 		list-style: disc;
 	}
@@ -337,7 +340,7 @@ footer {
 	float: left;
 	top: 3.5rem;
 	margin-top: -1.2rem;
-	margin-left: -22rem;
+	margin-left: -20rem;
 }
 
 // such responsive, much wow
