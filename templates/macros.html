@@ -5,3 +5,39 @@
 </li>
 {% endmacro post_in_list %}
 
+{% macro toc_inline(toc) %}
+    <details id = "toc-inline">
+        <summary><b>Table of Contents</b></summary>
+        <ul>
+            {% for h2 in toc %}<li>
+                <a href="#{{h2.id | safe}}">{{ h2.title | safe }}</a>
+                {% if h2.children %}<ul>
+                    {% for h3 in h2.children %}<li>
+                        <a href="#{{h3.id | safe}}">{{ h3.title | safe }}</a>
+                    </li>{% endfor %}
+                </ul>{% endif %}
+            </li>{% endfor %}
+        </ul>
+    </details>
+{% endmacro toc_inline %}
+
+{% macro toc_aside(toc) %}
+  <aside id="toc-aside">
+          <h4>Table of Contents</h4>
+      <ul>
+          {% for h2 in toc %}
+          <li>
+              <a href="#{{h2.id | safe}}">{{ h2.title | safe }}</a>
+              {% if h2.children %}
+              <ul>
+                  {% for h3 in h2.children %}
+                  <li>
+                      <a href="#{{h3.id | safe}}">{{ h3.title | safe }}</a>
+                  </li>
+                  {% endfor %}
+              </ul>
+              {% endif %}
+          </li>{% endfor %}
+      </ul>
+  </aside>
+{% endmacro toc_inline %}

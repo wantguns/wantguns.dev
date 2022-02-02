@@ -78,6 +78,7 @@
       </header>
       {% endblock header %}
 
+    <div>
 
       {% block content %}
       <ul class="homepage-list">
@@ -88,6 +89,7 @@
       {% endblock content %}
 
     </main>
+    </div>
     {% block after_main %}
     {% endblock after_main %}
 
@@ -95,5 +97,7 @@
       <sub>© 2022 &middot; Gunwant Jain</sub>
     </footer>
   </body>
+  {% block scripts %}
+  {% endblock scripts %}
 </html>
 

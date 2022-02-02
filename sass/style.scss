@@ -294,3 +294,62 @@ footer {
 		text-decoration: none;
 	}
 }
+
+// toc commons
+#toc-inline, #toc-aside {
+	font-size: 90%;
+	line-height: 1.6;
+	color: $greyColor;
+	a {
+		color: $greyColor;
+		text-decoration: none;
+
+		&:hover {
+			color: $uLinkColor;
+		}
+	}
+	li li {
+		list-style: disc;
+	}
+
+	li.active > a {
+		color: $uLinkColor;
+		font-weight: bold;
+	}
+}
+
+// inline toc
+#toc-inline {
+	padding: 1.25rem 0rem 0.5rem 0rem;
+	summary {
+		&:hover {
+			cursor: pointer;
+			color: $uLinkColor;
+		}
+	}
+}
+
+// aside toc
+#toc-aside {
+	display: block;
+	width: 15rem;
+	position: sticky;
+	float: left;
+	top: 3.5rem;
+	margin-top: -1.2rem;
+	margin-left: -22rem;
+}
+
+// such responsive, much wow
+@media (max-width: 80rem) {
+	#toc-aside {
+		display: none;
+	}
+}
+
+// such responsive, much wow
+@media (min-width: 80rem) {
+	#toc-inline {
+		display: none;
+	}
+}

@@ -1,6 +1,8 @@
 +++
 title = "Hey !"
 path = "about"
+[extra]
+notoc = true
 +++
 
 welcome to wantguns' blog.

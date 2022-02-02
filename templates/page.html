@@ -29,6 +29,13 @@
     {% endif %}
   {% endif %}
 
+  {% block toc %}
+  {% if page.toc and not page.extra.notoc %}
+    {{ macros::toc_inline(toc=page.toc) }}
+    {{ macros::toc_aside(toc=page.toc) }}
+  {% endif %}
+  {% endblock toc %}
+
   {{ page.content | safe }}
 </article>
 
@@ -58,3 +65,7 @@
     </div>
 {% endif %}
 {% endblock content %}
+
+{% block scripts %}
+ <script src={{ get_url(path="js/page.js") | safe }}></script> 
+{% endblock scripts %}
