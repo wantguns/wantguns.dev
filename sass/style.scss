@@ -356,3 +356,31 @@ footer {
 		display: none;
 	}
 }
+
+.footnote-reference {
+	&:after {
+	content: "]"
+	}
+
+	&:before {
+	content: "["
+	}
+	color: $uLinkColor;
+
+	a {
+		color: $uLinkColor;
+		text-decoration: none;
+	}
+}
+
+hr {
+	margin-top: 2rem;
+	margin-bottom: 2rem;
+}
+
+.footnote-definition {
+	p {
+		margin: 0rem;
+		margin-bottom: 1rem;
+	}
+}
