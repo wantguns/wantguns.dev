@@ -1,5 +1,5 @@
 base_url = "https://beta.wantguns.dev"
-description = "Professional Procrastinator"
+description = "Gunwant Jain's (@wantguns) place in the internet"
 title = "Gunwant Jain"
 
 compile_sass = true
@@ -18,7 +18,7 @@ highlight_code = true
 highlight_theme = "base16-black-metal-bathory"
 
 [extra]
-author = "Gunwant Jain"
+author = "Gunwant Jain - @wantguns"
 keywords = "Gunwant Jain, wantguns, Gunwant, WantGuns"
 seo = true
 
