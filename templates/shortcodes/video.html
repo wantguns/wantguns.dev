@@ -1,0 +1,16 @@
+<div {% if class %}class="{{class}}" {% else %} class=videoClass {% endif %}>
+    <figure {% if figClass %}class="{{figClass}}" {% else %} class=center {% endif %}>
+        <video controls
+            {% if vidStyle %} style="{{ imgStyle | safeCSS }}" {% endif %}
+            {% if position %} class="{{position}}" {% else %} class=center {% endif %}>
+            <source src="{{ src }}">
+        </video>
+        {% if caption %}
+            <figcaption {% if figcaptionClass %} class="{{figcaptionClass}}" {% else %} class=center {% endif %} 
+                {% if figcaptionStyle %} style="{{ figcaptionStyle | safeCSS }}" {% endif %}>
+                {{ caption | safe }}
+            </figcaption>
+        {% endif %}
+    </figure>
+</div>
+
