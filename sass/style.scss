@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;900&display=swap");
-@import url("https://cdn.jsdelivr.net/npm/firacode@6.0.0/distr/fira_code.css");
+// @import url("https://cdn.jsdelivr.net/npm/firacode@6.0.0/distr/fira_code.css");
+@import url("https://pvinis.github.io/iosevka-webfont/7.0.2/iosevka.css");
 
 $bgColor: #000;
 $textColor: rgba(255, 255, 255, 0.8);
@@ -136,10 +137,9 @@ header {
 }
 
 code {
-	font-family: "Fira Code", monospace;
-	background-color: $codeBGColor;
+	font-family: "Iosevka Web", monospace;
+	letter-spacing: normal;
 	color: $codeColor;
-	font-size: 0.9rem;
 	a {
 		text-decoration-color: $codeColor;
 	}
@@ -147,9 +147,9 @@ code {
 
 pre {
 	font-size: 1rem;
-	font-family: "Fira Code", monospace;
+	font-family: "Iosevka Web", monospace;
 	font-weight: 450;
-	letter-spacing: -0.02em;
+	letter-spacing: normal;
 	line-height: 1.5;
 	overflow: auto;
 	border: thin solid $darkGreyColor;
@@ -203,7 +203,6 @@ img {
 	figure {
 		display: table;
 		img {
-			// pointer-events: none;
 			user-select: none;
 		}
 		figcaption {
