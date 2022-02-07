@@ -139,6 +139,8 @@ header {
 code {
 	font-family: "Iosevka Web", monospace;
 	letter-spacing: normal;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
 	color: $codeColor;
 	a {
 		text-decoration-color: $codeColor;
@@ -354,6 +356,10 @@ footer {
 	#toc-inline {
 		display: none;
 	}
+}
+
+sup {
+    line-height: 0;
 }
 
 .footnote-reference {
