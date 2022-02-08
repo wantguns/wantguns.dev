@@ -32,8 +32,8 @@
       <meta property="og:image" content="{% block ogimage %}{% if config.extra.ogimage %}{{ get_url(path=config.extra.ogimage) | safe }}{% endif %}{% endblock ogimage %}">
 
       <meta name="twitter:card" content="summary">
-      <meta name="twitter:title" content="{% block ogtitle %}{{config.title}}{% endblock ogtitle %}">
-      <meta name="twitter:description" content="{% block ogdesc %}{{config.description}}{% endblock ogdesc %}">
+      <meta name="twitter:title" content="{% block twtitle %}{{config.title}}{% endblock twtitle %}">
+      <meta name="twitter:description" content="{% block twdesc %}{{config.description}}{% endblock twdesc %}">
 
       {% if page.date -%}
         <meta property="og:type" content="article" />

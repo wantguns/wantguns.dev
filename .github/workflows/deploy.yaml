@@ -1,0 +1,20 @@
+on:
+  push:
+    tags: 
+     - 'live'
+
+name: Deploy CI
+jobs:
+  build:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    - name: Deploy
+      uses: shalzz/zola-deploy-action@master
+      env:
+        PAGES_BRANCH: pages
+        BUILD_DIR: .
+        BUILD_FLAGS: --drafts
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
