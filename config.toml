@@ -1,6 +1,6 @@
 base_url = "https://wantguns.dev"
 description = "Gunwant Jain's (@wantguns) place in the internet"
-title = "Gunwant Jain"
+title = "Gunwant Jain - @wantguns"
 
 compile_sass = true
 generate_feed = true
@@ -18,7 +18,7 @@ highlight_code = true
 highlight_theme = "base16-black-metal-bathory"
 
 [extra]
-author = "Gunwant Jain - @wantguns"
+author = "Gunwant Jain"
 keywords = "Gunwant Jain, wantguns, Gunwant, WantGuns"
 seo = true
 
