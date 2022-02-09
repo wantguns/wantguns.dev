@@ -6,13 +6,13 @@ date = "2020-06-06"
 tags = ["android", "gsoc2020", "sharkbait"]
 +++
 
-As you would know from my previous [blog](@/uart_on_lavender/index.md), I couldn't make the UART work for my phone. Since without a serial console, the boot-up process is no less than a black-box, I decided to use some hacky debugs for finding out what went wrong with the original `preinit`. If you're not in for the process of going through it and just want to cut to the chase, jump onto this [section](@/booting_gentoo_using_preinit.md#final-comments-and-what-to-follow-next). 
+As you would know from my previous [blog](@/uart_on_lavender/index.md), I couldn't make the UART work for my phone. Since without a serial console, the boot-up process is no less than a black-box, I decided to use some hacky debugs for finding out what went wrong with the original `preinit`. If you're not in for the process of going through it and just want to cut to the chase, jump onto this [section](@/booting_gentoo_using_preinit/index.md#final-comments-and-what-to-follow-next). 
 
 ---
 
 ## Circumventing System-As-Root
 
-So, flashing a `preinit` failed for me. Again this was because of the changes in the boot-process of newer Android devices. If you have no clue about this, I would recommend reading this [blog](@/android_boot_high_jinks.md). 
+So, flashing a `preinit` failed for me. Again this was because of the changes in the boot-process of newer Android devices. If you have no clue about this, I would recommend reading this [blog](@/android_boot_high_jinks/index.md). 
 
 What we needed to change was the behaviour of our kernel to take the `ramdisk` provided to it in the `boot.img` as its `rootfs`. @topjohnwu suggested in his [infamous xda comment](https://forum.xda-developers.com/apps/magisk/pixel-2-pixel-2-xl-support-t3697427/post74361728#post74361728) that it could be achieved by substituting the `skip_ramdisk` string with any other. I tried doing this but it make the device boot straight up to Lineage (which we do not want). 
 
@@ -54,7 +54,7 @@ I did not have just 8 attempts, the [commit history](https://gitlab.com/WantGuns
 ## Final comments and What to follow next
 
 My [sar-preinit](https://gitlab.com/WantGuns/sar-preinit) repository holds the current workflow of getting a SAR-enabled device boot Gentoo in the Android based device. The Makefile is pretty self-explanatory but still, if you want to follow the process:
-1. Install Gentoo in you phone following this [blog](@/install_gentoo.md).
+1. Install Gentoo in you phone following this [blog](@/install_gentoo/index.md).
 2. Extract the `boot.img` from you Android phone. At the time of writing this blog, we dont have changing `selinux` modes automated. Please make sure that you do that first by adding `androidboot.selinux=permissive` string at the end of the kernel commandline in `bootimg.cfg`.
 3. Rename `boot.img` to `ogboot.img` and place it inside the artifacts folder.
 4. Fire up a terminal and run 
