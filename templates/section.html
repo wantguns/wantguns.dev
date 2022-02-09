@@ -1,0 +1,10 @@
+{% import "macros.html" as macros %}
+{% extends "index.html" %}
+
+{% block content %}
+<ul class="homepage-list">
+  {% for post in section.pages %}
+    {{ macros::post_in_list(post=post) }}
+  {% endfor %}
+</ul>
+{% endblock content %}

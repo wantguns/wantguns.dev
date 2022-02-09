@@ -23,8 +23,8 @@ keywords = "Gunwant Jain, wantguns, Gunwant, WantGuns"
 seo = true
 
 nav_links = [
-  {url = "$BASE_URL/about", name = "about"},
-  {url = "$BASE_URL/", name = "blog"},
+  {url = "$BASE_URL", name = "about"},
+  {url = "$BASE_URL/blog", name = "blog"},
   {url = "$BASE_URL/projects", name = "projects"},
   {url = "https://bin.wantguns.dev/cv", name = "resume"},
   {url = "$BASE_URL/atom.xml", name = "rss"},
