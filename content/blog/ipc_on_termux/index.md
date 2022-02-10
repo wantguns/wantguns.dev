@@ -13,13 +13,16 @@ has to be the fastest it can, every millisecond counts in a single loop.
 Which is why we turned to ZeroMQ for handling all the networking between
 different services. ZeroMQ is battle-tested, extremely fast and supports
 a whole variety of platforms.   
+
 ZMQ has a Java implementation,
 [JeroMQ](https://github.com/zeromq/jeromq) which is a complete rewrite
 of ZMQ in Java. It would be our first choice, but it does not support
 many protocols due to their lack of implementations in Java, and IPC is
 one of it.   
+
 But as justified earlier, we could not afford to have our messages go
 through the entire TCP stack, IPCs are just simpler and much faster.   
+
 Fortunately, there exists [JZMQ](https://github.com/zeromq/jzmq%20) ,
 the Java bindings for libzmq. I gotta mention that using it on our apps
 introduced more complexity, due to lack of packages for different
@@ -31,16 +34,16 @@ environment FlowPilot works in.
 
 ## Termux
 
-Not everything we write is in Java. Some services can have the liberty
-to be written in much slower languages like Python. We run those
-services inside Termux, an Android app which gives us a unix-like
-userland on Android.    One of the key softwares I worked with was an
-init-system / process-manager for FlowPilot -- `FlowInit`. FlowInit is
-written in Python, and therefore has to start in Termux.   
-FlowInit communicates with FlowPilot over Pub/Sub and Req/Rep. Some
-communications are sensitive and making them over TCP would increase the
-attack vector substantially.    
-This was the perfect time to utilise IPC.   
+Not everything we write is in Java. Some services can have the liberty to be
+written in much slower languages like Python. We run those services inside
+Termux, an Android app which gives us a unix-like userland on Android. One of
+the key softwares I worked with was an init-system / process-manager for
+FlowPilot -- `FlowInit`. 
+
+FlowInit is written in Python, and therefore has to start in Termux. FlowInit
+communicates with FlowPilot over Pub/Sub and Req/Rep. Some communications are
+sensitive and making them over TCP would increase the attack vector
+substantially. This was the perfect time to utilise IPC.   
 
  ### IPC b/w Termux and Android
  
@@ -86,9 +89,11 @@ make: *** [Makefile:30: run] Error 1
 ```
 
 I cross-checked with the PyZMQ repository, this error was not explicitly
-defined.   
+defined.
+
 Then I checked with the libzmq codebase, this error was again not
 explicitly defined.   
+
 Finally I went on to systrace'ing this:   
 
 ```bash
@@ -141,14 +146,17 @@ Linux --
    
 An Abstract socket address is distinguished from a Filesystem socket by
 setting `sun_path[0]` to a null byte `\0`.   
+
 Since any form of thin virtualisation like chroot, proot, whatever
 Termux does, bind-mount the `/dev` , `/sys`  and `/proc` pseudo
 filesystems on their userland, Abstract namespaced addresses would solve
 the notion of having a shared filesystem between Android and Termux by
 completely eliminating it on a deeper level.   
+
 We could just make an Abstract IPC socket with the same name on both
 Termux and an Android app, and both would look for a file with the of
 the socket under `/proc/net/unix` .   
+
 Who needs block-based filesystems when the Kernel's synthetic
 filesystems are so versatile.   
 
@@ -164,6 +172,7 @@ Before implementing my hypothesis, I cross-checked Android docs if
 somehow their security policies block this behavior and I found that
 Android says that it blocks app-level access to
 `/proc/net/unix`[^fourth].
+
 I quickly coded the Android app, and assigned new hosts with the
 Abstract namespaces for the sockets to connect to.    
    
