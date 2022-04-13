@@ -397,12 +397,21 @@ hr {
         line-height: 1.58;
         letter-spacing: -0.02em;
 
-        font-size: 0.85rem;
+        font-size: 0.7rem;
         margin: 0rem;
         margin-right: 0.5rem;
     }
+
 	p {
 		margin: 0rem;
 		margin-bottom: 1rem;
+
+        .footnote-backlink {
+            margin: 0rem;
+            margin-left: 0.5rem;
+
+            color: $uLinkColor;
+            text-decoration: none;
+        }
 	}
 }
