@@ -383,6 +383,24 @@ hr {
 }
 
 .footnote-definition {
+    display:flex; 
+    flex-direction: row;
+    font-size: 0.85rem;
+    sup {
+        all: initial; // have to fight with the markdown parsing
+        color: $textColor;
+        text-rendering: optimizeLegibility;
+        font-variant-ligatures: contextual;
+        font-family: "Inter", sans-serif;
+        font-weight: 450;
+        font-size: 1rem;
+        line-height: 1.58;
+        letter-spacing: -0.02em;
+
+        font-size: 0.85rem;
+        margin: 0rem;
+        margin-right: 0.5rem;
+    }
 	p {
 		margin: 0rem;
 		margin-bottom: 1rem;
