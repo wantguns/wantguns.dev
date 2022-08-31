@@ -39,25 +39,25 @@
   {{ page.content | safe }}
 </article>
 
-{% if page.earlier or page.later %}
+{% if page.lower or page.higher %}
   <div class="pagination_title">
     <span>Read other posts</span>
   </div>
   <div class="post_nav">
-      {% if page.later %}
+      {% if page.higher %}
         <div class="button">
-          <a class="button" href="{{ page.later.permalink }}">
+          <a class="button" href="{{ page.higher.path }}">
             ←&nbsp;
             <span class="next">
-              {{ page.later.title }}
+              {{ page.higher.title }}
             </span>
           </a>
         </div>
       {% endif %}
-      {% if page.earlier %}
+      {% if page.lower %}
         <div class="button">
-          <a class="button" href="{{ page.earlier.permalink }}">
-            <span class="previous">{{ page.earlier.title }}</span>
+          <a class="button" href="{{ page.lower.path }}">
+            <span class="previous">{{ page.lower.title }}</span>
             &nbsp;→
           </a>
         </div>
