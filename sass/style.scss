@@ -1,5 +1,9 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;900&display=swap");
-@import url("https://pvinis.github.io/iosevka-webfont/7.0.2/iosevka.css");
+@import url("/fonts/iosevka-term-ss15.css");
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/variable/Inter-VariableFont_slnt,wght.ttf') format("truetype-variations");
+  font-weight: 1 999;
+}
 
 $bgColor: #000;
 $textColor: rgba(255, 255, 255, 0.8);
@@ -11,6 +15,12 @@ $darkGreyColor: #202020;
 $selectionColor: #333;
 $codeBGColor: #fbcb970c;
 $codeColor: #919191;
+
+$serifFontFamily: "PT Serif", Georgia, Times, "Times New Roman", serif;
+$sansSerifFontFamily: "Inter", sans-serif;
+$monospaceFontFamily: "Iosevka Term SS15 Web", monospace;
+
+$nonMonospaceFontFamily: $sansSerifFontFamily;
 
 :root {
 	color-scheme: dark;
@@ -25,11 +35,11 @@ body {
 	text-rendering: optimizeLegibility;
 	font-variant-ligatures: contextual;
 
-	font-family: "Inter", sans-serif;
-	font-weight: 450;
-	font-size: 1rem;
-	line-height: 1.58;
-	letter-spacing: -0.02em;
+	font-family: $serifFontFamily;
+	font-weight: 400;
+	font-size: 16px;
+	line-height: 1.5;
+	// letter-spacing: -0.02em;
 }
 
 h1,
@@ -39,7 +49,7 @@ h4,
 h5,
 h6 {
 	color: $uLinkColor;
-	font-family: "Inter", sans-serif;
+	font-family: $sansSerifFontFamily;
 	font-weight: 900;
 }
 
@@ -88,7 +98,7 @@ a {
 		}
 		text-decoration: none;
 		font-weight: bold;
-		font-family: "Inter", sans-serif;
+		font-family: $sansSerifFontFamily;
 		color: $uLinkColor;
 	}
 	code {
@@ -136,10 +146,10 @@ header {
 }
 
 code {
-	font-family: "Iosevka Web", monospace;
+	font-family: $monospaceFontFamily;
 	letter-spacing: normal;
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
+	// padding-left: 0.25rem;
+	// padding-right: 0.25rem;
 	color: $codeColor;
 	a {
 		text-decoration-color: $codeColor;
@@ -147,9 +157,9 @@ code {
 }
 
 pre {
-	font-size: 1rem;
-	font-family: "Iosevka Web", monospace;
-	font-weight: 450;
+	font-size: 15px;
+	font-family: $monospaceFontFamily;
+	font-weight: 500;
 	letter-spacing: normal;
 	line-height: 1.5;
 	overflow: auto;
@@ -323,6 +333,7 @@ footer {
 
 // inline toc
 #toc-inline {
+	font-family: $sansSerifFontFamily;
 	padding: 1.25rem 0rem 0.5rem 0rem;
 	summary {
 		&:hover {
@@ -334,6 +345,7 @@ footer {
 
 // aside toc
 #toc-aside {
+	font-family: $sansSerifFontFamily;
 	display: block;
 	width: 15rem;
 	position: sticky;
@@ -391,7 +403,7 @@ hr {
         color: $textColor;
         text-rendering: optimizeLegibility;
         font-variant-ligatures: contextual;
-        font-family: "Inter", sans-serif;
+        font-family: $nonMonospaceFontFamily;
         font-weight: 450;
         font-size: 1rem;
         line-height: 1.58;
