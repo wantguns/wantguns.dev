@@ -1,7 +1,12 @@
 @import url("/fonts/iosevka-term-ss15.css");
+// @font-face {
+//   font-family: 'Inter';
+//   src: url('/fonts/variable/Inter-VariableFont_slnt,wght.ttf') format("truetype-variations");
+//   font-weight: 1 999;
+// }
 @font-face {
-  font-family: 'Inter';
-  src: url('/fonts/variable/Inter-VariableFont_slnt,wght.ttf') format("truetype-variations");
+  font-family: 'Literata';
+  src: url('/fonts/variable/Literata-VariableFont_opsz,wght.ttf') format("truetype-variations");
   font-weight: 1 999;
 }
 
@@ -16,8 +21,8 @@ $selectionColor: #333;
 $codeBGColor: #fbcb970c;
 $codeColor: #919191;
 
-$serifFontFamily: "PT Serif", Georgia, Times, "Times New Roman", serif;
-$sansSerifFontFamily: "Inter", sans-serif;
+$serifFontFamily: "Literata", "PT Serif", Georgia, Times, "Times New Roman", serif;
+$sansSerifFontFamily: "Literata", "Inter", sans-serif;
 $monospaceFontFamily: "Iosevka Term SS15 Web", monospace;
 
 $nonMonospaceFontFamily: $sansSerifFontFamily;
@@ -37,9 +42,9 @@ body {
 
 	font-family: $serifFontFamily;
 	font-weight: 400;
-	font-size: 16px;
-	line-height: 1.5;
-	// letter-spacing: -0.02em;
+	font-size: 16.5px;
+	line-height: 1.6;
+	letter-spacing: -0.02em;
 }
 
 h1,
@@ -157,13 +162,14 @@ code {
 }
 
 pre {
-	font-size: 15px;
+	font-size: 16px;
 	font-family: $monospaceFontFamily;
 	font-weight: 500;
 	letter-spacing: normal;
 	line-height: 1.5;
 	overflow: auto;
 	border: thin solid $darkGreyColor;
+	margin: 2rem 0rem;
 	padding: 1.5rem;
 	background-color: $bgColor;
 	code {
@@ -185,6 +191,7 @@ td {
 
 img {
 	height: auto;
+	margin: 2rem 0rem;
 	max-width: 100%;
 }
 
