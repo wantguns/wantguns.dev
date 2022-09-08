@@ -14,8 +14,8 @@ $vLinkColor: $textColor;
 $greyColor: #888888;
 $darkGreyColor: #202020;
 $selectionColor: #333;
-$codeBGColor: #fbcb970c;
-$codeColor: #919191;
+$codeBGColor: rgba(251, 203, 151, 0.175);
+$codeColor: rgba(251, 203, 151, 0.825);
 
 $serifFontFamily: "Georgia", "Times", serif;
 $sansSerifFontFamily: "Literata", sans-serif;
@@ -150,8 +150,9 @@ header {
 code {
 	font-family: $monospaceFontFamily;
 	letter-spacing: normal;
-	// padding-left: 0.25rem;
-	// padding-right: 0.25rem;
+	background-color: $codeBGColor;
+	padding-left: 0.25rem;
+	padding-right: 0.25rem;
 	color: $codeColor;
 	a {
 		text-decoration-color: $codeColor;
@@ -161,7 +162,7 @@ code {
 pre {
 	font-size: 16px;
 	font-family: $monospaceFontFamily;
-	font-weight: 500;
+	font-weight: 400;
 	letter-spacing: normal;
 	line-height: 1.5;
 	overflow: auto;
@@ -170,6 +171,7 @@ pre {
 	padding: 1.5rem;
 	background-color: $bgColor;
 	code {
+		padding: initial;
 		color: inherit;
 		background-color: inherit;
 	}
