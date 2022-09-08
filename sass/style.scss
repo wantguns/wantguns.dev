@@ -7,7 +7,7 @@
 }
 
 $bgColor: #000;
-$textColor: rgba(255, 255, 255, 0.8);
+$textColor: rgba(255, 255, 255, 0.825);
 $headColor: #e78a53;
 $uLinkColor: #fbcb97;
 $vLinkColor: $textColor;
@@ -17,8 +17,8 @@ $selectionColor: #333;
 $codeBGColor: #fbcb970c;
 $codeColor: #919191;
 
-$serifFontFamily: "Literata", "PT Serif", Georgia, Times, "Times New Roman", serif;
-$sansSerifFontFamily: "Literata", "Inter", sans-serif;
+$serifFontFamily: "Georgia", "Times", serif;
+$sansSerifFontFamily: "Literata", sans-serif;
 $monospaceFontFamily: "Iosevka Term SS15 Web", monospace;
 
 $nonMonospaceFontFamily: $sansSerifFontFamily;
