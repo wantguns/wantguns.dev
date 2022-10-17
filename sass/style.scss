@@ -10,7 +10,8 @@ $codeBGColor: rgba(251, 203, 151, 0.175);
 $codeColor: rgba(251, 203, 151, 0.825);
 
 $serifFontFamily: "Georgia", "Times", serif;
-$sansSerifFontFamily: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+$sansSerifFontFamily: $serifFontFamily;
+// $sansSerifFontFamily: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 $monospaceFontFamily: ui-monospace, // San Francisco Mono on macOS and iOS
     "Cascadia Mono", "Segoe UI Mono", // Newer Windows monospace fonts that are optionally installed. Most likely to be rendered in Consolas
     "Ubuntu Mono", // Ubuntu
@@ -19,7 +20,7 @@ $monospaceFontFamily: ui-monospace, // San Francisco Mono on macOS and iOS
     monospace; // The final fallback for rendering in monospace.
 
 
-$nonMonospaceFontFamily: $sansSerifFontFamily;
+$nonMonospaceFontFamily: $serifFontFamily;
 
 :root {
 	color-scheme: dark;
@@ -38,7 +39,6 @@ body {
 	font-weight: 400;
 	font-size: 16.5px;
 	line-height: 1.6;
-	letter-spacing: -0.02em;
 }
 
 h1,
@@ -53,6 +53,7 @@ h6 {
 }
 
 h1.page_title {
+	letter-spacing: -1px;
 	font-weight: 900;
 	font-size: 250%;
 	line-height: normal;
