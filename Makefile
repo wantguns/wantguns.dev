@@ -1,5 +1,4 @@
-# LOCAL_IP_ADDR := 172.30.154.80
-LOCAL_IP_ADDR := tardis
+LOCAL_IP_ADDR := saiph
 
 serve:
 	zola serve -i 0.0.0.0 -u $(LOCAL_IP_ADDR)
