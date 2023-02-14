@@ -97,6 +97,9 @@ a {
 		&:hover {
 			text-decoration: underline;
 		}
+
+		flex: 1;
+		word-wrap: break-word;
 		text-decoration: none;
 		font-weight: bold;
 		font-family: $sansSerifFontFamily;
@@ -202,7 +205,7 @@ img {
 	li {
 		align-items: center;
 		display: flex;
-		flex-wrap: wrap;
+		flex-wrap: nowrap;
 		justify-content: space-between;
 		margin-bottom: 10px;
 	}

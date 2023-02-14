@@ -1,7 +1,7 @@
 {% macro post_in_list(post) %}
 <li>
-  <a class="homepage-list_title" href="{{ post.permalink | safe }}">{{ post.title }}</a>
-  <time class="site_time" datetime="{{ post.date | date(format="%+") }}">{{ post.date | date(format="%B %d, %Y") }}</time>
+    <a class="homepage-list_title" href="{{ post.permalink | safe }}">{{ post.title }}</a>
+    <time class="site_time" datetime="{{ post.date | date(format="%+") }}">{{ post.date | date(format="%B %d, %Y") }}</time>
 </li>
 {% endmacro post_in_list %}
 
