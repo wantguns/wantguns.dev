@@ -16,4 +16,5 @@ learn.
   - GPG Key ID: `0x1D006626C5CDEC8A`
 - Telegram: [wantguns](https://t.me/wantguns)
 - Linkedin: [Gunwant Jain](https://www.linkedin.com/in/gunwant-jain/)
+- Mastodon: <a rel="me" href="https://mstdn.social/@wantguns">@wantguns@mstdn.social</a>
 - Matrix: `@wantguns:matrix.org`
