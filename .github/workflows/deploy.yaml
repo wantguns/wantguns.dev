@@ -12,7 +12,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@master
     - name: Deploy
-      uses: shalzz/zola-deploy-action@v0.16.1-1
+      uses: shalzz/zola-deploy-action@master
       env:
         PAGES_BRANCH: pages
         BUILD_DIR: .
