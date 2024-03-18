@@ -99,7 +99,16 @@
     {% endblock after_main %}
 
     <footer class=center>
-      <sub>© 2023 &middot; Gunwant Jain</sub>
+      <sub>
+        <div>
+            &copy;
+            <span id="copyright">
+                <script>document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))</script>
+            </span>
+            &middot;
+            Gunwant Jain
+        </div>
+      </sub>
     </footer>
   </body>
   {% block scripts %}
