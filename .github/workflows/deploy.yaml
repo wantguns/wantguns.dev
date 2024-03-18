@@ -17,4 +17,4 @@ jobs:
         PAGES_BRANCH: pages
         BUILD_DIR: .
         BUILD_FLAGS: --drafts
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
