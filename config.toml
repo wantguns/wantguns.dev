@@ -3,7 +3,7 @@ description = "Gunwant Jain's (@wantguns) place in the internet"
 title = "Gunwant Jain - @wantguns"
 
 compile_sass = true
-generate_feed = true
+generate_feeds = true
 
 taxonomies = [
     {name = "tags", feed = true},
