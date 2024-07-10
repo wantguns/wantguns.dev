@@ -5,7 +5,7 @@ notoc = true
 +++
 
 I am Gunwant, also mostly aliased as `wantguns`.  
-I am a student developer experienced in Android (not just the apps), Web
+I am a software engineer experienced in Android (not just the apps), Web
 Development and System Administration in Linux.  
 Sometimes I write blogs on my debugging expeditions with little new to
 learn. 
