@@ -798,7 +798,7 @@ nix run .#deploy -- mintaka true
 
 ## Future
 
-I have uploaded these files on my [github](https://github/wantguns/dotfiles). I
+I have uploaded these files on my [github](https://github.com/wantguns/dotfiles). I
 will keep tracking them and hopefully make abstractions for easier syncing if
 necessary.
 
