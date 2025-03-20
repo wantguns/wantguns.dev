@@ -1,5 +1,4 @@
-+++
-title = "Setting up my homelab and cloud with Nix"
++++ title = "Setting up my homelab and cloud with Nix"
 date = "2025-03-04"
 [taxonomies]
 tags = ["yakshaving", "selfhosting", "nix"]
@@ -34,7 +33,7 @@ needs, and I have realised:
   dotfiles on new hosts.
 - I am fine with running NixOS as my userland. I can also run nix-darwin
   on Macbooks.
-- I am going to handle all the hardware and os-level configuration to
+- I am going to hand over all the hardware and os-level configuration to
   Nix, and will use a deployment tool like deploy-rs.
 - I want all of my nodes to form a mesh, preferrably using wireguard,
   and preferrably not using proprietary tools like Tailscale, need to
@@ -59,4 +58,5 @@ keep updating:
 - [x] [Home Manager](/homemanager)
 - [x] [Nix Darwin](/nixdarwin)
 - [x] [Single Flake Multiple Hosts](/nixmultihost)
+    - files available on [github](https://github/wantguns/dotfiles)
 - [ ] Setting up Mintaka and sops

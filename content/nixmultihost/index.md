@@ -798,6 +798,10 @@ nix run .#deploy -- mintaka true
 
 ## Future
 
+I have uploaded these files on my [github](https://github/wantguns/dotfiles). I
+will keep tracking them and hopefully make abstractions for easier syncing if
+necessary.
+
 Since we now have a good abstraction for our hosts, I am going to start
 using this flake alongside nixos-anywhere and nixos-infect to start
 installing nix on my servers. The plan is to onboard them and build a
