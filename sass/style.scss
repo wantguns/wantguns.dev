@@ -149,7 +149,7 @@ code {
 	background-color: $codeBGColor;
 	padding-left: 0.25rem;
 	padding-right: 0.25rem;
-	font-size: 14px;
+	font-size: 14.5px;
 	color: $codeColor;
 	a {
 		text-decoration-color: $codeColor;
@@ -168,29 +168,12 @@ pre {
 	padding: 1.5rem;
 	background-color: $bgColor;
 	code {
-		font-size: 13.5px;
+		font-size: 14px;
 		padding: initial;
 		color: inherit;
 		background-color: inherit;
 	}
 
-	// /* Create a wrapper for the scrollable content */
-	// &::before {
-	// 	content: "";
-	// 	position: absolute;
-	// 	top: 0;
-	// 	right: 0;
-	// 	height: 40px;
-	// 	width: 70px;
-	// 	background-color: $bgColor;
-	// 	border-left: thin solid $darkGreyColor;
-	// 	border-bottom: thin solid $darkGreyColor;
-	// 	z-index: 2;
-	// }
-
-	overflow-x: auto;
-	overflow-y: auto;
-	
 	.copy-button {
 		position: absolute;
 		top: 8px;
@@ -207,11 +190,11 @@ pre {
 		opacity: 0.8;
 		transition: all 0.2s ease;
         z-index: 3; /* Ensure button stays above the background */
-		
+
 		&:hover {
 			opacity: 1;
 		}
-		
+
 		&.copied {
             border: thin solid $uLinkColor;
 		}
