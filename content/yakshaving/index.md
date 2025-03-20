@@ -1,9 +1,10 @@
-+++ title = "Setting up my homelab and cloud with Nix"
++++
+title = "Setting up my homelab and cloud with Nix"
 date = "2025-03-04"
 [taxonomies]
 tags = ["yakshaving", "selfhosting", "nix"]
 +++
----
+
 
 I have been maintaining a set of cloud servers, for the purpose of
 selfhosting a ton of software, VPNs, and random experimentation.

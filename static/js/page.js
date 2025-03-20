@@ -69,6 +69,15 @@ const addCopyButtons = () => {
   const preElements = document.querySelectorAll('pre');
 
   preElements.forEach(pre => {
+    // Create a wrapper div that will contain both the pre and the button
+    const wrapper = document.createElement('div');
+    wrapper.className = 'pre-wrapper';
+    wrapper.style.position = 'relative';
+    
+    // Replace the pre with the wrapper
+    pre.parentNode.insertBefore(wrapper, pre);
+    wrapper.appendChild(pre);
+    
     // Create the copy button
     const copyButton = document.createElement('button');
     copyButton.className = 'copy-button';
@@ -103,7 +112,7 @@ const addCopyButtons = () => {
         });
     });
 
-    // Add the button to the pre element
-    pre.appendChild(copyButton);
+    // Add the button to the wrapper (not the pre)
+    wrapper.appendChild(copyButton);
   });
 }
