@@ -5,6 +5,7 @@ window.onload = function () {
     window.onscroll = function () { toc_scroll_position(container) };
   }
   addBackLinks();
+  addCopyButtons();
 }
 
 function toc_scroll_position(container) {
@@ -63,3 +64,46 @@ const addBackLinks = () => {
   }
 }
 
+// This adds copy buttons to all code blocks
+const addCopyButtons = () => {
+  const preElements = document.querySelectorAll('pre');
+
+  preElements.forEach(pre => {
+    // Create the copy button
+    const copyButton = document.createElement('button');
+    copyButton.className = 'copy-button';
+    copyButton.textContent = 'copy';
+
+    // Add click event listener
+    copyButton.addEventListener('click', () => {
+      // Get the code content
+      const code = pre.querySelector('code');
+      const textToCopy = code ? code.textContent : pre.textContent;
+
+      // Copy to clipboard
+      navigator.clipboard.writeText(textToCopy)
+        .then(() => {
+          // Visual feedback
+          copyButton.textContent = 'copied!';
+          copyButton.classList.add('copied');
+
+          // Reset after 2 seconds
+          setTimeout(() => {
+            copyButton.textContent = 'copy';
+            copyButton.classList.remove('copied');
+          }, 2000);
+        })
+        .catch(err => {
+          console.error('Failed to copy text: ', err);
+          copyButton.textContent = 'error!';
+
+          setTimeout(() => {
+            copyButton.textContent = 'copy';
+          }, 2000);
+        });
+    });
+
+    // Add the button to the pre element
+    pre.appendChild(copyButton);
+  });
+}

@@ -157,6 +157,7 @@ code {
 }
 
 pre {
+	position: relative;
 	font-family: $monospaceFontFamily;
 	font-weight: 400;
 	letter-spacing: normal;
@@ -171,6 +172,49 @@ pre {
 		padding: initial;
 		color: inherit;
 		background-color: inherit;
+	}
+
+	// /* Create a wrapper for the scrollable content */
+	// &::before {
+	// 	content: "";
+	// 	position: absolute;
+	// 	top: 0;
+	// 	right: 0;
+	// 	height: 40px;
+	// 	width: 70px;
+	// 	background-color: $bgColor;
+	// 	border-left: thin solid $darkGreyColor;
+	// 	border-bottom: thin solid $darkGreyColor;
+	// 	z-index: 2;
+	// }
+
+	overflow-x: auto;
+	overflow-y: auto;
+	
+	.copy-button {
+		position: absolute;
+		top: 8px;
+		right: 8px;
+		color: $uLinkColor;
+		background-color: $bgColor;
+        border: thin solid $darkGreyColor;
+		width: 60px;
+		height: 28px;
+		padding: 5px 10px;
+		font-size: 12px;
+		font-family: $sansSerifFontFamily;
+		cursor: pointer;
+		opacity: 0.8;
+		transition: all 0.2s ease;
+        z-index: 3; /* Ensure button stays above the background */
+		
+		&:hover {
+			opacity: 1;
+		}
+		
+		&.copied {
+            border: thin solid $uLinkColor;
+		}
 	}
 }
 
