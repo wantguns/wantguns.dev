@@ -2,9 +2,8 @@
 {% extends "index.html" %}
 
 {% block content %}
-<ul class="homepage-list">
-  {% for post in section.pages %}
-    {{ macros::post_in_list(post=post) }}
-  {% endfor %}
-</ul>
+    <h1 class="page_title">{{ section.title }}</h1>
+    <article>
+      {{ section.content | safe }}
+    </article>
 {% endblock content %}

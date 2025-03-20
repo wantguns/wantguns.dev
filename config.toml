@@ -1,5 +1,5 @@
 base_url = "https://wantguns.dev"
-description = "Gunwant Jain's (@wantguns) place in the internet"
+description = "Gunwant Jain's (@wantguns) writings and musings"
 title = "Gunwant Jain - @wantguns"
 
 compile_sass = true
@@ -23,9 +23,9 @@ keywords = "Gunwant Jain, wantguns, Gunwant, WantGuns"
 seo = true
 
 nav_links = [
-  {url = "$BASE_URL", name = "about"},
-  {url = "$BASE_URL/blog", name = "blog"},
-  # {url = "$BASE_URL/projects", name = "projects"},
+  {url = "$BASE_URL/about", name = "about"},
+  {url = "$BASE_URL", name = "blog"},
+  {url = "$BASE_URL/tags", name = "tags"},
   {url = "https://bin.wantguns.dev/cv", name = "resume"},
   {url = "$BASE_URL/atom.xml", name = "rss"},
 ]

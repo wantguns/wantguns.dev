@@ -56,6 +56,7 @@ work's server.
 I am going to start blogging about my journey, here is timeline i'll
 keep updating:
 
-- [x] [Home Manager](/blog/homemanager)
-- [x] [Nix Darwin](/blog/nixdarwin)
-- [x] [Single Flake Multiple Hosts](/blog/nixmultihost)
+- [x] [Home Manager](/homemanager)
+- [x] [Nix Darwin](/nixdarwin)
+- [x] [Single Flake Multiple Hosts](/nixmultihost)
+- [ ] Setting up Mintaka and sops

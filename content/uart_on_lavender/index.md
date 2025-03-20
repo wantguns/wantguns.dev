@@ -6,7 +6,7 @@ date = "2020-06-02"
 tags = ["android", "gsoc2020", "sharkbait"]
 +++
 
-This blog is a short sequel to my previous [blog](@/blog/android_boot_high_jinks/index.md) where I discussed why I needed to access a serial console on Redmi Note 7 (I'll refer to it using its codename, lavender here onwards). I should give a disclaimer that this blog is one dead-end in the GSoC2020 series. But it could always help newcomers and other curious souls.
+This blog is a short sequel to my previous [blog](@/android_boot_high_jinks/index.md) where I discussed why I needed to access a serial console on Redmi Note 7 (I'll refer to it using its codename, lavender here onwards). I should give a disclaimer that this blog is one dead-end in the GSoC2020 series. But it could always help newcomers and other curious souls.
 
 ---
 ## The Need of a Serial Console

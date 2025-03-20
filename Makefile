@@ -1,4 +1,4 @@
-LOCAL_IP_ADDR := saiph
+LOCAL_IP_ADDR := 127.0.0.1
 
 serve:
 	zola serve -i 0.0.0.0 -u $(LOCAL_IP_ADDR)

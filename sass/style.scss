@@ -1,5 +1,5 @@
 $bgColor: #000;
-$textColor: rgba(255, 255, 255, 0.825);
+$textColor: rgba(255, 255, 255, 0.9);
 $headColor: #e78a53;
 $uLinkColor: #fbcb97;
 $vLinkColor: $textColor;
@@ -7,7 +7,7 @@ $greyColor: #888888;
 $darkGreyColor: #202020;
 $selectionColor: #333;
 $codeBGColor: rgba(251, 203, 151, 0.175);
-$codeColor: rgba(251, 203, 151, 0.825);
+$codeColor: rgba(251, 203, 151, 0.9);
 
 $serifFontFamily:  Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
 $sansSerifFontFamily: $serifFontFamily;
@@ -73,6 +73,9 @@ a {
 	}
 
 	&.site_title {
+		&:hover {
+			text-decoration: underline;
+		}
 		text-decoration: none;
 		margin-bottom: 0.2rem;
 		color: $headColor;
@@ -102,6 +105,13 @@ a {
 	code {
 		text-decoration-color: $codeColor;
 	}
+
+    &.footer {
+      color: $greyColor;
+      &:hover {
+          color: $uLinkColor;
+      }
+    }
 }
 
 .pipe {

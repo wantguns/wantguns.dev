@@ -25,13 +25,13 @@ rendered SharkBait's original boot order non functional for all devices
 shipping with Android 9. \
 The first month of my work revolved around porting SharkBait to SAR
 based devices. I succeeded in doing so, and wrote blogs about it:
-- [**Android Boot High Jinks**](@/blog/android_boot_high_jinks/index.md) \
+- [**Android Boot High Jinks**](@/android_boot_high_jinks/index.md) \
     In this blog we discuss the different approaches at booting
     Android, Google has experimented with.
-- [**Booting Gentoo from SAR-Preinit**](@/blog/booting_gentoo_using_preinit/index.md) \
+- [**Booting Gentoo from SAR-Preinit**](@/booting_gentoo_using_preinit/index.md) \
     This blog showcases how I patched my phone's kernel in order to
     boot Gentoo on my phone.
-- [**Starting System-as-Root Android in a LXC container**](@/blog/starting_android_in_gentoo/index.md) \
+- [**Starting System-as-Root Android in a LXC container**](@/starting_android_in_gentoo/index.md) \
     This blog is the first class guide for launching SharkBait in
     System-As-Root devices. 
 
@@ -53,7 +53,7 @@ AOSP uses. I was stuck on compiling and testing my modified scripts till
 the second month, when my mentor generously set up a beefy AArch64
 server for me. I succeeded in delivering that toolchain. Related sources
 are:
-- [**Building Android: BTS**](@/blog/build_android/index.md) \
+- [**Building Android: BTS**](@/build_android/index.md) \
     In this blog, I look what events get triggered under the hood when
     we build Android, as to seek insight on breaking down Android later.
 - [**Toolchain_LLVM_Android**](https://github.com/WantGuns/toolchain_llvm_android) \

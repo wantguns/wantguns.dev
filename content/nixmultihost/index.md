@@ -660,9 +660,9 @@ nix run nixpkgs#nixos-rebuild -- switch --flake .#"hostname"
 
 I also want the ability to execute these commands remotely and push
 changes remotely to all my hosts. There are a few tools which are
-popular - `deploy-rs`, `colemna`, `clan.lol`. I tried each of them and found
+popular - `deploy-rs`, `colmena`, `clan.lol`. I tried each of them and found
 out that:  
-- **Colemna** does not support hosts of different systems in the same flake ([issue](https://matrix.to/#/#colmena:nixos.org/$zmv3rJLkqDapZUTVuH3QFtZnw7f8wgz8FbKI9srWFN8))  
+- **Colmena** does not support hosts of different systems in the same flake ([issue](https://matrix.to/#/#colmena:nixos.org/$zmv3rJLkqDapZUTVuH3QFtZnw7f8wgz8FbKI9srWFN8))  
 - **Deploy-rs** does not support **building on remote**, it only supports copying the build artifacts to remote ([issue](https://github.com/serokell/deploy-rs/issues/300))  
 - **Clan.lol** is too restrictive for my taste  
 

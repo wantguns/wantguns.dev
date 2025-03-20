@@ -56,29 +56,20 @@
 
   <body>
     <main id="main" role="main">
-
       {% block header %}
       <header role="banner">
-        <h2 style="margin-top:100;">
-          <b><a class="site_title" href="{{ config.base_url | safe }}" title="Home" >{{ config.extra.author }}</a></b>
-          <br/>
-          <small>
-            <small>
-              {% block nav %}
-                {% if config.extra.nav_links %}
-                <nav style="margin-bottom:1rem;" role="navigation">
-                  {% for item in config.extra.nav_links %}
-                    <a class="site_nav" href="{{ item.url | replace(from="$BASE_URL", to=config.base_url) | safe }}">{{ item.name }}</a>
-                    {% if loop.last %}{% else %}
-                      <span>&nbsp</span>
-                    {% endif %}
-                  {% endfor %}
-                </nav>
+          {% block nav %}
+            {% if config.extra.nav_links %}
+            <nav style="margin-bottom:1rem;" role="navigation">
+              {% for item in config.extra.nav_links %}
+                <a class="site_nav" href="{{ item.url | replace(from="$BASE_URL", to=config.base_url) | safe }}">{{ item.name }}</a>
+                {% if loop.last %}{% else %}
+                  <span>&nbsp</span>
                 {% endif %}
-              {% endblock nav %}
-            </small>
-          </small>
-        </h2>
+              {% endfor %}
+            </nav>
+            {% endif %}
+          {% endblock nav %}
       </header>
       {% endblock header %}
 
@@ -86,10 +77,11 @@
     <div>
 
       {% block content %}
-        <h1 class="page_title">{{ section.title }}</h1>
-        <article>
-          {{ section.content | safe }}
-        </article>
+        <ul class="homepage-list">
+          {% for post in section.pages %}
+            {{ macros::post_in_list(post=post) }}
+          {% endfor %}
+        </ul>
       {% endblock content %}
 
     </div>
@@ -106,7 +98,7 @@
                 <script>document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))</script>
             </span>
             &middot;
-            Gunwant Jain
+            {{ config.extra.author }}. Built <a class="footer" href="https://github.com/wantguns/wantguns.dev">openly</a> with <a class="footer" href="https://www.getzola.org">Zola</a>
         </div>
       </sub>
     </footer>

@@ -7,7 +7,7 @@ tags = ["android", "gsoc2020", "sharkbait"]
 +++
 
 As I progress in my GSoC journey, my next task is to boot System-As-Root based Android in an LXC container inside Gentoo. As the name suggests, SAR devices use /system as their rootdir instead of /boot. SharkBait was based on the older booting mechanism.
-If you would want to know more about Android's Booting mechanism, I would recommend to have a look at this [blog](@/blog/android_boot_high_jinks/index.md).
+If you would want to know more about Android's Booting mechanism, I would recommend to have a look at this [blog](@/android_boot_high_jinks/index.md).
 
 Basically if you own a device that **_shipped_** with Android 9 (even the ones which are updated to Android 10) you would want to follow this guide.
 
@@ -15,7 +15,7 @@ Basically if you own a device that **_shipped_** with Android 9 (even the ones w
 
 ## Prerequisites
 This setup expects some prerequisites which are as follows:
-1. Have Gentoo installed as a chroot in your Android device. [guide](@/blog/install_gentoo/index.md)
+1. Have Gentoo installed as a chroot in your Android device. [guide](@/install_gentoo/index.md)
 2. You should have a LXC enabled Kernel. [guide](https://wiki.gentoo.org/wiki/LXC#Kernel_with_the_appropriate_LXC_options_enabled)
 3. You should have encryption disabled on your phone. [guide](https://github.com/Zackptg5/Disable_Dm-Verity_ForceEncrypt)
 4. You should have SELinux disabled.
