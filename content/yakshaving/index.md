@@ -60,4 +60,5 @@ keep updating:
 - [x] [Nix Darwin](/nixdarwin)
 - [x] [Single Flake Multiple Hosts](/nixmultihost)
     - files available on [github](https://github.com/wantguns/dotfiles)
-- [ ] Setting up Mintaka and sops
+- [x] [Setting up Mintaka and Bellatrix](/nixos-anywhere)
+- [ ] Setting up a Wireguard network
