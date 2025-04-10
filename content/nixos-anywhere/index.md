@@ -18,8 +18,8 @@ and works well with
 the hardware configuration and [disko](https://github.com/nix-community/disko)
 for declarative disk layout management.
 
-It is meant to be run once and if successful you are left with your
-desired NixOS configured according to your `nixosSystem`.
+It is meant to run once and if successful you are left with your
+desired NixOS configured according to your `nixosConfigurations`.
 
 ## Setting up my physical homeserver
 
