@@ -5,8 +5,6 @@ date = "2025-04-10"
 tags = ["yakshaving", "selfhosting", "nix"]
 +++
 
-# nixos-anywhere
-
 `nixos-anywhere` is a cool tool which can be used to installed nixos on:
 - an existing linux installation using kexec
 - a baremetal machine
