@@ -186,9 +186,6 @@ It worked !
 
 [^second]: [Wayback Machine](https://web.archive.org/web/20200209211732/http://web.eecs.umich.edu/~yurushao/pubs/sinspector_ccs2016.pdf)    
 
-[^third]: 
-[Source](https://github.com/zeromq/libzmq/blob/a01d259db372bff5e049aa966da4efce7259af67/src/ipc_address.cpp#L59)  
-[Man Page](http://api.zeromq.org/4-1:zmq-ipc), which I read after solving everything :(
+[^third]: [Source](https://github.com/zeromq/libzmq/blob/a01d259db372bff5e049aa966da4efce7259af67/src/ipc_address.cpp#L59)  [Man Page](http://api.zeromq.org/4-1:zmq-ipc), which I read after solving everything :(
 
-[^fourth]:
-[Android docs](https://developer.android.com/about/versions/10/privacy/changes#proc-net-filesystem) which are kind of misleading because I did not face any issues in setting my PoC up.
+[^fourth]: [Android docs](https://developer.android.com/about/versions/10/privacy/changes#proc-net-filesystem) which are kind of misleading because I did not face any issues in setting my PoC up.

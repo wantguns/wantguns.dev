@@ -29,24 +29,27 @@ from the motherboard settings.
 
 ### Adding the host to the flake
 
-Simply define the host in the flake.nix
+<details>
+  <summary>Simply define the host in the flake.nix</summary>
 
-```nix
-# inside flake.nix
-hosts = {
-    # ...
+  ```nix
+  # inside flake.nix
+  hosts = {
+      # ...
 
-    "mintaka" = lib.my.mkHostConfig {
-      hostname = "mintaka";
-      system = "x86_64-linux";
-      username = "wantguns";
-      remoteBuild = true;
-      ips = {
-        private = "192.168.1.130";
+      "mintaka" = lib.my.mkHostConfig {
+        hostname = "mintaka";
+        system = "x86_64-linux";
+        username = "wantguns";
+        remoteBuild = true;
+        ips = {
+          private = "192.168.1.130";
+        };
       };
-    };
-}
-```
+  }
+  ```
+  
+</details>
 
 ### Booting
 

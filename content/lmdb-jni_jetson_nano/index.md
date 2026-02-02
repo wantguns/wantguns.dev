@@ -107,11 +107,4 @@ sed pom.xml -i -e "s/<hawtjni-version>.*<\/hawtjni-version>/<hawtjni-version>1.1
 
 ---
 
-[^1]: 
-We could have used a more recent version, but
-[org.fusesource.hawtjni](https://mvnrepository.com/artifact/org.fusesource.hawtjni)
-changed the package name [after
-`v1.15`](https://mvnrepository.com/artifact/org.fusesource.hawtjni/hawtjni-maven-plugin)
-and would therefore require more work. 
-tldr; i am lazy.
-
+[^1]: We could have used a more recent version, but [org.fusesource.hawtjni](https://mvnrepository.com/artifact/org.fusesource.hawtjni) changed the package name [after `v1.15`](https://mvnrepository.com/artifact/org.fusesource.hawtjni/hawtjni-maven-plugin) and would therefore require more work. tldr; i am lazy.

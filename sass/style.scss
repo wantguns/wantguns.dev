@@ -1,3 +1,6 @@
+@import url("/fonts/cmuserif_roman_macroman/stylesheet.css");
+@import url("/fonts/cmutypewritertext_light_macroman/stylesheet.css");
+
 $bgColor: #000;
 $textColor: rgba(255, 255, 255, 0.9);
 $headColor: #e78a53;
@@ -9,9 +12,9 @@ $selectionColor: #333;
 $codeBGColor: rgba(251, 203, 151, 0.175);
 $codeColor: rgba(251, 203, 151, 0.9);
 
-$serifFontFamily:  Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+$serifFontFamily:  cmu_serifroman, Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
 $sansSerifFontFamily: $serifFontFamily;
-$monospaceFontFamily:  ui-monospace, 'SFMono-Regular', 'SF Mono', 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+$monospaceFontFamily:  cmu_typewriter_textlight, ui-monospace, 'SFMono-Regular', 'SF Mono', 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 $nonMonospaceFontFamily: $serifFontFamily;
 
 :root {
@@ -26,13 +29,13 @@ body {
 	margin: 0.3rem;
 	text-rendering: optimizeLegibility;
 	font-variant-ligatures: contextual;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+	// -webkit-font-smoothing: antialiased;
+	// -moz-osx-font-smoothing: grayscale;
 
 	font-family: $serifFontFamily;
-	font-weight: 400;
+	// font-weight: 400;
 	font-size: 16.5px;
-	line-height: 1.6;
+	// line-height: 1.6;
 }
 
 h1,
@@ -43,12 +46,12 @@ h5,
 h6 {
 	color: $uLinkColor;
 	font-family: $sansSerifFontFamily;
-	font-weight: 900;
+	// font-weight: 900;
 }
 
 h1.page_title {
-	letter-spacing: -1px;
-	font-weight: 900;
+	// letter-spacing: -1px;
+	// font-weight: 900;
 	font-size: 200%;
 	line-height: normal;
 	color: $uLinkColor;
@@ -58,18 +61,22 @@ h1.page_title {
 
 a {
 	text-decoration: underline;
+    text-underline-offset: 3px;
 	color: $vLinkColor;
+    // color: $uLinkColor;
 
-	&:visited {
-		color: $vLinkColor;
-		text-decoration: none;
-	}
+	// &:visited {
+	// 	color: $vLinkColor;
+	// 	text-decoration: none;
+	// }
+
 	&:active {
 		color: $uLinkColor;
 	}
 
 	&:hover {
-		color: $uLinkColor;
+		// color: $uLinkColor;
+        color: $codeColor;
 	}
 
 	&.site_title {
@@ -77,9 +84,9 @@ a {
 			text-decoration: underline;
 		}
 		text-decoration: none;
-		margin-bottom: 0.2rem;
+		// margin-bottom: 0.2rem;
 		color: $headColor;
-		font-weight: 900;
+		// font-weight: 900;
 		list-style: 1;
 	}
 
@@ -155,11 +162,11 @@ header {
 
 code {
 	font-family: $monospaceFontFamily;
-	letter-spacing: normal;
-	background-color: $codeBGColor;
-	padding-left: 0.25rem;
-	padding-right: 0.25rem;
-	font-size: 14.5px;
+	// letter-spacing: normal;
+	// background-color: $codeBGColor;
+	// padding-left: 0.25rem;
+	// padding-right: 0.25rem;
+	// font-size: 14.5px;
 	color: $codeColor;
 	a {
 		text-decoration-color: $codeColor;
@@ -169,16 +176,16 @@ code {
 pre {
 	position: relative;
 	font-family: $monospaceFontFamily;
-	font-weight: 400;
-	letter-spacing: normal;
-	line-height: 1.5;
+	// font-weight: 400;
+	// letter-spacing: normal;
+	// line-height: 1.5;
 	overflow: auto;
 	border: thin solid $darkGreyColor;
 	margin: 2rem 0rem;
 	padding: 1.5rem;
 	background-color: $bgColor;
 	code {
-		font-size: 14px;
+		// font-size: 14px;
 		padding: initial;
 		color: inherit;
 		background-color: inherit;
@@ -200,12 +207,12 @@ pre {
 	width: 60px;
 	height: 28px;
 	padding: 5px 10px;
-	font-size: 12px;
+	// font-size: 12px;
 	font-family: $sansSerifFontFamily;
-    font-weight: 400;
+    // font-weight: 400;
 	cursor: pointer;
 	opacity: 0.8;
-	transition: all 0.2s ease;
+	transition: all 0.1s ease;
     // z-index: 3;
 
 	&:hover {
