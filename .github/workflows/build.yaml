@@ -9,7 +9,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
       - name: Build
-        uses: shalzz/zola-deploy-action@master
+        uses: shalzz/zola-deploy-action@v0.22.1
         env:
           BUILD_DIR: .
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
