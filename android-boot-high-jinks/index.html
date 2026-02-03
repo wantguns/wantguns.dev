@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Android Boot High Jinks: And What it Means for SharkBait &middot; Gunwant Jain - @wantguns</title>
+    <meta name="description" content="Attempts at finding measures and ways we could use to deal with System-As-Root devices for SharkBaitOS" />
+    <link rel="apple-touch-icon" sizes="180x180" href="https://wantguns.dev/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="https://wantguns.dev/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="https://wantguns.dev/favicon-16x16.png" />
+    <link rel="manifest" href="https://wantguns.dev/site.webmanifest" />
+    <link rel="alternate" type="application/atom+xml" title="RSS" href="https://wantguns.dev/atom.xml">
+
+    <style>@import url("/fonts/cmuserif_roman_macroman/stylesheet.css");@import url("/fonts/cmutypewritertext_light_macroman/stylesheet.css");:root{color-scheme:dark}html,body{background:#000;color:rgba(255,255,255,.9);padding:.3rem;margin:.3rem;text-rendering:optimizeLegibility;font-variant-ligatures:contextual;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;font-size:16.5px}h1,h2,h3,h4,h5,h6{color:#fbcb97;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif}h1.page_title{font-size:200%;line-height:normal;color:#fbcb97;margin-bottom:1rem;line-height:1.1}a{text-decoration:underline;text-underline-offset:3px;color:rgba(255,255,255,.9)}a:active{color:#fbcb97}a:hover{color:rgba(251,203,151,.9)}a.site_title{text-decoration:none;color:#e78a53;list-style:1}a.site_title:hover{text-decoration:underline}a.site_nav{text-decoration:none;color:#e78a53}a.site_nav:hover{text-decoration:underline}a.homepage-list_title{flex:1;word-wrap:break-word;text-decoration:none;font-weight:bold;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;color:#fbcb97}a.homepage-list_title:hover{text-decoration:underline}a code{text-decoration-color:rgba(251,203,151,.9)}a.footer{color:#888}a.footer:hover{color:#fbcb97}.pipe{color:#202020}time.site_time{font-size:90%;color:#888}span.page_time{padding:1.2rem auto;color:#888}:target{background-color:#000}hr{border:none;height:1px;background-color:#202020}::selection{background:#333}main{margin:auto;max-width:650px}header{padding-top:1rem;padding-bottom:0rem;font-weight:900}code{font-family:cmu_typewriter_textlight,ui-monospace,"SFMono-Regular","SF Mono","Cascadia Code","Source Code Pro",Menlo,Consolas,"DejaVu Sans Mono",monospace;color:rgba(251,203,151,.9)}code a{text-decoration-color:rgba(251,203,151,.9)}pre{position:relative;font-family:cmu_typewriter_textlight,ui-monospace,"SFMono-Regular","SF Mono","Cascadia Code","Source Code Pro",Menlo,Consolas,"DejaVu Sans Mono",monospace;overflow:auto;border:thin solid #202020;margin:2rem 0rem;padding:1.5rem;background-color:#000}pre code{padding:initial;color:inherit;background-color:inherit}.pre-wrapper{position:relative;margin:2rem 0}.copy-button{position:absolute;top:0px;right:0px;color:#fbcb97;background-color:#000;border:thin solid #202020;width:60px;height:28px;padding:5px 10px;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;cursor:pointer;opacity:.8;transition:all .1s ease}.copy-button:hover{opacity:1}.copy-button.copied{border:thin solid #fbcb97}table{border-collapse:collapse;width:100%}th,td{border:1px solid #202020;padding:1.1rem}img{height:auto;margin:2rem 0rem;max-width:100%}.homepage-list,.taxonomies__list{list-style:none;padding:1rem 0}.homepage-list li,.taxonomies__list li{align-items:center;display:flex;flex-wrap:nowrap;justify-content:space-between;margin-bottom:10px}.center{margin-left:auto;margin-right:auto;max-width:100%;text-align:center}.imageClass,.videoClass{padding:.5rem}.imageClass figure,.videoClass figure{display:table}.imageClass figure img,.videoClass figure img{user-select:none}.imageClass figure figcaption,.videoClass figure figcaption{display:table-caption;caption-side:bottom;padding:.2rem;margin:.2rem auto;background-color:#fbcb97;color:#000}.imageClass figure figcaption::selection,.videoClass figure figcaption::selection{background-color:#e78a53}@media (max-width: 38rem){.homepage-list li a{width:100%}}footer{margin-top:2rem;color:#888}.pagination_title{width:100%;text-align:center;border-bottom:1px solid #202020;line-height:.1em;margin:2.5rem auto}.pagination_title span{background:#000;font-size:.8rem;padding:0 10px}.post_nav{display:flex;align-items:center;justify-content:center;text-align:center;margin:2.5rem auto 4rem auto}.post_nav .button{position:relative;display:inline-flex;flex:1;align-items:center;justify-content:center;overflow:hidden;text-decoration:none;margin:auto 1.5rem;font-weight:bold}.post_nav .button .previous,.post_nav .button .next{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.time_tag_sep{padding:.5rem;color:#888;user-select:none}.post_tags a{padding:0 .5rem 0 0;color:#888;text-decoration:none}.post_tags a:hover{color:#fbcb97}.taxonomies__title{color:#888}.taxonomies__list a{text-decoration:none}#toc-inline,#toc-aside{font-size:90%;line-height:1.6;color:#888}#toc-inline a,#toc-aside a{color:#888;text-decoration:none}#toc-inline a:hover,#toc-aside a:hover{color:#fbcb97}#toc-inline ul,#toc-aside ul{padding-left:1rem}#toc-inline li li,#toc-aside li li{list-style:disc}#toc-inline li.active>a,#toc-aside li.active>a{color:#fbcb97;font-weight:bold}#toc-inline{font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;padding:1.25rem 0rem .5rem 0rem}#toc-inline summary:hover{cursor:pointer;color:#fbcb97}#toc-aside{font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;display:block;width:15rem;position:sticky;float:left;top:3.5rem;margin-top:-1.2rem;margin-left:-20rem}@media (max-width: 80rem){#toc-aside{display:none}}@media (min-width: 80rem){#toc-inline{display:none}}sup{line-height:0}.footnote-reference{color:#fbcb97}.footnote-reference:after{content:"]"}.footnote-reference:before{content:"["}.footnote-reference a{color:#fbcb97;text-decoration:none}hr{margin-top:2rem;margin-bottom:2rem}.footnote-definition{display:flex;flex-direction:row;font-size:.85rem}.footnote-definition sup{all:initial;color:rgba(255,255,255,.9);text-rendering:optimizeLegibility;font-variant-ligatures:contextual;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;font-weight:450;font-size:1rem;line-height:1.58;letter-spacing:-.02em;font-size:.7rem;margin:0rem;margin-right:.5rem}.footnote-definition p{margin:0rem;margin-bottom:1rem}.footnote-definition p .footnote-backlink{margin:0rem;margin-left:.5rem;color:#fbcb97;text-decoration:none}</style>
+
+    <meta property="og:site_name" content="Gunwant Jain - @wantguns">
+      <meta name="author" content="Gunwant Jain" />
+      <meta name="keywords" content="Gunwant Jain, wantguns, Gunwant, WantGuns" />
+      <meta property="og:title" content="Android Boot High Jinks: And What it Means for SharkBait">
+      <meta property="og:description" content="Attempts at finding measures and ways we could use to deal with System-As-Root devices for SharkBaitOS">
+      <meta property="og:url" content="https://wantguns.dev/android-boot-high-jinks/">
+      <meta property="og:image" content="">
+
+      <meta name="twitter:card" content="summary">
+      <meta name="twitter:title" content="Gunwant Jain - @wantguns">
+      <meta name="twitter:description" content="Gunwant Jain&#x27;s (@wantguns) writings and musings">
+
+      <meta property="og:type" content="article" />
+        <meta property="article:published_time" content="2020-06-01T00:00:00+00:00" />
+
+      
+      
+    
+
+  </head>
+  
+
+  <body>
+    <main id="main" role="main">
+      
+      <header role="banner">
+          
+            
+            <nav style="margin-bottom:1rem;" role="navigation">
+              
+                <a class="site_nav" href="https://wantguns.dev/about">about</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev">blog</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev/tags">tags</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://bin.wantguns.dev/cv">resume</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev/atom.xml">rss</a>
+                
+              
+            </nav>
+            
+          
+      </header>
+      
+
+
+    <div>
+
+      
+<article>
+  <h1 class="page_title">Android Boot High Jinks: And What it Means for SharkBait</h1>
+
+  
+    <span class="page_time">Posted on <time datetime="2020-06-01T00:00:00+00:00">June 01, 2020</time></span>
+    
+    <span class="time_tag_sep">&middot;</span>
+    <span class="post_tags">
+        
+            <a href="https://wantguns.dev/tags/android/">#android</a>
+        
+            <a href="https://wantguns.dev/tags/gsoc2020/">#gsoc2020</a>
+        
+            <a href="https://wantguns.dev/tags/sharkbait/">#sharkbait</a>
+        
+    </span>
+    
+  
+
+  
+  
+    
+    <details id = "toc-inline">
+        <summary><b>Table of Contents</b></summary>
+        <ul>
+            <li>
+                <a href="#the-boot-process-of-present-day-sharkbait">The Boot process of present-day SharkBait</a>
+                
+            </li><li>
+                <a href="#changes-in-android-9-devices">Changes in Android 9+ devices</a>
+                <ul>
+                    <li>
+                        <a href="#this-poses-some-challenges">This poses some challenges</a>
+                    </li><li>
+                        <a href="#magisk-s-approach-to-system-as-root">Magisk's approach to System-As-Root</a>
+                    </li>
+                </ul>
+            </li><li>
+                <a href="#my-approach-to-revise-sharkbait">My approach to revise SharkBait</a>
+                <ul>
+                    <li>
+                        <a href="#1-w-magisk">1. w/ Magisk</a>
+                    </li><li>
+                        <a href="#2-w-o-magisk-untriaged">2. w/o Magisk (untriaged)</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </details>
+
+    
+  <aside id="toc-aside">
+          <h4>Table of Contents</h4>
+      <ul>
+          
+          <li>
+              <a href="#the-boot-process-of-present-day-sharkbait">The Boot process of present-day SharkBait</a>
+              
+          </li>
+          <li>
+              <a href="#changes-in-android-9-devices">Changes in Android 9+ devices</a>
+              
+              <ul>
+                  
+                  <li>
+                      <a href="#this-poses-some-challenges">This poses some challenges</a>
+                  </li>
+                  
+                  <li>
+                      <a href="#magisk-s-approach-to-system-as-root">Magisk's approach to System-As-Root</a>
+                  </li>
+                  
+              </ul>
+              
+          </li>
+          <li>
+              <a href="#my-approach-to-revise-sharkbait">My approach to revise SharkBait</a>
+              
+              <ul>
+                  
+                  <li>
+                      <a href="#1-w-magisk">1. w/ Magisk</a>
+                  </li>
+                  
+                  <li>
+                      <a href="#2-w-o-magisk-untriaged">2. w/o Magisk (untriaged)</a>
+                  </li>
+                  
+              </ul>
+              
+          </li>
+      </ul>
+  </aside>
+
+  
+  
+
+  <p>Presently, SharkBait aims at devices launching with Android version lower than 9. I will discuss few ways we could the port this setup to newer devices, whose boot mechanisms are different. We shall also address the boot process of SharkBait and what System-As-Root actually is.</p>
+<hr />
+<h2 id="the-boot-process-of-present-day-sharkbait">The Boot process of present-day SharkBait</h2>
+<ol>
+<li>
+<p>Swapping the Android's <code>init</code> with <a href="https://gitlab.com/sharkbaitOS/bootstrap/preinit"><code>preinit</code></a></p>
+<ul>
+<li>We swapped the <code>init</code> executable present in a functioning boot.img with KireinaHoro's <code>preinit</code>.</li>
+<li>Preinit was responsible for early-mounting partitions and finally switch_root to Gentoo's init, thus firing OpenRC.</li>
+<li>The "swapping" was essentially replacing a normal Android <code>boot.img</code>'s <code>ramdisk</code>'s init with <code>preinit</code>, and then flashing the new <code>boot.img</code>.</li>
+<li>After OpenRC is fired, it starts the lxc.android service.</li>
+</ul>
+</li>
+<li>
+<p>The Android lxc container.</p>
+<ul>
+<li>Prior to swapping inits, we established an lxc container in the Gentoo userland.</li>
+<li>The Android rootfs (at that time it was <strong>ramdisk</strong> <em>inside the boot.img</em>), is extracted in the lxc container's rootfs folder.</li>
+<li>Android boots inside the container easily.</li>
+<li>The lxc container's <code>config</code> might provide some insights as well:</li>
+</ul>
+</li>
+</ol>
+<pre data-lang="txt" style="background-color:#000000;color:#c1c1c1;" class="language-txt "><code class="language-txt" data-lang="txt"><span>lxc.uts.name = android
+</span><span>lxc.rootfs.path = /var/lib/lxc/android/rootfs
+</span><span>lxc.init.cmd = /init
+</span><span>lxc.net.0.type = none
+</span><span>lxc.autodev = 0
+</span><span>
+</span><span>lxc.hook.pre-start = /var/lib/lxc/android/pre-start.sh
+</span><span>lxc.hook.post-stop = /var/lib/lxc/android/post-stop.sh
+</span><span>lxc.cgroup.cpu.rt_runtime_us = 950000
+</span></code></pre>
+<p>This is just a gist of what happened. There was a lot more involved.
+Gentoo's <code>fstab</code> was tweaked such that it mounted the device blocks and binded them to the container for Android's use.
+Also KireinHoro managed to make a <a href="https://wiki.gentoo.org/wiki/Android/SharkBait/Starting_Android_in_LXC">working real-time group scheduling model</a> by the use of cgroups.</p>
+<h2 id="changes-in-android-9-devices">Changes in Android 9+ devices</h2>
+<p>Well, Google has made it very confusing to follow their language in the <a href="https://source.android.com/devices/bootloader/system-as-root">AOSP docs</a>, I found that <a href="https://topjohnwu.github.io/Magisk/boot.html">Magisk's Documentation</a> is very insightful.
+Basically, Android Kernels dont use ramdisks as their <code>rootfs</code> now. The <a href="https://source.android.com/devices/bootloader/system-as-root#partition-layouts-nonabdevices">older ramdisks</a> found inside a <code>boot.img</code> are now merged inside system.img.</p>
+<h3 id="this-poses-some-challenges">This poses some challenges</h3>
+<ul>
+<li>What do we use now as lxc-container's rootfs</li>
+<li>If the kernel does not take a ramdisk inside the <code>boot.img</code> as its rootfs, how do we perform the "<code>init</code> &lt;-&gt; <code>preinit</code> swaps".</li>
+</ul>
+<p><strong>Turns out Magisk already has some workarounds.</strong></p>
+<h3 id="magisk-s-approach-to-system-as-root">Magisk's approach to System-As-Root</h3>
+<p>In order to circumvent the new system.img-as-rootfs approach, Magisk hexpatches the device's Kernel to use the <code>ramdisk</code> inside <code>boot.img</code> as rootfs. The hexpatch essentially is just replacing the <code>skip_initramfs</code> with <code>want_initramfs</code> (could be any 4 lettered word instead as well) from the Kernel commandline. But replacing it from the extracted <code>bootimg.cfg</code> of a <code>initrd.img</code> did not work for me. So I stick to using hexpatching using <code>magiskboot</code>.</p>
+<p>Then Magisk patches the original <code>boot.img</code> by adding a new <code>ramdisk.cpio</code> incpio inside it.
+The new <code>ramdisk</code> has <code>magiskinit</code> disguised as <code>init</code>.
+<a href="https://topjohnwu.github.io/Magisk/deploy.html#systemless">Source</a></p>
+<pre data-lang="bash" style="background-color:#000000;color:#c1c1c1;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#888888;"># original System-As-Root ramdisk #####
+</span><span>	</span><span style="color:#fbcb97;">.
+</span><span>
+</span><span style="color:#888888;"># ramdisk after flashing Magisk #######
+</span><span>	</span><span style="color:#fbcb97;">.
+</span><span>	</span><span style="color:#e78a53;">|</span><span style="color:#5f8787;">-</span><span> .backup/
+</span><span>	`</span><span style="color:#5f8787;">-</span><span> init
+</span></code></pre>
+<p><code>magiskinit</code> is responsible for :</p>
+<ul>
+<li>Early mounting required partitions. On system-as-root devices, we will switch root to system.</li>
+<li>Injecting magisk services into <code>init.rc</code>.</li>
+<li>Loading sepolicy either from <code>/sepolicy</code>, precompiled <code>sepolicy</code> in vendor, or compiling split sepolicy.</li>
+<li>Patching sepolicy rules and dump to <code>/sepolicy</code> or <code>/sbin/.se</code> and patching init or <code>libselinux.so</code> to load the patched policies</li>
+<li>Executing the original init to start the ordinary boot process</li>
+</ul>
+<p>This is conceptually somewhat similar to KireinaHoro's approach at Preinit.</p>
+<h2 id="my-approach-to-revise-sharkbait">My approach to revise SharkBait</h2>
+<p>I have two approaches. Both approaches have some commonality. We apply the same hexpatch which Magisk applies, to the custom kernel which is already lxc-enabled. This forces the kernel to use the <code>ramdisk</code> inside the <code>boot.img</code> as its <code>rootfs</code>.
+Then we package a new <code>boot.img</code> which had KireinaHoro's <code>preinit</code> as its <code>init</code>. I assume, this enables the kernel to fire up Gentoo's init and eventually start the lxc-container on the way while Gentoo is booting up.</p>
+<p>We make the edits to the <code>fstab</code> at the <code>/vendor</code> partition (which as you might guess, is another change made by google), in order to provide Android with the correct mounts in Gentoo's userland.
+Another change made by google was the decision to parse the cgroup mounts using <code>/etc/cgroups.json</code> instead of the original parsing <code>init.rc</code> approach. <a href="https://source.android.com/devices/tech/perf/cgroups">Source</a>.
+Fortunately this might not affect us as we dont need to mount any new cgroup. We make edits in the <code>init.rc</code> for bind-mounting the container's pseudofs(s).</p>
+<h3 id="1-w-magisk">1. w/ Magisk</h3>
+<p>The differences arises in what we use as the <code>rootfs</code> for our lxc-container.
+The approach I already followed, required using only magiskinit as the <code>rootfs</code>.
+I expected <code>magiskinit</code> to follow its approach and eventually mount all the required device blocks inside the Android userland. Then finally switch to <code>/system</code> as the rootdir.
+This was the method which failed, causing my device to bootloop.</p>
+<h3 id="2-w-o-magisk-untriaged">2. w/o Magisk (untriaged)</h3>
+<p>This approach requires to use entire <code>system.img</code>, extracted, as <code>rootfs</code>.
+The <code>init</code> used here is the Android's original <code>init</code>.
+Since every file required of the merged ramdisk is present in the <code>rootfs</code>, I expect that <code>init</code> fires up smoothly.</p>
+<p>Except that since <code>system.img</code> should already be mounted by the kernel in a system-as-root device, We might have to mount it manually. <a href="https://android.googlesource.com/platform/system/core/+/master/init/README.md#early-init-boot-sequence">Source</a>.</p>
+<hr />
+<p><em>P.S. This article was already written in drafts a few weeks ago, the next paragraphs serve no purpose other than that of history. I will be writing more articles explaining what happened afterwards in order to provide a smoother and realistic reading experience.</em></p>
+<p>Without the use of a serial console, this whole "trace-fest" is difficult to understand. Finding out what went wrong, is on an entirely different level.</p>
+<p>We have no dmesg logs as they get overwritten by the recovery boot, which in turn is what I require to check the dmesg logs.
+Since the kernel does not panic and the <code>init</code> just <code>exit</code>s, we have no <code>last_kmsg</code> or <code>console-ramoops</code> logs either.
+Fortunately spending a lot of time researching I found <a href="https://wiki.postmarketos.org/wiki/Xiaomi_Redmi_Note_7_(xiaomi-lavender)">this</a>.
+My device has a serial-console baked in. Although accessing it would require taking out the phone's glass back, it is worth the fruit.</p>
+
+</article>
+
+
+  <div class="pagination_title">
+    <span>Read other posts</span>
+  </div>
+  <div class="post_nav">
+      
+        <div class="button">
+          <a class="button" href="&#x2F;install-gentoo&#x2F;">
+            ←&nbsp;
+            <span class="next">
+              Installing Gentoo on Android
+            </span>
+          </a>
+        </div>
+      
+      
+        <div class="button">
+          <a class="button" href="&#x2F;uart-on-lavender&#x2F;">
+            <span class="previous">UART on Xiaomi Redmi Note 7</span>
+            &nbsp;→
+          </a>
+        </div>
+      
+    </div>
+
+
+
+    </div>
+    </main>
+
+    
+    
+
+    <footer class=center>
+      <sub>
+        <div>
+            &copy;
+            <span id="copyright">
+                <script>document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))</script>
+            </span>
+            &middot;
+            Gunwant Jain. Built <a class="footer" href="https://github.com/wantguns/wantguns.dev">openly</a> with <a class="footer" href="https://www.getzola.org">Zola</a>
+        </div>
+      </sub>
+    </footer>
+  </body>
+  
+ <script src=https://wantguns.dev/js/page.js></script> 
+
+</html>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>Gunwant Jain - @wantguns - onnx</title>
+    <subtitle>Gunwant Jain&#x27;s (@wantguns) writings and musings</subtitle>
+    <link rel="self" type="application/atom+xml" href="https://wantguns.dev/tags/onnx/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://wantguns.dev"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2022-02-20T00:00:00+00:00</updated>
+    <id>https://wantguns.dev/tags/onnx/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Building ONNX Runtime for Jetson Nano</title>
+        <published>2022-02-20T00:00:00+00:00</published>
+        <updated>2022-02-20T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://wantguns.dev/onnxruntime-jetson-nano/"/>
+        <id>https://wantguns.dev/onnxruntime-jetson-nano/</id>
+        
+        <content type="html" xml:base="https://wantguns.dev/onnxruntime-jetson-nano/">&lt;h2 id=&quot;building&quot;&gt;Building&lt;&#x2F;h2&gt;
+&lt;p&gt;I hate to use docker for automating VM purposes, but I acknowledge it as
+an ad-hoc method for this instance.&lt;&#x2F;p&gt;
+&lt;p&gt;We will be compiling natively for arm64 in a qemu image which is running
+inside a docker container.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;dockerfile&quot;&gt;Dockerfile&lt;&#x2F;h4&gt;
+&lt;pre data-lang=&quot;Dockerfile&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-Dockerfile &quot;&gt;&lt;code class=&quot;language-Dockerfile&quot; data-lang=&quot;Dockerfile&quot;&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Import info for 64-bit Qemu based build
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# There are also raspberry pi 4 and 64-bit images available so adjust as required
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;FROM&lt;&#x2F;span&gt;&lt;span&gt; balenalib&#x2F;raspberrypi4-64-python:latest-bullseye-build
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;ARG &lt;&#x2F;span&gt;&lt;span&gt;ONNXRUNTIME_REPO=https:&#x2F;&#x2F;github.com&#x2F;Microsoft&#x2F;onnxruntime
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;ARG &lt;&#x2F;span&gt;&lt;span&gt;ONNXRUNTIME_SERVER_BRANCH=master
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Enforces cross-compilation through Qemu.
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;RUN &lt;&#x2F;span&gt;&lt;span&gt;[ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;cross-build-start&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt; ]
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;RUN &lt;&#x2F;span&gt;&lt;span&gt;sudo apt update -y &amp;amp;&amp;amp; sudo apt upgrade -y
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;RUN &lt;&#x2F;span&gt;&lt;span&gt;sudo apt install -y \
+&lt;&#x2F;span&gt;&lt;span&gt;    sudo \
+&lt;&#x2F;span&gt;&lt;span&gt;    build-essential \
+&lt;&#x2F;span&gt;&lt;span&gt;    curl \
+&lt;&#x2F;span&gt;&lt;span&gt;    libcurl4-openssl-dev \
+&lt;&#x2F;span&gt;&lt;span&gt;    libssl-dev \
+&lt;&#x2F;span&gt;&lt;span&gt;    wget \
+&lt;&#x2F;span&gt;&lt;span&gt;    python3 \
+&lt;&#x2F;span&gt;&lt;span&gt;    python3-dev \
+&lt;&#x2F;span&gt;&lt;span&gt;    git \
+&lt;&#x2F;span&gt;&lt;span&gt;    tar \
+&lt;&#x2F;span&gt;&lt;span&gt;    libatlas-base-dev \
+&lt;&#x2F;span&gt;&lt;span&gt;    default-jdk \
+&lt;&#x2F;span&gt;&lt;span&gt;    unzip \
+&lt;&#x2F;span&gt;&lt;span&gt;    neovim \
+&lt;&#x2F;span&gt;&lt;span&gt;    cmake \
+&lt;&#x2F;span&gt;&lt;span&gt;    openjdk-11-jdk
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;RUN &lt;&#x2F;span&gt;&lt;span&gt;wget --no-verbose --output-document=gradle.zip &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;https:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-6.3-bin.zip&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt; &amp;amp;&amp;amp;\
+&lt;&#x2F;span&gt;&lt;span&gt;    echo &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;Installing Gradle&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt; &amp;amp;&amp;amp;\
+&lt;&#x2F;span&gt;&lt;span&gt;    unzip gradle.zip &amp;amp;&amp;amp;\
+&lt;&#x2F;span&gt;&lt;span&gt;    rm gradle.zip &amp;amp;&amp;amp;\
+&lt;&#x2F;span&gt;&lt;span&gt;    mv &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;gradle-6.3&amp;quot; &amp;quot;&#x2F;opt&#x2F;gradle&#x2F;&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt; &amp;amp;&amp;amp;\
+&lt;&#x2F;span&gt;&lt;span&gt;    ln --symbolic &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;&#x2F;opt&#x2F;gradle&#x2F;bin&#x2F;gradle&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;usr&#x2F;bin&#x2F;gradle
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Set up build args
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;ARG &lt;&#x2F;span&gt;&lt;span&gt;BUILDTYPE=MinSizeRel
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# if doing a 32-bit build change &amp;#39;--arm64&amp;#39; to &amp;#39;--arm&amp;#39;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;ARG &lt;&#x2F;span&gt;&lt;span&gt;BUILDARGS=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;--config ${BUILDTYPE} --arm64&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Prepare onnxruntime Repo
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;WORKDIR &lt;&#x2F;span&gt;&lt;span&gt;&#x2F;code
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;RUN &lt;&#x2F;span&gt;&lt;span&gt;git clone --single-branch --branch ${ONNXRUNTIME_SERVER_BRANCH} --recursive ${ONNXRUNTIME_REPO} onnxruntime
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Build ORT including the shared lib and python bindings
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;WORKDIR &lt;&#x2F;span&gt;&lt;span&gt;&#x2F;code&#x2F;onnxruntime
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;RUN &lt;&#x2F;span&gt;&lt;span&gt;.&#x2F;build.sh --use_openmp ${BUILDARGS} --update --build --build_shared_lib --build_java --parallel \
+&lt;&#x2F;span&gt;&lt;span&gt;    --cmake_extra_defines JAVA_AWT_LIBRARY=NotNeeded JAVA_JVM_LIBRARY=NotNeeded
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Build Output
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;RUN &lt;&#x2F;span&gt;&lt;span&gt;ls -l &#x2F;code&#x2F;onnxruntime&#x2F;build&#x2F;Linux&#x2F;${BUILDTYPE}&#x2F;*.so*
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;VOLUME &lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;.&#x2F;artifacts&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;]
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Uncomment if building python wheels
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# RUN ls -l &#x2F;code&#x2F;onnxruntime&#x2F;build&#x2F;Linux&#x2F;${BUILDTYPE}&#x2F;dist&#x2F;*.whl
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;RUN &lt;&#x2F;span&gt;&lt;span&gt;[ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;cross-build-end&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt; ]%
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;pitfalls&quot;&gt;Pitfalls&lt;&#x2F;h2&gt;
+&lt;h3 id=&quot;jni&quot;&gt;JNI&lt;&#x2F;h3&gt;
+&lt;pre data-lang=&quot;cmake&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-cmake &quot;&gt;&lt;code class=&quot;language-cmake&quot; data-lang=&quot;cmake&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;Could&lt;&#x2F;span&gt;&lt;span&gt; NOT find JNI (missing: &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt;JAVA_AWT_LIBRARY JAVA_JVM_LIBRARY&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;strong&gt;Fix&lt;&#x2F;strong&gt;: set JAVA_AWT_LIBRARY, JAVA_JVM_LIBRARY to not needed.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;c-version&quot;&gt;C++ Version&lt;&#x2F;h3&gt;
+&lt;pre data-lang=&quot;cmake&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-cmake &quot;&gt;&lt;code class=&quot;language-cmake&quot; data-lang=&quot;cmake&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;In&lt;&#x2F;span&gt;&lt;span&gt; file included from &#x2F;code&#x2F;onnxruntime&#x2F;onnxruntime&#x2F;test&#x2F;onnx&#x2F;tensorprotoutils.cc:15:0:
+&lt;&#x2F;span&gt;&lt;span&gt;&#x2F;code&#x2F;onnxruntime&#x2F;include&#x2F;onnxruntime&#x2F;core&#x2F;framework&#x2F;data_types.h: In static member function ‘static const onnxruntime::DataTypeImpl* onnxruntime::data_types_internal::OptionalTypeHelper::GetElemType()’:
+&lt;&#x2F;span&gt;&lt;span&gt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;code&lt;&#x2F;span&gt;&lt;span&gt;&#x2F;onnxruntime&#x2F;include&#x2F;onnxruntime&#x2F;core&#x2F;framework&#x2F;data_types.h:427:8: error: expected ‘(’ before ‘constexpr’
+&lt;&#x2F;span&gt;&lt;span&gt;     if constexpr (std::is_same&amp;lt;T, Tensor&amp;gt;::value) {
+&lt;&#x2F;span&gt;&lt;span&gt;        ^~~~~~~~~
+&lt;&#x2F;span&gt;&lt;span&gt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;code&lt;&#x2F;span&gt;&lt;span&gt;&#x2F;onnxruntime&#x2F;include&#x2F;onnxruntime&#x2F;core&#x2F;framework&#x2F;data_types.h:429:7: error: ‘else’ without a previous ‘if’
+&lt;&#x2F;span&gt;&lt;span&gt;     } else {
+&lt;&#x2F;span&gt;&lt;span&gt;       ^~~~
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;strong&gt;Fix&lt;&#x2F;strong&gt;: GCC Version not up to date, use gcc 7+.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+</feed>

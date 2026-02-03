@@ -1,0 +1,1040 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>Gunwant Jain - @wantguns - android</title>
+    <subtitle>Gunwant Jain&#x27;s (@wantguns) writings and musings</subtitle>
+    <link rel="self" type="application/atom+xml" href="https://wantguns.dev/tags/android/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://wantguns.dev"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2022-01-29T00:00:00+00:00</updated>
+    <id>https://wantguns.dev/tags/android/atom.xml</id>
+    <entry xml:lang="en">
+        <title>IPC between Termux and Other Android Apps using ZMQ</title>
+        <published>2022-01-29T00:00:00+00:00</published>
+        <updated>2022-01-29T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://wantguns.dev/ipc-on-termux/"/>
+        <id>https://wantguns.dev/ipc-on-termux/</id>
+        
+        <content type="html" xml:base="https://wantguns.dev/ipc-on-termux/">&lt;h2 id=&quot;preface&quot;&gt;Preface&lt;&#x2F;h2&gt;
+&lt;p&gt;At FlowDrive, we do not have the luxury of travelling heavy. Everything
+has to be the fastest it can, every millisecond counts in a single loop.
+Which is why we turned to ZeroMQ for handling all the networking between
+different services. ZeroMQ is battle-tested, extremely fast and supports
+a whole variety of platforms.&lt;&#x2F;p&gt;
+&lt;p&gt;ZMQ has a Java implementation,
+&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;zeromq&#x2F;jeromq&quot;&gt;JeroMQ&lt;&#x2F;a&gt; which is a complete rewrite
+of ZMQ in Java. It would be our first choice, but it does not support
+many protocols due to their lack of implementations in Java, and IPC is
+one of it.&lt;&#x2F;p&gt;
+&lt;p&gt;But as justified earlier, we could not afford to have our messages go
+through the entire TCP stack, IPCs are just simpler and much faster.&lt;&#x2F;p&gt;
+&lt;p&gt;Fortunately, there exists &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;zeromq&#x2F;jzmq%20&quot;&gt;JZMQ&lt;&#x2F;a&gt; ,
+the Java bindings for libzmq. I gotta mention that using it on our apps
+introduced more complexity, due to lack of packages for different
+architectures. We made it work though, by building it ourselves, and
+cross-compiling it for whatever architectures we needed to support.&lt;&#x2F;p&gt;
+&lt;p&gt;To make sure that the reader follows the context, I have to explain the
+environment FlowPilot works in.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;termux&quot;&gt;Termux&lt;&#x2F;h2&gt;
+&lt;p&gt;Not everything we write is in Java. Some services can have the liberty to be
+written in much slower languages like Python. We run those services inside
+Termux, an Android app which gives us a unix-like userland on Android. One of
+the key softwares I worked with was an init-system &#x2F; process-manager for
+FlowPilot -- &lt;code&gt;FlowInit&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;FlowInit is written in Python, and therefore has to start in Termux. FlowInit
+communicates with FlowPilot over Pub&#x2F;Sub and Req&#x2F;Rep. Some communications are
+sensitive and making them over TCP would increase the attack vector
+substantially. This was the perfect time to utilise IPC.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;ipc-b-w-termux-and-android&quot;&gt;IPC b&#x2F;w Termux and Android&lt;&#x2F;h3&gt;
+&lt;p&gt;I mounted the Android directories on the termux land and binded a ZMQ
+REP socket on a shared path between Android and Termux.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;python&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-python &quot;&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span style=&quot;font-style:italic;color:#e78a53;&quot;&gt;def &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;wait_for_green_flag&lt;&#x2F;span&gt;&lt;span&gt;():
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;&amp;quot;&amp;quot;&amp;quot;Waits for a ready signal from javaland to start FlowInit&amp;quot;&amp;quot;&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    context &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;zmq.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;Context&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;    socket &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;context.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;socket&lt;&#x2F;span&gt;&lt;span&gt;(zmq.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;REP&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;    socket.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;bind&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;ipc:&#x2F;&#x2F;&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;home&#x2F;storage&#x2F;shared&#x2F;Documents&#x2F;houston&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;while True&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# This is asynchronous, so sleeping doesn&amp;#39;t matter as long as an
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# infinite loop is running
+&lt;&#x2F;span&gt;&lt;span&gt;        time.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;sleep&lt;&#x2F;span&gt;&lt;span&gt;(Config.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;FREQUENCY&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Wait on getting a flag, then send an ACK and initiate flowinit
+&lt;&#x2F;span&gt;&lt;span&gt;        flag &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;socket.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;recv_string&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;flag &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;== &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;green_flag&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;            socket.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;send_string&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;ACK&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;break
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;But I faced with this unusual error:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;Traceback&lt;&#x2F;span&gt;&lt;span&gt; (most recent call last)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;File &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;home&#x2F;dev&#x2F;flowinit&#x2F;venv&#x2F;bin&#x2F;flowinit&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;, line 33, in &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&amp;lt;&lt;&#x2F;span&gt;&lt;span&gt;module&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;sys.exit&lt;&#x2F;span&gt;&lt;span&gt;(load_entry_point(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;#39;flowinit==0.1.0&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;#39;console_scripts&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;#39;flowinit&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;)())
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;File &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;home&#x2F;dev&#x2F;flowinit&#x2F;venv&#x2F;lib&#x2F;python3.10&#x2F;site-packages&#x2F;flowinit-0.1.0-py3.10.egg&#x2F;flowinit&#x2F;flowinit.py&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;, line 132, in main
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;wait_for_green_flag&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;  File &amp;quot;&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;home&#x2F;dev&#x2F;flowinit&#x2F;venv&#x2F;lib&#x2F;python3.10&#x2F;site-packages&#x2F;flowinit-0.1.0-py3.10.egg&#x2F;flowinit&#x2F;flowinit.py&amp;quot;, line 58, in wait_for_green_flag
+&lt;&#x2F;span&gt;&lt;span&gt;    socket.bind(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;HOST&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;File &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;usr&#x2F;lib&#x2F;python3.10&#x2F;site-packages&#x2F;zmq&#x2F;sugar&#x2F;socket.py&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;, line 208, in bind
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;super&lt;&#x2F;span&gt;&lt;span&gt;().bind(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;addr&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;File &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;zmq&#x2F;backend&#x2F;cython&#x2F;socket.pyx&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;, line 540, in zmq.backend.cython.socket.Socket.bind
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;File &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;zmq&#x2F;backend&#x2F;cython&#x2F;checkrc.pxd&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;, line 28, in zmq.backend.cython.checkrc._check_rc
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;zmq.error.ZMQError:&lt;&#x2F;span&gt;&lt;span&gt; Invalid argument
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;make: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;*** [&lt;&#x2F;span&gt;&lt;span&gt;Makefile:30: run&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;]&lt;&#x2F;span&gt;&lt;span&gt; Error 1
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;I cross-checked with the PyZMQ repository, this error was not explicitly
+defined.&lt;&#x2F;p&gt;
+&lt;p&gt;Then I checked with the libzmq codebase, this error was again not
+explicitly defined.&lt;&#x2F;p&gt;
+&lt;p&gt;Finally I went on to systrace&#x27;ing this:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# ...
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;unlinkat&lt;&#x2F;span&gt;&lt;span&gt;(AT_FDCWD,&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;home&#x2F;storage&#x2F;shared&#x2F;Documents&#x2F;houston&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;, 0) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;-1&lt;&#x2F;span&gt;&lt;span&gt; ENOENT (No such file or directory)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;socket&lt;&#x2F;span&gt;&lt;span&gt;(AF_UNIX, SOCK_STREAM, 0)         &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;13
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;fcntl&lt;&#x2F;span&gt;&lt;span&gt;(13, F_SETFD, FD_CLOEXEC)          &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;0
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;bind&lt;&#x2F;span&gt;&lt;span&gt;(13, {sa_family=AF_UNIX, sun_path=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;home&#x2F;storage&#x2F;shared&#x2F;Documents&#x2F;houston&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;}, 67) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;-1&lt;&#x2F;span&gt;&lt;span&gt; EINVAL (Invalid argument)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;close&lt;&#x2F;span&gt;&lt;span&gt;(13)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# ...
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The actual error was arising from the &lt;code&gt;bind&lt;&#x2F;code&gt; syscall. Onto reading the
+manpage of bind:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;man&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-man &quot;&gt;&lt;code class=&quot;language-man&quot; data-lang=&quot;man&quot;&gt;&lt;span&gt;ERRORS
+&lt;&#x2F;span&gt;&lt;span&gt;       EINVAL addrlen is wrong, or addr is not a valid address for this
+&lt;&#x2F;span&gt;&lt;span&gt;              socket&amp;#39;s domain.
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;But as clearly shown in the strace log, the &lt;code&gt;sun_path&lt;&#x2F;code&gt; is well under 104
+chars. Clearly some other goof was at play here. I tried this again
+after setting my SELinux to permissive, but the error still came up.&lt;br &#x2F;&gt;
+Till date I have not realised what was wrong with the path I provided
+for an IPC socket. But all evidence points to something wrong (maybe for
+the sake of security) on how android symlinks directories &lt;sup class=&quot;footnote-reference&quot;&gt;&lt;a href=&quot;#first&quot;&gt;1&lt;&#x2F;a&gt;&lt;&#x2F;sup&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;After some more research on Unix Domain Sockets, I came across this
+paper &lt;sup class=&quot;footnote-reference&quot;&gt;&lt;a href=&quot;#second&quot;&gt;2&lt;&#x2F;a&gt;&lt;&#x2F;sup&gt; which has been now removed from clearnet, but the
+WayBack machine has 1 copy.&lt;&#x2F;p&gt;
+&lt;p&gt;I learned more about IPC on Linux, and came across &lt;strong&gt;Abstract Sockets.&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;abstract-sockets&quot;&gt;Abstract Sockets&lt;&#x2F;h2&gt;
+&lt;p&gt;Whenever you want to create sockets for IPC, you have two options on
+Linux --&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Filesystem namespace&lt;br &#x2F;&gt;
+An address in this namespace is associated with a file on the
+filesystem. When the server binds to an address (pathname), a socket
+file is automatically created.&lt;br &#x2F;&gt;
+The format for a Filesystem namespaced socket is simple:
+&lt;code&gt;ipc:&#x2F;&#x2F;&#x2F;path&#x2F;to&#x2F;some&#x2F;file&lt;&#x2F;code&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;Abstract namespace&lt;br &#x2F;&gt;
+Abstractly namespaced address are neat. Addresses under this namespace
+are actually not associated to a file on the filesystem. Instead they
+are created under &lt;code&gt;&#x2F;proc&#x2F;net&#x2F;unix&#x2F;&lt;&#x2F;code&gt;.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;An Abstract socket address is distinguished from a Filesystem socket by
+setting &lt;code&gt;sun_path[0]&lt;&#x2F;code&gt; to a null byte &lt;code&gt;\0&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;Since any form of thin virtualisation like chroot, proot, whatever
+Termux does, bind-mount the &lt;code&gt;&#x2F;dev&lt;&#x2F;code&gt; , &lt;code&gt;&#x2F;sys&lt;&#x2F;code&gt;  and &lt;code&gt;&#x2F;proc&lt;&#x2F;code&gt; pseudo
+filesystems on their userland, Abstract namespaced addresses would solve
+the notion of having a shared filesystem between Android and Termux by
+completely eliminating it on a deeper level.&lt;&#x2F;p&gt;
+&lt;p&gt;We could just make an Abstract IPC socket with the same name on both
+Termux and an Android app, and both would look for a file with the of
+the socket under &lt;code&gt;&#x2F;proc&#x2F;net&#x2F;unix&lt;&#x2F;code&gt; .&lt;&#x2F;p&gt;
+&lt;p&gt;Who needs block-based filesystems when the Kernel&#x27;s synthetic
+filesystems are so versatile.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;zmq-and-abstract-sockets&quot;&gt;ZMQ and Abstract Sockets&lt;&#x2F;h3&gt;
+&lt;p&gt;The only thing remaining was to confirm whether ZMQ supports abstract
+sockets. And by perusing through the code-base several times earlier, I
+remembered that it did indeed&lt;sup class=&quot;footnote-reference&quot;&gt;&lt;a href=&quot;#third&quot;&gt;3&lt;&#x2F;a&gt;&lt;&#x2F;sup&gt; We just need to prefix our paths
+with &lt;code&gt;@&lt;&#x2F;code&gt; and ZMQ would identify it as an Abstract namespace address.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;final-implementation&quot;&gt;Final Implementation&lt;&#x2F;h2&gt;
+&lt;p&gt;Before implementing my hypothesis, I cross-checked Android docs if
+somehow their security policies block this behavior and I found that
+Android says that it blocks app-level access to
+&lt;code&gt;&#x2F;proc&#x2F;net&#x2F;unix&lt;&#x2F;code&gt;&lt;sup class=&quot;footnote-reference&quot;&gt;&lt;a href=&quot;#fourth&quot;&gt;4&lt;&#x2F;a&gt;&lt;&#x2F;sup&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;I quickly coded the Android app, and assigned new hosts with the
+Abstract namespaces for the sockets to connect to.&lt;&#x2F;p&gt;
+&lt;p&gt;It worked !&lt;&#x2F;p&gt;
+&lt;div  class=videoClass &gt;
+    &lt;figure  class=center &gt;
+        &lt;video controls
+            
+             class=center &gt;
+            &lt;source src=&quot;liverun.mp4&quot;&gt;
+        &lt;&#x2F;video&gt;
+        
+            &lt;figcaption  class=center  
+                &gt;
+                Live Run
+            &lt;&#x2F;figcaption&gt;
+        
+    &lt;&#x2F;figure&gt;
+&lt;&#x2F;div&gt;
+
+&lt;hr &#x2F;&gt;
+&lt;div class=&quot;footnote-definition&quot; id=&quot;first&quot;&gt;&lt;sup class=&quot;footnote-definition-label&quot;&gt;1&lt;&#x2F;sup&gt;
+&lt;p&gt;Termux normally symlinks the directories, It would be better to study how Android practices its security when symlinking &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;termux&#x2F;termux-app&#x2F;blob&#x2F;81dd11315765814cc6b270f1126bd1565fa94f44&#x2F;app&#x2F;src&#x2F;main&#x2F;java&#x2F;com&#x2F;termux&#x2F;app&#x2F;TermuxInstaller.java#L265&quot;&gt;source&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;&#x2F;div&gt;
+&lt;div class=&quot;footnote-definition&quot; id=&quot;second&quot;&gt;&lt;sup class=&quot;footnote-definition-label&quot;&gt;2&lt;&#x2F;sup&gt;
+&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;web.archive.org&#x2F;web&#x2F;20200209211732&#x2F;http:&#x2F;&#x2F;web.eecs.umich.edu&#x2F;~yurushao&#x2F;pubs&#x2F;sinspector_ccs2016.pdf&quot;&gt;Wayback Machine&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;&#x2F;div&gt;
+&lt;div class=&quot;footnote-definition&quot; id=&quot;third&quot;&gt;&lt;sup class=&quot;footnote-definition-label&quot;&gt;3&lt;&#x2F;sup&gt;
+&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;zeromq&#x2F;libzmq&#x2F;blob&#x2F;a01d259db372bff5e049aa966da4efce7259af67&#x2F;src&#x2F;ipc_address.cpp#L59&quot;&gt;Source&lt;&#x2F;a&gt;  &lt;a href=&quot;http:&#x2F;&#x2F;api.zeromq.org&#x2F;4-1:zmq-ipc&quot;&gt;Man Page&lt;&#x2F;a&gt;, which I read after solving everything :(&lt;&#x2F;p&gt;
+&lt;&#x2F;div&gt;
+&lt;div class=&quot;footnote-definition&quot; id=&quot;fourth&quot;&gt;&lt;sup class=&quot;footnote-definition-label&quot;&gt;4&lt;&#x2F;sup&gt;
+&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;developer.android.com&#x2F;about&#x2F;versions&#x2F;10&#x2F;privacy&#x2F;changes#proc-net-filesystem&quot;&gt;Android docs&lt;&#x2F;a&gt; which are kind of misleading because I did not face any issues in setting my PoC up.&lt;&#x2F;p&gt;
+&lt;&#x2F;div&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Final Report - GSoC 2020</title>
+        <published>2020-08-26T00:00:00+00:00</published>
+        <updated>2020-08-26T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://wantguns.dev/final-report/"/>
+        <id>https://wantguns.dev/final-report/</id>
+        
+        <content type="html" xml:base="https://wantguns.dev/final-report/">&lt;p&gt;Its almost 3 months since I have been officially working with the
+SharkBait team at Gentoo. A lot of ground has been covered, a lot is
+still left. In this blog, I will explain the scope of SharkBait right
+now and how I plan its future.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h2 id=&quot;work-covered&quot;&gt;Work Covered&lt;&#x2F;h2&gt;
+&lt;h3 id=&quot;porting-sharkbaitos&quot;&gt;Porting SharkBaitOS&lt;&#x2F;h3&gt;
+&lt;p&gt;When KireinaHoro started working on SharkBait, the latest Android
+version of that time was 8 or Android Oreo. Sharkbait at that time,
+supported all the Android devices because it targeted only a specific
+boot order, which was common till Android 8.
+Then came Android 9, with its System-As-Root configuration, which
+rendered SharkBait&#x27;s original boot order non functional for all devices
+shipping with Android 9. &lt;br &#x2F;&gt;
+The first month of my work revolved around porting SharkBait to SAR
+based devices. I succeeded in doing so, and wrote blogs about it:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;wantguns.dev&#x2F;android-boot-high-jinks&#x2F;&quot;&gt;&lt;strong&gt;Android Boot High Jinks&lt;&#x2F;strong&gt;&lt;&#x2F;a&gt; &lt;br &#x2F;&gt;
+In this blog we discuss the different approaches at booting
+Android, Google has experimented with.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;wantguns.dev&#x2F;booting-gentoo-using-preinit&#x2F;&quot;&gt;&lt;strong&gt;Booting Gentoo from SAR-Preinit&lt;&#x2F;strong&gt;&lt;&#x2F;a&gt; &lt;br &#x2F;&gt;
+This blog showcases how I patched my phone&#x27;s kernel in order to
+boot Gentoo on my phone.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;wantguns.dev&#x2F;starting-android-in-gentoo&#x2F;&quot;&gt;&lt;strong&gt;Starting System-as-Root Android in a LXC container&lt;&#x2F;strong&gt;&lt;&#x2F;a&gt; &lt;br &#x2F;&gt;
+This blog is the first class guide for launching SharkBait in
+System-As-Root devices.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;The projects made in efforts to port SharkBait for SAR were:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;WantGuns&#x2F;sar-preinit&quot;&gt;&lt;strong&gt;SAR-Preinit&lt;&#x2F;strong&gt;&lt;&#x2F;a&gt; &lt;br &#x2F;&gt;
+This repository acts as the setup which patches your custom kernel
+and makes it boot a GNU&#x2F;Linux distro, instead of Android on your
+phone.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;WantGuns&#x2F;bootstrap-init&quot;&gt;&lt;strong&gt;Bootstrap-init&lt;&#x2F;strong&gt;&lt;&#x2F;a&gt; &lt;br &#x2F;&gt;
+This repository hosts the source of the init binary executed inside
+the LXC container which launches System-As-Root Android on top of
+Gentoo.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h3 id=&quot;introducing-android-builds-on-aarch64-hosts&quot;&gt;Introducing Android builds on AArch64 Hosts&lt;&#x2F;h3&gt;
+&lt;p&gt;As simple as it sounds, this part of my GSoC tenure turned out to be the
+exact opposite. &lt;br &#x2F;&gt;
+My first task was to provide a AArch64 native port of the LLVM toolchain
+AOSP uses. I was stuck on compiling and testing my modified scripts till
+the second month, when my mentor generously set up a beefy AArch64
+server for me. I succeeded in delivering that toolchain. Related sources
+are:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;wantguns.dev&#x2F;build-android&#x2F;&quot;&gt;&lt;strong&gt;Building Android: BTS&lt;&#x2F;strong&gt;&lt;&#x2F;a&gt; &lt;br &#x2F;&gt;
+In this blog, I look what events get triggered under the hood when
+we build Android, as to seek insight on breaking down Android later.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;WantGuns&#x2F;toolchain_llvm_android&quot;&gt;&lt;strong&gt;Toolchain_LLVM_Android&lt;&#x2F;strong&gt;&lt;&#x2F;a&gt; &lt;br &#x2F;&gt;
+This repository hosts the build scripts and instructions on building
+AOSP&#x27;s LLVM distribution on AArch64 Host, which targets AArch64 and
+Arm platforms&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;Once I dealt with the toolchains, I could focus on building Android.
+Unfortunately this part is still unfinished due to the massive scale of
+thought-process and work it requires. Still, I will report on whatever I
+have been doing:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;WantGuns&#x2F;manifest&#x2F;&quot;&gt;&lt;strong&gt;Manifest&lt;&#x2F;strong&gt;&lt;&#x2F;a&gt; &lt;br &#x2F;&gt;
+This is the (yet-to-be) SharkBait Manifest. It houses the different
+AOSP components SharkBait pulls in order to build Android. Some of
+which I have been working on:
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;WantGuns&#x2F;android_build_soong&#x2F;commits?author=WantGuns&quot;&gt;android_build_blueprint&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;WantGuns&#x2F;android_build_soong&#x2F;commits?author=WantGuns&quot;&gt;android_build_soong&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;WantGuns&#x2F;android_build&#x2F;commits?author=WantGuns&quot;&gt;android_build&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;future-work&quot;&gt;Future Work&lt;&#x2F;h2&gt;
+&lt;p&gt;There are many things to be concerned with such as the flow of project
+development to follow, how exactly we should aim introducing
+arm64 as an host. &lt;br &#x2F;&gt;
+Plus the final goal of SharkBait is the ability to
+upgrade its Android container with the use of Portage, thus providing
+granular, GNU like updates to Android, quite possibly the first time
+ever. Keeping all this in mind we needed a proper roadmap on how to
+achieve this. My vision for it resembles somewhat like the following:&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;Build Android as an whole separate entity on AArch64.&lt;&#x2F;li&gt;
+&lt;li&gt;Then compose a monolithic ebuild for the exact same thing.&lt;&#x2F;li&gt;
+&lt;li&gt;Start breaking parts from Android:
+&lt;ul&gt;
+&lt;li&gt;Ship the toolchains used by AOSP separately using Portage and
+possibly integrate it with crossdev.&lt;&#x2F;li&gt;
+&lt;li&gt;Ship the necessary prebuilt &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;LineageOS&#x2F;android_prebuilts_build-tools&quot;&gt;build-tools&lt;&#x2F;a&gt; AOSP bundles as
+packages with Portage on arm64.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;li&gt;
+&lt;li&gt;Capitalizing on the fact that AOSP code is highly modular, separate
+those modules into different packages under a common overlay.&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;And since I consider myself apt in bringing this for SharkBait, I would
+love to work on it even after GSoC finishes.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;acknowledgements&quot;&gt;Acknowledgements&lt;&#x2F;h2&gt;
+&lt;p&gt;I immensely appreciate the patience of my mentor, Benda Xu. He has
+always given me the helm when it comes to SharkBait, while still
+actively monitoring my work and helping me out. Without his generous
+efforts of providing me with an industry-standard arm64 server, I dont
+think I could consider this GSoC a success.&lt;&#x2F;p&gt;
+&lt;p&gt;My co-mentors - Pengcheng Xu, Lucas Ramage and Stephen Christie helped
+me whenever I got stuck in my work. Pengcheng offered me assistance in
+getting UART work for my Phone, Lucas actively kept a lookout on my work
+and Stephen would offer me assistance in getting better hardware without
+two thoughts.&lt;&#x2F;p&gt;
+&lt;p&gt;All of them offered crucial personal help whenever I was stuck, be it my
+work, understanding the project or even my proposal writing, something
+which I can never overlook.&lt;&#x2F;p&gt;
+&lt;p&gt;The least I can do to return their favours is to bring SharkBait to all
+its glory, which I eagerly wait for.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Building Android: BTS</title>
+        <published>2020-07-13T00:00:00+00:00</published>
+        <updated>2020-07-13T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://wantguns.dev/build-android/"/>
+        <id>https://wantguns.dev/build-android/</id>
+        
+        <content type="html" xml:base="https://wantguns.dev/build-android/">&lt;p&gt;So you&#x27;ve successfully compiled AOSP. But you are still not entertained
+and rather inquisitive about how things worked under the hood after you
+hit &lt;code&gt;make bacon&lt;&#x2F;code&gt; or &lt;code&gt;brunch&lt;&#x2F;code&gt; on your Lineage tree.&lt;&#x2F;p&gt;
+&lt;p&gt;I am too and so I decided to take a look under the myriad that AOSP is.
+In this blog, I would share what I have learned so far, also being
+relevent to my GSoC obligations and therefore prepping hand by hand for a native aarch64 build.&lt;&#x2F;p&gt;
+&lt;p&gt;So just setup your build environment and follow along.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h2 id=&quot;toolchains&quot;&gt;Toolchains&lt;&#x2F;h2&gt;
+&lt;p&gt;Android has decided to phase out of using a GCC toolchain to the
+LLVM&#x2F;Clang based solution since Android 8.0. People usually see a
+performance boost after the switch.&lt;&#x2F;p&gt;
+&lt;p&gt;The actual Toolchain AOSP uses is already prebuilt and bundled with the
+entire AOSP source. But since AOSP only supports a Linux&#x2F;Darwin x86 host
+enviroment for building, we will have to build our own toolchain
+supporting aarch64 hosts.&lt;&#x2F;p&gt;
+&lt;p&gt;In order to do that we shall dive deep first and study &lt;a href=&quot;https:&#x2F;&#x2F;android.googlesource.com&#x2F;toolchain&#x2F;llvm_android&#x2F;&quot;&gt;llvm_android&lt;&#x2F;a&gt;,
+the source of the prebuilt toolchain.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;llvm-android&quot;&gt;LLVM_android&lt;&#x2F;h3&gt;
+&lt;p&gt;&lt;em&gt;I should mention that we could have used vanilla LLVM, but Google pushes some &lt;a href=&quot;https:&#x2F;&#x2F;android.googlesource.com&#x2F;toolchain&#x2F;llvm_android&#x2F;+&#x2F;refs&#x2F;heads&#x2F;master&#x2F;patches&#x2F;&quot;&gt;patches&lt;&#x2F;a&gt; along with its LLVM fork which is required by AOSP. So it is better if we stick to the way Google handles it. These patches are applied to the toolchain in between its compilation.&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;After setting that toolchain up and doing a build test on x86, we
+realise that LLVM_android ships with prebuilt GCC and Clang toolchains.
+It uses Clang as its compiler and GCC&#x27;s libs and binaries to build the
+stage 1 of the LLVM_android compiler.&lt;&#x2F;p&gt;
+&lt;p&gt;LLVM_android also ships with the Bionic (Android&#x27;s libc) sources. Though we notice while building the toolchain that only Bionic&#x27;s headers are copied to the building toolchain. Bionic is not compiled at this stage.&lt;&#x2F;p&gt;
+&lt;p&gt;After building &lt;code&gt;swig&lt;&#x2F;code&gt; and &lt;code&gt;libedit&lt;&#x2F;code&gt; we finally reach the start of stage
+2.
+As expected the script now calls CMake again but with debug flags
+referring to the newly built Clang&#x2F;++ and its libraries. It also calls
+the prebuilt libraries like it did earlier.&lt;&#x2F;p&gt;
+&lt;p&gt;Briefly put these are all the building parts, in order:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;For Linux:
+&lt;ul&gt;
+&lt;li&gt;Stage 1:  builds the crude Clang&lt;&#x2F;li&gt;
+&lt;li&gt;swig:     required for Stage 2&lt;&#x2F;li&gt;
+&lt;li&gt;libedit:  required for Stage 2&lt;&#x2F;li&gt;
+&lt;li&gt;Stage 2:  builds the final Clang&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;li&gt;
+&lt;li&gt;For Android { arm, aarch64, x86, i386 }:
+&lt;ul&gt;
+&lt;li&gt;sysroots&lt;&#x2F;li&gt;
+&lt;li&gt;compiler-rt&lt;&#x2F;li&gt;
+&lt;li&gt;compiler-rt-i386-host (only for linux)&lt;&#x2F;li&gt;
+&lt;li&gt;libomp&lt;&#x2F;li&gt;
+&lt;li&gt;lldb-server&lt;&#x2F;li&gt;
+&lt;li&gt;asan-mapfile&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;We will have to patch &lt;a href=&quot;https:&#x2F;&#x2F;android.googlesource.com&#x2F;toolchain&#x2F;llvm_android&#x2F;+&#x2F;refs&#x2F;heads&#x2F;master&#x2F;paths.py&quot;&gt;paths.py&lt;&#x2F;a&gt; and replace the paths where the script calls its tools with the host&#x27;s to compensate for the aarch64 host.
+Additionally, we should only &lt;code&gt;sync&lt;&#x2F;code&gt; the repositories which are necessary by editing the &lt;code&gt;.repo&#x2F;manifest.xml&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;But enough of that, let&#x27;s move on to building Android now.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;building-android-using-the-toolchain-we-just-made&quot;&gt;Building Android using the toolchain we just made&lt;&#x2F;h2&gt;
+&lt;p&gt;If not done already, sync Lineage&#x27;s Android Manifest.
+Put the newly made toolchain at &lt;code&gt;prebuilts&#x2F;clang&#x2F;host&#x2F;linux-x86&#x2F;&lt;&#x2F;code&gt;
+and change the Clang version to that of the one we just built at
+&lt;code&gt;build&#x2F;soong&#x2F;cmd&#x2F;cc&#x2F;config&#x2F;global.go&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;Now setup the environment and brunch your device.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;source&lt;&#x2F;span&gt;&lt;span&gt; build&#x2F;envsetup.sh
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;brunch&lt;&#x2F;span&gt;&lt;span&gt; _TARGET_NAME_
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;You&#x27;ll notice that Building would give errors due to warnings.
+We come to yet another realisation that AOSP uses an older version of Clang (9.0.3 currently).
+The toolchain we just built is at bleeding edge, and is throwing errors at the old code as it
+finds vulnerabilities in it.
+We should recall that the lineage tree we synced is stable and so all
+the warnings generated by the newer compiler can actually be avoided. We
+could approach this in two ways:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Disable certain flags which throws those errors.&lt;&#x2F;li&gt;
+&lt;li&gt;compile the current supported version of clang and use it instead.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;Approach 1 would be time intensive and not scalable in any way, since we
+don&#x27;t control the main tree and upstream could make our forks fatal.
+So we should follow the second approach.&lt;&#x2F;p&gt;
+&lt;p&gt;And so once we get a hold of the correct toolchain version, the builds
+should not be throwing errors.&lt;&#x2F;p&gt;
+&lt;p&gt;Let me explain the build process now. Once you &lt;code&gt;make bacon&lt;&#x2F;code&gt; or &lt;code&gt;brunch&lt;&#x2F;code&gt;,
+the soong build system is called and is compiled.
+The very first program built is &lt;code&gt;soong_ui&lt;&#x2F;code&gt; which is the build
+system used to iniate the build process. The target you lunch will be
+passed to the newly built &lt;code&gt;soong_ui&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;Go is used to build all of &lt;code&gt;soong&lt;&#x2F;code&gt;, and AOSP ships its prebuilt version of Go.
+We will have to change the location of GOROOT to use host&#x27;s tools.
+GOROOT is called at &lt;code&gt;build&#x2F;blueprint&#x2F;microfactory&#x2F;microfactory.bash&lt;&#x2F;code&gt;
+so we will edit it there.&lt;&#x2F;p&gt;
+&lt;p&gt;Eventually it parses all the blueprint files (.bp extensions), and kati parses all
+the makefiles. Once the &lt;code&gt;build.ninja&lt;&#x2F;code&gt; file is created, the Android build
+is ready to start.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;code&gt;build.ninja&lt;&#x2F;code&gt; is called and it starts building certain intermediates
+first which would be used later in assistance to build Android. One of
+these intermediates which is of concern to us is &lt;strong&gt;&lt;code&gt;Bionic&lt;&#x2F;code&gt;&lt;&#x2F;strong&gt;.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;compiling-bionic&quot;&gt;Compiling Bionic&lt;&#x2F;h3&gt;
+&lt;p&gt;Like we discussed earlier, Bionic&#x27;s header files are already included in
+the llvm_android toolchain. But the &lt;code&gt;libc&lt;&#x2F;code&gt; sources are not compiled then.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;code&gt;libc&lt;&#x2F;code&gt; and friends are actually compiled within the build as
+intermediates and then copied to some different folder under &lt;code&gt;&#x2F;out&lt;&#x2F;code&gt;, from where it
+gets called later in the build process.&lt;&#x2F;p&gt;
+&lt;p&gt;So, as I believe, once we have the toolchain ready, we should be good to
+go for building Android using aarch64 host. I will be setting up an
+ARM based VPS for the same, since I only have 32 gig of storage on my
+phone.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;&#x2F;h2&gt;
+&lt;p&gt;We need to build llvm_android on aarch64 host, by patching the build scripts provided by Google.
+Also we need to build the &lt;a href=&quot;https:&#x2F;&#x2F;android.googlesource.com&#x2F;platform&#x2F;prebuilts&#x2F;clang&#x2F;host&#x2F;linux-x86&#x2F;+&#x2F;master&#x2F;README.md#llvm-users&quot;&gt;latest supported version&lt;&#x2F;a&gt; of Clang&#x2F;LLVM.
+Once that is done, we will have to edit the paths of various tools called in the AOSP tree with our host&#x27;s. And then finally, test a build.&lt;&#x2F;p&gt;
+&lt;p&gt;Achieving this should mark my task of building Android on aarch64 Host,
+which is incomplete in the sense that I don&#x27;t have a separatable
+toolchain. But once we are through with this process, Separating Bionic
+and implementing crossdev for the toolchain would be easier.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Starting System-as-Root Android in a LXC container</title>
+        <published>2020-06-23T00:00:00+00:00</published>
+        <updated>2020-06-23T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://wantguns.dev/starting-android-in-gentoo/"/>
+        <id>https://wantguns.dev/starting-android-in-gentoo/</id>
+        
+        <content type="html" xml:base="https://wantguns.dev/starting-android-in-gentoo/">&lt;p&gt;As I progress in my GSoC journey, my next task is to boot System-As-Root based Android in an LXC container inside Gentoo. As the name suggests, SAR devices use &#x2F;system as their rootdir instead of &#x2F;boot. SharkBait was based on the older booting mechanism.
+If you would want to know more about Android&#x27;s Booting mechanism, I would recommend to have a look at this &lt;a href=&quot;https:&#x2F;&#x2F;wantguns.dev&#x2F;android-boot-high-jinks&#x2F;&quot;&gt;blog&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;Basically if you own a device that &lt;strong&gt;&lt;em&gt;shipped&lt;&#x2F;em&gt;&lt;&#x2F;strong&gt; with Android 9 (even the ones which are updated to Android 10) you would want to follow this guide.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h2 id=&quot;prerequisites&quot;&gt;Prerequisites&lt;&#x2F;h2&gt;
+&lt;p&gt;This setup expects some prerequisites which are as follows:&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;Have Gentoo installed as a chroot in your Android device. &lt;a href=&quot;https:&#x2F;&#x2F;wantguns.dev&#x2F;install-gentoo&#x2F;&quot;&gt;guide&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;You should have a LXC enabled Kernel. &lt;a href=&quot;https:&#x2F;&#x2F;wiki.gentoo.org&#x2F;wiki&#x2F;LXC#Kernel_with_the_appropriate_LXC_options_enabled&quot;&gt;guide&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;You should have encryption disabled on your phone. &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;Zackptg5&#x2F;Disable_Dm-Verity_ForceEncrypt&quot;&gt;guide&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;You should have SELinux disabled.&lt;&#x2F;li&gt;
+&lt;li&gt;You should have the &lt;strong&gt;schedtune&lt;&#x2F;strong&gt; cgroup disabled.&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;The 4th and 5th prerequisites are addressed in the next section.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;preparing-the-boot-image&quot;&gt;Preparing the boot image&lt;&#x2F;h2&gt;
+&lt;p&gt;Clone the SAR-Preinit repository&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;git&lt;&#x2F;span&gt;&lt;span&gt; clone https:&#x2F;&#x2F;gitlab.com&#x2F;WantGuns&#x2F;sar-preinit.git&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; --depth&lt;&#x2F;span&gt;&lt;span&gt; 1
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Pull out your device&#x27;s &lt;code&gt;boot.img&lt;&#x2F;code&gt; in the artifacts directory.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;cd&lt;&#x2F;span&gt;&lt;span&gt; sar-preinit
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;adb&lt;&#x2F;span&gt;&lt;span&gt; root
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;adb&lt;&#x2F;span&gt;&lt;span&gt; shell dd if=&#x2F;dev&#x2F;block&#x2F;bootdevice&#x2F;by-name&#x2F;boot &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;| &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;dd&lt;&#x2F;span&gt;&lt;span&gt; of=artifacts&#x2F;boot.img
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Now unpack the boot.img using the Makefile provided and edit the &lt;strong&gt;bootimg.cfg&lt;&#x2F;strong&gt; file produced in &lt;code&gt;out&#x2F;unpack&lt;&#x2F;code&gt; directory.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;make&lt;&#x2F;span&gt;&lt;span&gt; unpack
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;nvim&lt;&#x2F;span&gt;&lt;span&gt; out&#x2F;unpack&#x2F;bootimg.cfg
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Add this string to the &lt;code&gt;cmdline&lt;&#x2F;code&gt; key, if not already present.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;txt&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-txt &quot;&gt;&lt;code class=&quot;language-txt&quot; data-lang=&quot;txt&quot;&gt;&lt;span&gt;androidboot.selinux=permissive cgroup_disable=schedtune
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This addresses the 4th and 5th prerequisites. If the kernel you are currently using is not LXC-enabled, you could swap the &lt;strong&gt;zImage&lt;&#x2F;strong&gt; inside the unpack directory with the LXC-enabled kernel image.&lt;&#x2F;p&gt;
+&lt;p&gt;Now we can finally repack and patch the boot image for the use of SharkBait.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;make&lt;&#x2F;span&gt;&lt;span&gt; repack
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The &lt;code&gt;boot-mod.img&lt;&#x2F;code&gt; under the out directory is the patched boot which we need. Just don&#x27;t flash it yet.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;preparing-the-bootstrap-init&quot;&gt;Preparing the bootstrap-init&lt;&#x2F;h2&gt;
+&lt;p&gt;Since System-As-Root requires a special environment unlike Android&#x27;s older iterations, we need a &lt;strong&gt;init&lt;&#x2F;strong&gt; to bootstrap Android in the container.
+Currently the &lt;strong&gt;bootstrap-init&lt;&#x2F;strong&gt; requires NDK for building, this is subject to change for native compilation later.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;em&gt;People who are in a hurry could checkout the pre-built binaries provided &lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;WantGuns&#x2F;bootstrap-init&#x2F;-&#x2F;jobs&#x2F;608731821&#x2F;artifacts&#x2F;browse&#x2F;libs&#x2F;&quot;&gt;here&lt;&#x2F;a&gt; and skip the hassle of manually setting up their environment and compiling it.&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;If you&#x27;re not one of them, continue following.
+Clone the repository and edit the Makefile&#x27;s provided NDK path with your own NDK path.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;git&lt;&#x2F;span&gt;&lt;span&gt; clone https:&#x2F;&#x2F;gitlab.com&#x2F;WantGuns&#x2F;bootstrap-init.git&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; --depth&lt;&#x2F;span&gt;&lt;span&gt; 1
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;cd&lt;&#x2F;span&gt;&lt;span&gt; bootstrap-init
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;nvim&lt;&#x2F;span&gt;&lt;span&gt; Makefile
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Then call &lt;code&gt;make&lt;&#x2F;code&gt; in the bootstrap-init folder. This will build the required binary for different architechtures, we should focus on arm64-v8a inside the libs folder.&lt;&#x2F;p&gt;
+&lt;p&gt;Copy the downloaded&#x2F;compiled &lt;strong&gt;bootstrap-init&lt;&#x2F;strong&gt; to Gentoo&#x27;s home, we will need it later.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;adb&lt;&#x2F;span&gt;&lt;span&gt; push libs&#x2F;arm64-v8a&#x2F;bootstrap-init &#x2F;data&#x2F;gnu&#x2F;home&#x2F;init
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;preparing-gentoo-for-android&quot;&gt;Preparing Gentoo for Android&lt;&#x2F;h2&gt;
+&lt;p&gt;Chroot into Gentoo and start setting it up.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;adb&lt;&#x2F;span&gt;&lt;span&gt; root
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;adb&lt;&#x2F;span&gt;&lt;span&gt; shell
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;## Now switched to Android&amp;#39;s shell
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Generate SSH key pairs, (will come in use later)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;ssh-keygen&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -t&lt;&#x2F;span&gt;&lt;span&gt; ed25519&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -C&lt;&#x2F;span&gt;&lt;span&gt; android&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -f&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;data&#x2F;ssh&#x2F;id_ed25519
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;mount&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -t&lt;&#x2F;span&gt;&lt;span&gt; proc &#x2F;proc &#x2F;data&#x2F;gnu&#x2F;proc
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;mount&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; --rbind&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;dev &#x2F;data&#x2F;gnu&#x2F;dev
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;mount&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; --rbind&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;sys &#x2F;data&#x2F;gnu&#x2F;sys
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;chroot&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;data&#x2F;gnu &#x2F;bin&#x2F;bash
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;## Now switched to Gentoo&amp;#39;s root
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;source&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;etc&#x2F;profile
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;mkdir&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -p&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;var&#x2F;lib&#x2F;android&#x2F;{system,vendor,data,system,cache}
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;mkdir&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -p&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android&#x2F;{rootfs,run,artifacts}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;All the commands henceforth are executed in the Gentoo chroot unless specified otherwise.&lt;&#x2F;em&gt;&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;fstab&quot;&gt;Fstab&lt;&#x2F;h3&gt;
+&lt;p&gt;Edit Gentoo&#x27;s fstab with mount entries for Android&#x27;s partitions.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#888888;&quot;&gt;####&#x2F;etc&#x2F;fstab#####
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Android mounts
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;&#x2F;dev&#x2F;mmcblk0p63&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;var&#x2F;lib&#x2F;android&#x2F;system ext4 ro,barrier=1,inode_readahead_blks=8 0 0
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;&#x2F;dev&#x2F;mmcblk0p55&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;var&#x2F;lib&#x2F;android&#x2F;persist ext4 noatime,nosuid,nodev,barrier=1,data=ordered,nomblk_io_submit 0 0
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;&#x2F;dev&#x2F;mmcblk0p64&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;var&#x2F;lib&#x2F;android&#x2F;vendor ext4 ro,barrier=1,inode_readahead_blks=8 0 0
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;&#x2F;dev&#x2F;mmcblk0p62&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;var&#x2F;lib&#x2F;android&#x2F;cache ext4 noatime,nosuid,nodev,barrier=1,data=ordered,nomblk_io_submit,noauto_da_alloc 0 0
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;&#x2F;dev&#x2F;mmcblk0p66&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;var&#x2F;lib&#x2F;android&#x2F;data ext4 noatime,nosuid,nodev,barrier=1,data=ordered,nomblk_io_submit,noauto_da_alloc,inode_readahead_blks=8 0 0
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Bind into container
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;&#x2F;run&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android&#x2F;rootfs&#x2F;run none bind 0 0
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h3 id=&quot;install-lxc&quot;&gt;Install LXC&lt;&#x2F;h3&gt;
+&lt;p&gt;At the time of writing this blog, LXC&#x27;s version 4 does not work for the setup. I would recommend to install the version 3.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;emerge&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -av --autounmask&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span&gt;y =app-emulation&#x2F;lxc-3.0.3
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;After this is done, setup the helper scripts for the container.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;cd&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;## lxc&amp;#39;s config
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;cat &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&amp;gt;&lt;&#x2F;span&gt;&lt;span&gt; config &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&amp;lt;&amp;lt;EOF
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;lxc.uts.name = android
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;lxc.rootfs.path = &#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android&#x2F;rootfs&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;lxc.init.cmd = &#x2F;init
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;lxc.net.0.type = none
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;lxc.autodev = 0
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;lxc.log.level = 0
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;lxc.log.file = &#x2F;var&#x2F;log&#x2F;lxc&#x2F;hellalxc.log
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;lxc.hook.pre-start = &#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android&#x2F;pre-start.sh
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;lxc.hook.post-stop = &#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android&#x2F;post-stop.sh
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;lxc.cgroup.cpu.rt_runtime_us = 950000
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;lxc.console.path = none
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;EOF
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;## pre-start.sh
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;cat &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&amp;gt;&lt;&#x2F;span&gt;&lt;span&gt; pre-start.sh &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&amp;lt;&amp;lt;EOF
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;#!&#x2F;bin&#x2F;sh
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;cp &#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android&#x2F;artifacts&#x2F;init &#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android&#x2F;rootfs&#x2F;init
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;mkdir -p &#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android&#x2F;rootfs&#x2F;dev
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;mkdir -p &#x2F;run
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;if [ -f &#x2F;run&#x2F;.android-shutdown ]; then
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;        # we&amp;#39;re shutting down; don&amp;#39;t respawn
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;        echo &amp;quot;Shutting down, won&amp;#39;t restart.&amp;quot;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;        exit 1
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;fi
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;# handle cgroup
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;mkdir &#x2F;sys&#x2F;fs&#x2F;cgroup&#x2F;cpu&#x2F;lxc
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;echo 950000 &amp;gt; &#x2F;sys&#x2F;fs&#x2F;cgroup&#x2F;cpu&#x2F;lxc&#x2F;cpu.rt_runtime_us
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;EOF
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;## post-stop.sh
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;cat &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&amp;gt;&lt;&#x2F;span&gt;&lt;span&gt; post-stop.sh &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&amp;lt;&amp;lt;EOF
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;#!&#x2F;bin&#x2F;bash
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;# do not reboot &#x2F; restart when debugging
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;if [ -f &#x2F;run&#x2F;.android-debug ]; then
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;        echo &amp;quot;Debug mode, won&amp;#39;t power off.&amp;quot;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;        exit 0
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;fi
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;# clean rootfs for SAR-enabled devices.
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;rm -rf &#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android&#x2F;rootfs&#x2F;*
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;# leave mark to prevent container restart
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;touch &#x2F;run&#x2F;.android-shutdown
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;if [ -f &#x2F;run&#x2F;.android-reboot ]; then
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;        echo &amp;quot;Rebooting...&amp;quot;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;        reboot
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;else
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;        echo &amp;quot;Powering off...&amp;quot;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;        poweroff
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;fi
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;EOF
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Copy the &lt;strong&gt;bootstrap-init&lt;&#x2F;strong&gt; binary to the &lt;strong&gt;artifacts&lt;&#x2F;strong&gt; folder.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;cp&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;home&#x2F;init &#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android&#x2F;artifacts&#x2F;init
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;If it helps, this is the &lt;code&gt;&#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android&lt;&#x2F;code&gt; tree :&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;localhost&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android $ tree .
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;.
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;├──&lt;&#x2F;span&gt;&lt;span&gt; artifacts
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;│&lt;&#x2F;span&gt;&lt;span&gt;   └── init
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;├──&lt;&#x2F;span&gt;&lt;span&gt; config
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;├──&lt;&#x2F;span&gt;&lt;span&gt; post-stop.sh
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;├──&lt;&#x2F;span&gt;&lt;span&gt; pre-start.sh
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;├──&lt;&#x2F;span&gt;&lt;span&gt; rootfs
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;└──&lt;&#x2F;span&gt;&lt;span&gt; run
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Check if the container is getting detected by Android using &lt;code&gt;lxc-info android&lt;&#x2F;code&gt;. If it is getting detected, we should be ready to go.&lt;&#x2F;p&gt;
+&lt;p&gt;Finally, setup the &lt;strong&gt;lxc.android&lt;&#x2F;strong&gt; service so that the container auto-starts on boot.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;cd&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;etc&#x2F;init.d
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;ln&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -s&lt;&#x2F;span&gt;&lt;span&gt; lxc lxc.android
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;rc-update&lt;&#x2F;span&gt;&lt;span&gt; add lxc.android boot
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;As a bonus, we can also setup SSH for accessing Gentoo when Android boots. The &lt;strong&gt;dialhome&lt;&#x2F;strong&gt; script mentioned below can be found &lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;sharkbaitOS&#x2F;bootstrap&#x2F;setup&#x2F;-&#x2F;blob&#x2F;master&#x2F;scripts&#x2F;dialhome&quot;&gt;here&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;umask&lt;&#x2F;span&gt;&lt;span&gt; 077
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;mkdir&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -p &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;~&lt;&#x2F;span&gt;&lt;span&gt;&#x2F;.ssh
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;mount&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;dev&#x2F;block&#x2F;by-name&#x2F;userdata &#x2F;var&#x2F;lib&#x2F;android&#x2F;data&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;cat&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;var&#x2F;lib&#x2F;android&#x2F;data&#x2F;ssh&#x2F;id_ed25519.pub &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&amp;gt;&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;~&lt;&#x2F;span&gt;&lt;span&gt;&#x2F;.ssh&#x2F;authorized_keys
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;cp&lt;&#x2F;span&gt;&lt;span&gt; dialhome &#x2F;var&#x2F;lib&#x2F;android&#x2F;data&#x2F;ssh&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;chmod&lt;&#x2F;span&gt;&lt;span&gt; u+x &#x2F;var&#x2F;lib&#x2F;android&#x2F;data&#x2F;ssh&#x2F;dialhome
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;chown&lt;&#x2F;span&gt;&lt;span&gt; 2000:2000 &#x2F;var&#x2F;lib&#x2F;android&#x2F;data&#x2F;ssh&#x2F;dialhome
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;umount&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;var&#x2F;lib&#x2F;android&#x2F;data
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;rc-update&lt;&#x2F;span&gt;&lt;span&gt; add sshd default
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;We are done with Gentoo now, exit it and unmount its pseudofs&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;exit
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;## Now back in Android&amp;#39;s Shell
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;umount&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -f&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;data&#x2F;gnu&#x2F;proc
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;umount&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -l&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;data&#x2F;gnu&#x2F;sys
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;umount&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -l&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;data&#x2F;gnu&#x2F;dev
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;final-steps&quot;&gt;Final Steps&lt;&#x2F;h2&gt;
+&lt;p&gt;We are almost done now.&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;Reboot to your Recovery and flash the &lt;code&gt;boot-mod.img&lt;&#x2F;code&gt; to the &lt;code&gt;boot&lt;&#x2F;code&gt; partition.
+Fastboot users could also flash it via&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;fastboot&lt;&#x2F;span&gt;&lt;span&gt; flash boot boot-mod.img
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;ol&gt;
+&lt;li&gt;While you&#x27;re in the Recovery mode, fire up adb again and patch the &lt;code&gt;init.rc&lt;&#x2F;code&gt; present in &lt;code&gt;&#x2F;system&lt;&#x2F;code&gt; according to the patch &lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;sharkbaitOS&#x2F;bootstrap&#x2F;setup&#x2F;-&#x2F;blob&#x2F;master&#x2F;devices&#x2F;angler&#x2F;patches&#x2F;init.rc.patch&quot;&gt;here&lt;&#x2F;a&gt;. Keep in mind that we &lt;strong&gt;&lt;em&gt;do not&lt;&#x2F;em&gt;&lt;&#x2F;strong&gt; need to patch Android&#x27;s &lt;code&gt;fstab&lt;&#x2F;code&gt; if you&#x27;re following this setup.&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;And then finally cross your fingers and reboot. If Android boots, congrats, you just joined the SharkBait party. But it gets even better.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h2 id=&quot;final-thoughts-and-scopes-of-improvement&quot;&gt;Final Thoughts and Scopes of Improvement&lt;&#x2F;h2&gt;
+&lt;p&gt;If Android does not boot, check the logs at &lt;code&gt;&#x2F;data&#x2F;gnu&#x2F;var&#x2F;logs&lt;&#x2F;code&gt;. Check &lt;code&gt;dmesg&lt;&#x2F;code&gt; for kernel logs, &lt;code&gt;rc.log&lt;&#x2F;code&gt;, &lt;code&gt;messages&lt;&#x2F;code&gt; for Gentoo&#x27;s logs, &lt;code&gt;lxc&#x2F;hellalxc.log&lt;&#x2F;code&gt; and &lt;code&gt;lxc&#x2F;android.log&lt;&#x2F;code&gt; for LXC logs.&lt;&#x2F;p&gt;
+&lt;p&gt;Currently SharkBait is at a very young stage. Encryption and SELinux are not supported right now. But this is subject to change once SharkBait matures.&lt;&#x2F;p&gt;
+&lt;p&gt;Also if this entire process seems a bit lengthy, I should inform that when the &lt;strong&gt;bootstrap-init&lt;&#x2F;strong&gt; and &lt;strong&gt;sar-preinit&lt;&#x2F;strong&gt; merges into the official SharkBait workflow, this install will take significantly lower efforts and would be a breeze to the porters as well as the users of SharkBait.&lt;&#x2F;p&gt;
+&lt;p&gt;Lastly I should give credits to the official &lt;a href=&quot;https:&#x2F;&#x2F;wiki.gentoo.org&#x2F;wiki&#x2F;Android&#x2F;SharkBait&#x2F;Starting_Android_in_LXC&quot;&gt;guide&lt;&#x2F;a&gt; on which this install guide is based on. Please have a look at it as well as my other blogs to understand how this works under-the-hood.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;div  class=imageClass &gt;
+    &lt;figure  class=center &gt;
+        &lt;img src=&quot;neofetch.jpg&quot; alt=&quot;neofetch&quot;  
+            
+             class=center  &#x2F;&gt;
+        
+            &lt;figcaption  class=center  
+                &gt;
+                Obligatory Neofetch
+            &lt;&#x2F;figcaption&gt;
+        
+    &lt;&#x2F;figure&gt;
+&lt;&#x2F;div&gt;</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Booting Gentoo from SAR-Preinit; or Debugging the init, the Hard Way</title>
+        <published>2020-06-06T00:00:00+00:00</published>
+        <updated>2020-06-06T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://wantguns.dev/booting-gentoo-using-preinit/"/>
+        <id>https://wantguns.dev/booting-gentoo-using-preinit/</id>
+        
+        <content type="html" xml:base="https://wantguns.dev/booting-gentoo-using-preinit/">&lt;p&gt;As you would know from my previous &lt;a href=&quot;https:&#x2F;&#x2F;wantguns.dev&#x2F;uart-on-lavender&#x2F;&quot;&gt;blog&lt;&#x2F;a&gt;, I couldn&#x27;t make the UART work for my phone. Since without a serial console, the boot-up process is no less than a black-box, I decided to use some hacky debugs for finding out what went wrong with the original &lt;code&gt;preinit&lt;&#x2F;code&gt;. If you&#x27;re not in for the process of going through it and just want to cut to the chase, jump onto this &lt;a href=&quot;https:&#x2F;&#x2F;wantguns.dev&#x2F;booting-gentoo-using-preinit&#x2F;#final-comments-and-what-to-follow-next&quot;&gt;section&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h2 id=&quot;circumventing-system-as-root&quot;&gt;Circumventing System-As-Root&lt;&#x2F;h2&gt;
+&lt;p&gt;So, flashing a &lt;code&gt;preinit&lt;&#x2F;code&gt; failed for me. Again this was because of the changes in the boot-process of newer Android devices. If you have no clue about this, I would recommend reading this &lt;a href=&quot;https:&#x2F;&#x2F;wantguns.dev&#x2F;android-boot-high-jinks&#x2F;&quot;&gt;blog&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;What we needed to change was the behaviour of our kernel to take the &lt;code&gt;ramdisk&lt;&#x2F;code&gt; provided to it in the &lt;code&gt;boot.img&lt;&#x2F;code&gt; as its &lt;code&gt;rootfs&lt;&#x2F;code&gt;. @topjohnwu suggested in his &lt;a href=&quot;https:&#x2F;&#x2F;forum.xda-developers.com&#x2F;apps&#x2F;magisk&#x2F;pixel-2-pixel-2-xl-support-t3697427&#x2F;post74361728#post74361728&quot;&gt;infamous xda comment&lt;&#x2F;a&gt; that it could be achieved by substituting the &lt;code&gt;skip_ramdisk&lt;&#x2F;code&gt; string with any other. I tried doing this but it make the device boot straight up to Lineage (which we do not want).&lt;&#x2F;p&gt;
+&lt;p&gt;Then I looked into what goes on under-the-hood when Magisk is flashed. It seems that Magisk hexpatches the kernel with some specfic strings which ultimately leads the kernel to take the ramdisk inside &lt;code&gt;boot.img&lt;&#x2F;code&gt; as its &lt;code&gt;rootfs&lt;&#x2F;code&gt;.
+I double checked by cpio&#x27;ing the &lt;code&gt;magiskinit64&lt;&#x2F;code&gt; binary into an &lt;code&gt;ramdisk.cpio&lt;&#x2F;code&gt; incpio and then patching the kernel image using &lt;code&gt;magiskboot&lt;&#x2F;code&gt;, in a similar fashion to that of Magisk. Then packed the stuff into a &lt;code&gt;boot.img&lt;&#x2F;code&gt; (ofc including a bootimg.cfg).&lt;&#x2F;p&gt;
+&lt;p&gt;Now remember, since we have patched the kernel, the kernel would take the &lt;code&gt;magiskinit64&lt;&#x2F;code&gt; as its init and exec it. Then &lt;code&gt;magiskinit64&lt;&#x2F;code&gt; would ultimately mount &lt;code&gt;&#x2F;system&lt;&#x2F;code&gt; as root and exec the &lt;code&gt;&#x2F;system&#x2F;bin&#x2F;init&lt;&#x2F;code&gt; thus entering the Android land.&lt;&#x2F;p&gt;
+&lt;p&gt;And so we did. Lineage booted up. To cross-check, I also tried to boot using a boot.img without &lt;code&gt;magiskinit64&lt;&#x2F;code&gt; as its init. It did not reach the Android land.&lt;&#x2F;p&gt;
+&lt;p&gt;And so I adopted this approach for circumventing SAR. But using &lt;code&gt;preinit&lt;&#x2F;code&gt; as the init inside &lt;code&gt;boot.img&lt;&#x2F;code&gt; still did not boot Gentoo up. So we come to the debugging phase.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;the-debugging-phase-skippable&quot;&gt;The Debugging Phase (skippable)&lt;&#x2F;h2&gt;
+&lt;p&gt;The lack of a serial console, made me come up with some ugly debugs. First I tried to access the &lt;code&gt;last_kmsg&lt;&#x2F;code&gt; and &lt;code&gt;console-ramoops-0&lt;&#x2F;code&gt; for getting the kernel logs from the previous reboot. But I didn&#x27;t get any. I double checked my kernel defconfig whether I had the correct options enabled and yes they were.&lt;&#x2F;p&gt;
+&lt;p&gt;At this point, I wan&#x27;t even unhappy. Time for a new debug method. What occured to me next was that we could &lt;code&gt;sleep&lt;&#x2F;code&gt; the init script between certain steps and time the process of my phone bootlooping. For a reference value, I recorded the time it took my phone to boot-loop without any &lt;code&gt;sleep&lt;&#x2F;code&gt;. I prepared myself for a night of constant phone reboots. The table below describes the entire process until finally booting Gentoo with insightful comments at the end.&lt;&#x2F;p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th style=&quot;text-align: center&quot;&gt;Attempt&lt;&#x2F;th&gt;&lt;th style=&quot;text-align: center&quot;&gt;Time (in sec)&lt;&#x2F;th&gt;&lt;th style=&quot;text-align: center&quot;&gt;Remarks&lt;&#x2F;th&gt;&lt;th style=&quot;text-align: center&quot;&gt;Commit&lt;&#x2F;th&gt;&lt;&#x2F;tr&gt;&lt;&#x2F;thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td style=&quot;text-align: center&quot;&gt;1&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;10&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;reference&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;&lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;WantGuns&#x2F;sar-preinit&#x2F;-&#x2F;commit&#x2F;2037d2b9523f9c954b18d6efe85c803cac432563&quot;&gt;link&lt;&#x2F;a&gt;&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td style=&quot;text-align: center&quot;&gt;2&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;20&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;test &lt;code&gt;sleep&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;&lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;WantGuns&#x2F;sar-preinit&#x2F;-&#x2F;commit&#x2F;195c4d40a30bd412c8574d670432098ed1fd4ed9&quot;&gt;link&lt;&#x2F;a&gt;&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td style=&quot;text-align: center&quot;&gt;3&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;30&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;failed to mount at &lt;code&gt;&#x2F;userdata&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;&lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;WantGuns&#x2F;sar-preinit&#x2F;-&#x2F;commit&#x2F;15c1f7ae1c60983141f5f96e82d47c924e075d53&quot;&gt;link&lt;&#x2F;a&gt;&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td style=&quot;text-align: center&quot;&gt;4&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;41&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;kernel panics&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;&lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;WantGuns&#x2F;sar-preinit&#x2F;-&#x2F;commit&#x2F;b373d65a132363d58d608d354e82f1469cc3d289&quot;&gt;link&lt;&#x2F;a&gt;&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td style=&quot;text-align: center&quot;&gt;5&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;41&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;abandoning this approach&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;&lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;WantGuns&#x2F;sar-preinit&#x2F;-&#x2F;commit&#x2F;a5b6ac35c2822fb516bc471f4387a784308f94d3&quot;&gt;link&lt;&#x2F;a&gt;&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td style=&quot;text-align: center&quot;&gt;6&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;21&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;couldn&#x27;t mount &lt;code&gt;&#x2F;dev&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;&lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;WantGuns&#x2F;sar-preinit&#x2F;-&#x2F;commit&#x2F;3db8942d0c31cc3b3184962a4eea403cc6e49bc5&quot;&gt;link&lt;&#x2F;a&gt;&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td style=&quot;text-align: center&quot;&gt;7&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;35&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;&lt;code&gt;&#x2F;dev&lt;&#x2F;code&gt; is mounted&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;&lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;WantGuns&#x2F;sar-preinit&#x2F;-&#x2F;commit&#x2F;4af274df4fcda6ad05c63e6d8caca3cd3c422b47&quot;&gt;link&lt;&#x2F;a&gt;&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td style=&quot;text-align: center&quot;&gt;8&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;60+&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;Gentoo boots&lt;&#x2F;td&gt;&lt;td style=&quot;text-align: center&quot;&gt;&lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;WantGuns&#x2F;sar-preinit&#x2F;-&#x2F;commit&#x2F;f786531094daf77b7a0877177f9888d5d9e9b750&quot;&gt;link&lt;&#x2F;a&gt;&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;&#x2F;tbody&gt;&lt;&#x2F;table&gt;
+&lt;ol start=&quot;3&quot;&gt;
+&lt;li&gt;At this point, I found out that the kernel could mount the userdata partition. I also realised that I was not getting last_ksmg because the kernel was not panicking and instead just &lt;code&gt;exit&lt;&#x2F;code&gt;ing. So I tried to get the &lt;code&gt;last_kmsg&lt;&#x2F;code&gt; next.&lt;&#x2F;li&gt;
+&lt;li&gt;I tried to forcefully panic the kernel. And got the &lt;code&gt;last_kmsg&lt;&#x2F;code&gt; and &lt;code&gt;console-ramoops-0&lt;&#x2F;code&gt; in the next boot. But they didnt have the parts where kernel logged the Preinit messages. So I thought that giving them a higher priority would make them get picked by the &lt;code&gt;last_kmsg&lt;&#x2F;code&gt; and it didn&#x27;t help either.&lt;&#x2F;li&gt;
+&lt;li&gt;Finally I abandoned this approach.&lt;&#x2F;li&gt;
+&lt;li&gt;Then I looked into mounting the pseudo-filesystems. I realised that the kernel could not mount &#x2F;dev.&lt;&#x2F;li&gt;
+&lt;li&gt;I realised that using &lt;code&gt;tmpfs&lt;&#x2F;code&gt; instead of &lt;code&gt;devtmpfs&lt;&#x2F;code&gt; mounts the &lt;code&gt;&#x2F;userdata&lt;&#x2F;code&gt;. What I did not know at that time that my kernel did not have the options for &lt;code&gt;devtmpfs&lt;&#x2F;code&gt; enabled in its &lt;code&gt;defconfig&lt;&#x2F;code&gt;, this all could be avoided.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;code&gt;&#x2F;dev&lt;&#x2F;code&gt; mounts now, but we have to populate it as well.&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;I did not have just 8 attempts, the &lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;WantGuns&#x2F;sar-preinit&#x2F;-&#x2F;commits&#x2F;timer&quot;&gt;commit history&lt;&#x2F;a&gt; would show that I forgot that my kernel was SELinux Enforcing, I had to change that among many other things. Robert Landley&#x27;s &lt;a href=&quot;https:&#x2F;&#x2F;landley.net&#x2F;writing&#x2F;&quot;&gt;blogs&lt;&#x2F;a&gt; on initramfs helped me get to know the very basics of an initramfs.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;final-comments-and-what-to-follow-next&quot;&gt;Final comments and What to follow next&lt;&#x2F;h2&gt;
+&lt;p&gt;My &lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;WantGuns&#x2F;sar-preinit&quot;&gt;sar-preinit&lt;&#x2F;a&gt; repository holds the current workflow of getting a SAR-enabled device boot Gentoo in the Android based device. The Makefile is pretty self-explanatory but still, if you want to follow the process:&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;Install Gentoo in you phone following this &lt;a href=&quot;https:&#x2F;&#x2F;wantguns.dev&#x2F;install-gentoo&#x2F;&quot;&gt;blog&lt;&#x2F;a&gt;.&lt;&#x2F;li&gt;
+&lt;li&gt;Extract the &lt;code&gt;boot.img&lt;&#x2F;code&gt; from you Android phone. At the time of writing this blog, we dont have changing &lt;code&gt;selinux&lt;&#x2F;code&gt; modes automated. Please make sure that you do that first by adding &lt;code&gt;androidboot.selinux=permissive&lt;&#x2F;code&gt; string at the end of the kernel commandline in &lt;code&gt;bootimg.cfg&lt;&#x2F;code&gt;.&lt;&#x2F;li&gt;
+&lt;li&gt;Rename &lt;code&gt;boot.img&lt;&#x2F;code&gt; to &lt;code&gt;ogboot.img&lt;&#x2F;code&gt; and place it inside the artifacts folder.&lt;&#x2F;li&gt;
+&lt;li&gt;Fire up a terminal and run&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;make&lt;&#x2F;span&gt;&lt;span&gt; bootimg_chute
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;ol start=&quot;5&quot;&gt;
+&lt;li&gt;Flash the &lt;code&gt;boot_mod.img&lt;&#x2F;code&gt; created inside the &lt;code&gt;out&lt;&#x2F;code&gt; directory on your phone, preferably using &lt;code&gt;fastboot boot&lt;&#x2F;code&gt;, if you&#x27;re not that confident. &lt;code&gt;fastboot boot&lt;&#x2F;code&gt; somehow doesn&#x27;t work for my device, but that&#x27;s going off-track.&lt;&#x2F;li&gt;
+&lt;li&gt;Since we haven&#x27;t figured out the Android in LXC part yet, the best you could do to check your Gentoo boot, is to reboot into the recovery, fire up adb and check the &lt;code&gt;&#x2F;data&#x2F;gnu&#x2F;var&#x2F;log&#x2F;&lt;&#x2F;code&gt; directory for &lt;code&gt;dmesg&lt;&#x2F;code&gt; or any other logs.&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;I plan to merge this entire workflow into SharkBait, so that you don&#x27;t have to go through the hassle of doing it all.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;p&gt;I should have already mentioned this somewhere, but if I didn&#x27;t, I should tell the readers that all is based on the &lt;a href=&quot;https:&#x2F;&#x2F;www.shark-bait.org&#x2F;&quot;&gt;SharkBaitOS&lt;&#x2F;a&gt; established mostly by @KireinaHoro. The &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;KireinaHoro&#x2F;preinit&quot;&gt;&lt;code&gt;preinit&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; I used as a template was the original one from SharkBaitOS. In order to have a better understanding about this project I would recommend the readers to have a look at &lt;a href=&quot;https:&#x2F;&#x2F;jsteward.moe&#x2F;&quot;&gt;KireinaHoro&#x27;s Blogs&lt;&#x2F;a&gt; as well.&lt;&#x2F;p&gt;
+&lt;p&gt;In my next blog, I will discuss about getting Android 9+ to work inside a LXC-Container, in the Gentoo land. I have yet to achieve doing that myself. Hopefully we will reach there soon.&lt;&#x2F;p&gt;
+&lt;p&gt;Until then, Happy Hacking !&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>UART on Xiaomi Redmi Note 7</title>
+        <published>2020-06-02T00:00:00+00:00</published>
+        <updated>2020-06-02T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://wantguns.dev/uart-on-lavender/"/>
+        <id>https://wantguns.dev/uart-on-lavender/</id>
+        
+        <content type="html" xml:base="https://wantguns.dev/uart-on-lavender/">&lt;p&gt;This blog is a short sequel to my previous &lt;a href=&quot;https:&#x2F;&#x2F;wantguns.dev&#x2F;android-boot-high-jinks&#x2F;&quot;&gt;blog&lt;&#x2F;a&gt; where I discussed why I needed to access a serial console on Redmi Note 7 (I&#x27;ll refer to it using its codename, lavender here onwards). I should give a disclaimer that this blog is one dead-end in the GSoC2020 series. But it could always help newcomers and other curious souls.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h2 id=&quot;the-need-of-a-serial-console&quot;&gt;The Need of a Serial Console&lt;&#x2F;h2&gt;
+&lt;p&gt;My first attempt at porting SharkBait for SAR failed. I was confident about the approach but had trouble finding out what went wrong. If only somehow I could get the kernel logs before my phone went into the bootloop, I could quickly provide fixes.&lt;&#x2F;p&gt;
+&lt;p&gt;Fortunately that is when I found &lt;a href=&quot;https:&#x2F;&#x2F;wiki.postmarketos.org&#x2F;wiki&#x2F;Xiaomi_Redmi_Note_7_(xiaomi-lavender)&quot;&gt;this article&lt;&#x2F;a&gt; from the awesome guys at PostMarketOS. My device had a serial console built in. Accessing it via UART could provide the logs I required.&lt;&#x2F;p&gt;
+&lt;p&gt;So I followed the process described there and disassembled my phone, soldered the required jumper wires to the GPIO pins mentioned in the article and was ready for connecting it to a convertor.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;em&gt;Please excuse the potato quality of the upcoming images.&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;div  class=imageClass &gt;
+    &lt;figure  class=center &gt;
+        &lt;img src=&quot;smallfull.jpg&quot; alt=&quot;Opening the back&quot;  
+            
+             class=center  &#x2F;&gt;
+        
+            &lt;figcaption  class=center  
+                &gt;
+                Opening the back
+            &lt;&#x2F;figcaption&gt;
+        
+    &lt;&#x2F;figure&gt;
+&lt;&#x2F;div&gt;
+&lt;div  class=imageClass &gt;
+    &lt;figure  class=center &gt;
+        &lt;img src=&quot;smallpins.jpg&quot; alt=&quot;GPIO pins&quot;  
+            
+             class=center  &#x2F;&gt;
+        
+            &lt;figcaption  class=center  
+                &gt;
+                Soldered the wires on the GPIO pins
+            &lt;&#x2F;figcaption&gt;
+        
+    &lt;&#x2F;figure&gt;
+&lt;&#x2F;div&gt;&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;pl2303hxa&quot;&gt;PL2303HXA&lt;&#x2F;h2&gt;
+&lt;p&gt;After that, I connected the jumper wires to the PL2303HXA convertor I bought and quickly fired up a &lt;code&gt;screen&lt;&#x2F;code&gt; session, excited to look at the console output.&lt;&#x2F;p&gt;
+&lt;p&gt;But there was &lt;a href=&quot;https:&#x2F;&#x2F;youtu.be&#x2F;UGSwtv_PKHE&quot;&gt;no output&lt;&#x2F;a&gt;. You can see that the convertor&#x27;s RX LED is blinking when the phone boots up, but there is no output on the console end.&lt;&#x2F;p&gt;
+&lt;p&gt;I consulted around with people at PostMarketOS and the SharkBait IRC chat. KireinaHoro asked me to grab a multimeter and check out the voltage the UART operated on. The GPIO pins were at a voltage difference of 1.8V with the ground. I came to the realisation that the PL2303 could not interpret signals with voltage that low. So I decided to buy another convertor, about which I was sure to read signals at 1.8V.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;ft232r&quot;&gt;FT232R&lt;&#x2F;h2&gt;
+&lt;p&gt;&lt;div  class=imageClass &gt;
+    &lt;figure  class=center &gt;
+        &lt;img src=&quot;smallFT232R.jpg&quot; alt=&quot;FT2303R based convertor&quot;  
+            
+             class=center  &#x2F;&gt;
+        
+            &lt;figcaption  class=center  
+                &gt;
+                FT232R based convertor
+            &lt;&#x2F;figcaption&gt;
+        
+    &lt;&#x2F;figure&gt;
+&lt;&#x2F;div&gt;
+&lt;div  class=imageClass &gt;
+    &lt;figure  class=center &gt;
+        &lt;img src=&quot;smallfinal.jpg&quot; alt=&quot;FT2303R&quot;  
+            
+             class=center  &#x2F;&gt;
+        
+            &lt;figcaption  class=center  
+                &gt;
+                Final Product
+            &lt;&#x2F;figcaption&gt;
+        
+    &lt;&#x2F;figure&gt;
+&lt;&#x2F;div&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;With my fingers crossed, I fired up another &lt;code&gt;screen&lt;&#x2F;code&gt; shell, and finally got &lt;em&gt;some&lt;&#x2F;em&gt; output.
+But all I got were the logs thrown by the Bootloader. I needed the kernel logs because the &lt;code&gt;init&lt;&#x2F;code&gt; is launched by the kernel. And so yet again, I went to chat with Alexey from PostMarketOS who is working on lavender. He informed me that the vendor&#x27;s downstream kernel for lavender would not give any UART logs for some reason &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;minlexx&#x2F;android_kernel_xiaomi_lavender&#x2F;blob&#x2F;lineage-16.0&#x2F;arch&#x2F;arm&#x2F;boot&#x2F;dts&#x2F;qcom&#x2F;sdm660-pinctrl.dtsi#L69&quot;&gt;(related)&lt;&#x2F;a&gt;. To get the kernel logs via UART, we would have to use the mainline kernel, but that would mean no android for us.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;p&gt;So I had two options :&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Work on bringing UART to lavender by patching the vendor&#x27;s downstream kernel. But this would take a lot of time from a &lt;em&gt;very&lt;&#x2F;em&gt; beginner kernel hacker like me. Also it would be rather too off-topic from my original GSoC journey.&lt;&#x2F;li&gt;
+&lt;li&gt;Abandon UART altogether. I had some very hacky debugs in mind which I could use. It would take some time to yield a fruitful result but this was a lower hanging fruit.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;And so, I chose the second option.&lt;&#x2F;p&gt;
+&lt;p&gt;Which I am very glad to share, worked out. As of yesterday, I was finally able to boot Gentoo via the preinit, but all that&#x27;s for another blog (coming tomorrow).&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Android Boot High Jinks: And What it Means for SharkBait</title>
+        <published>2020-06-01T00:00:00+00:00</published>
+        <updated>2020-06-01T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://wantguns.dev/android-boot-high-jinks/"/>
+        <id>https://wantguns.dev/android-boot-high-jinks/</id>
+        
+        <content type="html" xml:base="https://wantguns.dev/android-boot-high-jinks/">&lt;p&gt;Presently, SharkBait aims at devices launching with Android version lower than 9. I will discuss few ways we could the port this setup to newer devices, whose boot mechanisms are different. We shall also address the boot process of SharkBait and what System-As-Root actually is.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h2 id=&quot;the-boot-process-of-present-day-sharkbait&quot;&gt;The Boot process of present-day SharkBait&lt;&#x2F;h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Swapping the Android&#x27;s &lt;code&gt;init&lt;&#x2F;code&gt; with &lt;a href=&quot;https:&#x2F;&#x2F;gitlab.com&#x2F;sharkbaitOS&#x2F;bootstrap&#x2F;preinit&quot;&gt;&lt;code&gt;preinit&lt;&#x2F;code&gt;&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;We swapped the &lt;code&gt;init&lt;&#x2F;code&gt; executable present in a functioning boot.img with KireinaHoro&#x27;s &lt;code&gt;preinit&lt;&#x2F;code&gt;.&lt;&#x2F;li&gt;
+&lt;li&gt;Preinit was responsible for early-mounting partitions and finally switch_root to Gentoo&#x27;s init, thus firing OpenRC.&lt;&#x2F;li&gt;
+&lt;li&gt;The &quot;swapping&quot; was essentially replacing a normal Android &lt;code&gt;boot.img&lt;&#x2F;code&gt;&#x27;s &lt;code&gt;ramdisk&lt;&#x2F;code&gt;&#x27;s init with &lt;code&gt;preinit&lt;&#x2F;code&gt;, and then flashing the new &lt;code&gt;boot.img&lt;&#x2F;code&gt;.&lt;&#x2F;li&gt;
+&lt;li&gt;After OpenRC is fired, it starts the lxc.android service.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;li&gt;
+&lt;li&gt;
+&lt;p&gt;The Android lxc container.&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Prior to swapping inits, we established an lxc container in the Gentoo userland.&lt;&#x2F;li&gt;
+&lt;li&gt;The Android rootfs (at that time it was &lt;strong&gt;ramdisk&lt;&#x2F;strong&gt; &lt;em&gt;inside the boot.img&lt;&#x2F;em&gt;), is extracted in the lxc container&#x27;s rootfs folder.&lt;&#x2F;li&gt;
+&lt;li&gt;Android boots inside the container easily.&lt;&#x2F;li&gt;
+&lt;li&gt;The lxc container&#x27;s &lt;code&gt;config&lt;&#x2F;code&gt; might provide some insights as well:&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;pre data-lang=&quot;txt&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-txt &quot;&gt;&lt;code class=&quot;language-txt&quot; data-lang=&quot;txt&quot;&gt;&lt;span&gt;lxc.uts.name = android
+&lt;&#x2F;span&gt;&lt;span&gt;lxc.rootfs.path = &#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android&#x2F;rootfs
+&lt;&#x2F;span&gt;&lt;span&gt;lxc.init.cmd = &#x2F;init
+&lt;&#x2F;span&gt;&lt;span&gt;lxc.net.0.type = none
+&lt;&#x2F;span&gt;&lt;span&gt;lxc.autodev = 0
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;lxc.hook.pre-start = &#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android&#x2F;pre-start.sh
+&lt;&#x2F;span&gt;&lt;span&gt;lxc.hook.post-stop = &#x2F;var&#x2F;lib&#x2F;lxc&#x2F;android&#x2F;post-stop.sh
+&lt;&#x2F;span&gt;&lt;span&gt;lxc.cgroup.cpu.rt_runtime_us = 950000
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This is just a gist of what happened. There was a lot more involved.
+Gentoo&#x27;s &lt;code&gt;fstab&lt;&#x2F;code&gt; was tweaked such that it mounted the device blocks and binded them to the container for Android&#x27;s use.
+Also KireinHoro managed to make a &lt;a href=&quot;https:&#x2F;&#x2F;wiki.gentoo.org&#x2F;wiki&#x2F;Android&#x2F;SharkBait&#x2F;Starting_Android_in_LXC&quot;&gt;working real-time group scheduling model&lt;&#x2F;a&gt; by the use of cgroups.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;changes-in-android-9-devices&quot;&gt;Changes in Android 9+ devices&lt;&#x2F;h2&gt;
+&lt;p&gt;Well, Google has made it very confusing to follow their language in the &lt;a href=&quot;https:&#x2F;&#x2F;source.android.com&#x2F;devices&#x2F;bootloader&#x2F;system-as-root&quot;&gt;AOSP docs&lt;&#x2F;a&gt;, I found that &lt;a href=&quot;https:&#x2F;&#x2F;topjohnwu.github.io&#x2F;Magisk&#x2F;boot.html&quot;&gt;Magisk&#x27;s Documentation&lt;&#x2F;a&gt; is very insightful.
+Basically, Android Kernels dont use ramdisks as their &lt;code&gt;rootfs&lt;&#x2F;code&gt; now. The &lt;a href=&quot;https:&#x2F;&#x2F;source.android.com&#x2F;devices&#x2F;bootloader&#x2F;system-as-root#partition-layouts-nonabdevices&quot;&gt;older ramdisks&lt;&#x2F;a&gt; found inside a &lt;code&gt;boot.img&lt;&#x2F;code&gt; are now merged inside system.img.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;this-poses-some-challenges&quot;&gt;This poses some challenges&lt;&#x2F;h3&gt;
+&lt;ul&gt;
+&lt;li&gt;What do we use now as lxc-container&#x27;s rootfs&lt;&#x2F;li&gt;
+&lt;li&gt;If the kernel does not take a ramdisk inside the &lt;code&gt;boot.img&lt;&#x2F;code&gt; as its rootfs, how do we perform the &quot;&lt;code&gt;init&lt;&#x2F;code&gt; &amp;lt;-&amp;gt; &lt;code&gt;preinit&lt;&#x2F;code&gt; swaps&quot;.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;&lt;strong&gt;Turns out Magisk already has some workarounds.&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;magisk-s-approach-to-system-as-root&quot;&gt;Magisk&#x27;s approach to System-As-Root&lt;&#x2F;h3&gt;
+&lt;p&gt;In order to circumvent the new system.img-as-rootfs approach, Magisk hexpatches the device&#x27;s Kernel to use the &lt;code&gt;ramdisk&lt;&#x2F;code&gt; inside &lt;code&gt;boot.img&lt;&#x2F;code&gt; as rootfs. The hexpatch essentially is just replacing the &lt;code&gt;skip_initramfs&lt;&#x2F;code&gt; with &lt;code&gt;want_initramfs&lt;&#x2F;code&gt; (could be any 4 lettered word instead as well) from the Kernel commandline. But replacing it from the extracted &lt;code&gt;bootimg.cfg&lt;&#x2F;code&gt; of a &lt;code&gt;initrd.img&lt;&#x2F;code&gt; did not work for me. So I stick to using hexpatching using &lt;code&gt;magiskboot&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;Then Magisk patches the original &lt;code&gt;boot.img&lt;&#x2F;code&gt; by adding a new &lt;code&gt;ramdisk.cpio&lt;&#x2F;code&gt; incpio inside it.
+The new &lt;code&gt;ramdisk&lt;&#x2F;code&gt; has &lt;code&gt;magiskinit&lt;&#x2F;code&gt; disguised as &lt;code&gt;init&lt;&#x2F;code&gt;.
+&lt;a href=&quot;https:&#x2F;&#x2F;topjohnwu.github.io&#x2F;Magisk&#x2F;deploy.html#systemless&quot;&gt;Source&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# original System-As-Root ramdisk #####
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;.
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# ramdisk after flashing Magisk #######
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;.
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;|&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span&gt; .backup&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;	`&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span&gt; init
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;code&gt;magiskinit&lt;&#x2F;code&gt; is responsible for :&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Early mounting required partitions. On system-as-root devices, we will switch root to system.&lt;&#x2F;li&gt;
+&lt;li&gt;Injecting magisk services into &lt;code&gt;init.rc&lt;&#x2F;code&gt;.&lt;&#x2F;li&gt;
+&lt;li&gt;Loading sepolicy either from &lt;code&gt;&#x2F;sepolicy&lt;&#x2F;code&gt;, precompiled &lt;code&gt;sepolicy&lt;&#x2F;code&gt; in vendor, or compiling split sepolicy.&lt;&#x2F;li&gt;
+&lt;li&gt;Patching sepolicy rules and dump to &lt;code&gt;&#x2F;sepolicy&lt;&#x2F;code&gt; or &lt;code&gt;&#x2F;sbin&#x2F;.se&lt;&#x2F;code&gt; and patching init or &lt;code&gt;libselinux.so&lt;&#x2F;code&gt; to load the patched policies&lt;&#x2F;li&gt;
+&lt;li&gt;Executing the original init to start the ordinary boot process&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;This is conceptually somewhat similar to KireinaHoro&#x27;s approach at Preinit.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;my-approach-to-revise-sharkbait&quot;&gt;My approach to revise SharkBait&lt;&#x2F;h2&gt;
+&lt;p&gt;I have two approaches. Both approaches have some commonality. We apply the same hexpatch which Magisk applies, to the custom kernel which is already lxc-enabled. This forces the kernel to use the &lt;code&gt;ramdisk&lt;&#x2F;code&gt; inside the &lt;code&gt;boot.img&lt;&#x2F;code&gt; as its &lt;code&gt;rootfs&lt;&#x2F;code&gt;.
+Then we package a new &lt;code&gt;boot.img&lt;&#x2F;code&gt; which had KireinaHoro&#x27;s &lt;code&gt;preinit&lt;&#x2F;code&gt; as its &lt;code&gt;init&lt;&#x2F;code&gt;. I assume, this enables the kernel to fire up Gentoo&#x27;s init and eventually start the lxc-container on the way while Gentoo is booting up.&lt;&#x2F;p&gt;
+&lt;p&gt;We make the edits to the &lt;code&gt;fstab&lt;&#x2F;code&gt; at the &lt;code&gt;&#x2F;vendor&lt;&#x2F;code&gt; partition (which as you might guess, is another change made by google), in order to provide Android with the correct mounts in Gentoo&#x27;s userland.
+Another change made by google was the decision to parse the cgroup mounts using &lt;code&gt;&#x2F;etc&#x2F;cgroups.json&lt;&#x2F;code&gt; instead of the original parsing &lt;code&gt;init.rc&lt;&#x2F;code&gt; approach. &lt;a href=&quot;https:&#x2F;&#x2F;source.android.com&#x2F;devices&#x2F;tech&#x2F;perf&#x2F;cgroups&quot;&gt;Source&lt;&#x2F;a&gt;.
+Fortunately this might not affect us as we dont need to mount any new cgroup. We make edits in the &lt;code&gt;init.rc&lt;&#x2F;code&gt; for bind-mounting the container&#x27;s pseudofs(s).&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;1-w-magisk&quot;&gt;1. w&#x2F; Magisk&lt;&#x2F;h3&gt;
+&lt;p&gt;The differences arises in what we use as the &lt;code&gt;rootfs&lt;&#x2F;code&gt; for our lxc-container.
+The approach I already followed, required using only magiskinit as the &lt;code&gt;rootfs&lt;&#x2F;code&gt;.
+I expected &lt;code&gt;magiskinit&lt;&#x2F;code&gt; to follow its approach and eventually mount all the required device blocks inside the Android userland. Then finally switch to &lt;code&gt;&#x2F;system&lt;&#x2F;code&gt; as the rootdir.
+This was the method which failed, causing my device to bootloop.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;2-w-o-magisk-untriaged&quot;&gt;2. w&#x2F;o Magisk (untriaged)&lt;&#x2F;h3&gt;
+&lt;p&gt;This approach requires to use entire &lt;code&gt;system.img&lt;&#x2F;code&gt;, extracted, as &lt;code&gt;rootfs&lt;&#x2F;code&gt;.
+The &lt;code&gt;init&lt;&#x2F;code&gt; used here is the Android&#x27;s original &lt;code&gt;init&lt;&#x2F;code&gt;.
+Since every file required of the merged ramdisk is present in the &lt;code&gt;rootfs&lt;&#x2F;code&gt;, I expect that &lt;code&gt;init&lt;&#x2F;code&gt; fires up smoothly.&lt;&#x2F;p&gt;
+&lt;p&gt;Except that since &lt;code&gt;system.img&lt;&#x2F;code&gt; should already be mounted by the kernel in a system-as-root device, We might have to mount it manually. &lt;a href=&quot;https:&#x2F;&#x2F;android.googlesource.com&#x2F;platform&#x2F;system&#x2F;core&#x2F;+&#x2F;master&#x2F;init&#x2F;README.md#early-init-boot-sequence&quot;&gt;Source&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;p&gt;&lt;em&gt;P.S. This article was already written in drafts a few weeks ago, the next paragraphs serve no purpose other than that of history. I will be writing more articles explaining what happened afterwards in order to provide a smoother and realistic reading experience.&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Without the use of a serial console, this whole &quot;trace-fest&quot; is difficult to understand. Finding out what went wrong, is on an entirely different level.&lt;&#x2F;p&gt;
+&lt;p&gt;We have no dmesg logs as they get overwritten by the recovery boot, which in turn is what I require to check the dmesg logs.
+Since the kernel does not panic and the &lt;code&gt;init&lt;&#x2F;code&gt; just &lt;code&gt;exit&lt;&#x2F;code&gt;s, we have no &lt;code&gt;last_kmsg&lt;&#x2F;code&gt; or &lt;code&gt;console-ramoops&lt;&#x2F;code&gt; logs either.
+Fortunately spending a lot of time researching I found &lt;a href=&quot;https:&#x2F;&#x2F;wiki.postmarketos.org&#x2F;wiki&#x2F;Xiaomi_Redmi_Note_7_(xiaomi-lavender)&quot;&gt;this&lt;&#x2F;a&gt;.
+My device has a serial-console baked in. Although accessing it would require taking out the phone&#x27;s glass back, it is worth the fruit.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Installing Gentoo on Android</title>
+        <published>2020-04-15T00:00:00+00:00</published>
+        <updated>2020-04-15T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://wantguns.dev/install-gentoo/"/>
+        <id>https://wantguns.dev/install-gentoo/</id>
+        
+        <content type="html" xml:base="https://wantguns.dev/install-gentoo/">&lt;p&gt;I am tired of re-installing gentoo (from an chroot approach) on my phone by connecting parts from different resources and so here is the guide to do it all in a go.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;p&gt;&lt;em&gt;This guide assumes the prerequisite of a rooted phone. Just fire up an adb shell &#x2F; termux and follow this :&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;First we proceed with downloading the correct &lt;a href=&quot;http:&#x2F;&#x2F;distfiles.gentoo.org&#x2F;experimental&#x2F;arm64&#x2F;&quot;&gt;stage3 tarballs&lt;&#x2F;a&gt;. Copy it in your phone&#x27;s storage.&lt;&#x2F;p&gt;
+&lt;p&gt;Then we make a folder for the Gentoo root. Since we are following SharkBait, we will use &lt;code&gt;data&#x2F;gnu&lt;&#x2F;code&gt; as root. Copy the stage3 into it.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;mkdir&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -p&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;data&#x2F;gnu
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;cp&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;sdcard&#x2F;stage3-arm64-&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;data&#x2F;gnu&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;cd&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;data&#x2F;gnu
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Then we extract the stage3&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;tar&lt;&#x2F;span&gt;&lt;span&gt; xpvf stage3-&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;* &lt;&#x2F;span&gt;&lt;span&gt;`&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;--xattrs-include&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;#39;*.*&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;`&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; --numeric-owner
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# no those backticks are not just a content generation error
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;After this we will copy the DNS information in &lt;code&gt;&#x2F;etc&#x2F;resolve.conf&lt;&#x2F;code&gt; so that networking works after entering the new environment.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;cp&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; --dereference&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;etc&#x2F;resolv.conf &#x2F;data&#x2F;gnu&#x2F;etc&#x2F;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Mount the required filesystems:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;cd&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;mount&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -t&lt;&#x2F;span&gt;&lt;span&gt; proc proc &#x2F;data&#x2F;gnu&#x2F;proc
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;busybox&lt;&#x2F;span&gt;&lt;span&gt; mount&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; --rbind&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;dev &#x2F;data&#x2F;gnu&#x2F;dev
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;busybox&lt;&#x2F;span&gt;&lt;span&gt; mount&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; --rbind&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;sys &#x2F;data&#x2F;gnu&#x2F;sys
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Finally we enter the new environment:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;chroot&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;data&#x2F;gnu &#x2F;bin&#x2F;bash
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;source&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;etc&#x2F;profile
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;export &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;PS1&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;(chroot) ${&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;PS1&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;}&amp;quot;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Add Portage to gid 3003(inet):&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;groupadd&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -g&lt;&#x2F;span&gt;&lt;span&gt; 3003 inet &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&amp;amp;&amp;amp; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;gpasswd&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -a&lt;&#x2F;span&gt;&lt;span&gt; portage inet
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h4 id=&quot;configuring-portage-and-emerging-packages&quot;&gt;Configuring Portage and Emerging Packages:&lt;&#x2F;h4&gt;
+&lt;p&gt;These for preventing mount errors while emerging:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;mkdir&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -p&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;dev&#x2F;shm
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;mount&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -t&lt;&#x2F;span&gt;&lt;span&gt; tmpfs&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -o&lt;&#x2F;span&gt;&lt;span&gt; nodev,nosuid,noexec,mode=1777,size=6144m tmpfs &#x2F;dev&#x2F;shm
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;mount&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;dev&#x2F;pts&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -o&lt;&#x2F;span&gt;&lt;span&gt; remount,gid=5,mode=620
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Unless you want to stare at your phone for more than 4 hours, or just have a lot of time, I would recommend you to perform these steps while before going to bed, because this takes time. The best approach would be to do all this in a wake-lock(ed) termux session.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;emerge-webrsync
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;emerge&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; --ask --verbose --update --deep --newuse&lt;&#x2F;span&gt;&lt;span&gt; @world
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h4 id=&quot;configuring-timezone-and-locales&quot;&gt;Configuring Timezone and Locales&lt;&#x2F;h4&gt;
+&lt;p&gt;Set your timezone with the correct one from &lt;code&gt;&#x2F;usr&#x2F;share&#x2F;zoneinfo&lt;&#x2F;code&gt; :&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;echo &amp;quot;Asia&#x2F;Calcutta&amp;quot; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&amp;gt;&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;etc&#x2F;timezone
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;emerge&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; --config&lt;&#x2F;span&gt;&lt;span&gt; sys-libs&#x2F;timezone-data
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Configure locales by uncommenting the correct one from &lt;code&gt;&#x2F;etc&#x2F;locale.gen&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;locale-gen
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;eselect&lt;&#x2F;span&gt;&lt;span&gt; locale list
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# proceed to chose the desired locale
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;env-update &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&amp;amp;&amp;amp; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;source&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;etc&#x2F;profile &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&amp;amp;&amp;amp; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;export &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;PS1&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;(chroot) ${&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;PS1&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;}&amp;quot;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;hr &#x2F;&gt;
+&lt;p&gt;I believe I have covered the information required until device specific steps. Now the part left is to add your device specific unofficial overlay, or continue with the official one, if your device is enlisted in it. An upcoming guide will guide you to make your kernel for SharkBait and finally, deploy SharkBait. Deploying SharkBait currently is a breeze for devices shipping with Android version lower than 9. Since mine did not, I would have to hack around the current script. If the results turn out to be positive, expect another blog coming up. Till then, Happy Hacking !&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+</feed>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Installing Gentoo on Android &middot; Gunwant Jain - @wantguns</title>
+    <meta name="description" content="I am tired of re-installing gentoo on my phone by connecting parts from different resources and so here is the guide to do it all in a go." />
+    <link rel="apple-touch-icon" sizes="180x180" href="https://wantguns.dev/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="https://wantguns.dev/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="https://wantguns.dev/favicon-16x16.png" />
+    <link rel="manifest" href="https://wantguns.dev/site.webmanifest" />
+    <link rel="alternate" type="application/atom+xml" title="RSS" href="https://wantguns.dev/atom.xml">
+
+    <style>@import url("/fonts/cmuserif_roman_macroman/stylesheet.css");@import url("/fonts/cmutypewritertext_light_macroman/stylesheet.css");:root{color-scheme:dark}html,body{background:#000;color:rgba(255,255,255,.9);padding:.3rem;margin:.3rem;text-rendering:optimizeLegibility;font-variant-ligatures:contextual;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;font-size:16.5px}h1,h2,h3,h4,h5,h6{color:#fbcb97;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif}h1.page_title{font-size:200%;line-height:normal;color:#fbcb97;margin-bottom:1rem;line-height:1.1}a{text-decoration:underline;text-underline-offset:3px;color:rgba(255,255,255,.9)}a:active{color:#fbcb97}a:hover{color:rgba(251,203,151,.9)}a.site_title{text-decoration:none;color:#e78a53;list-style:1}a.site_title:hover{text-decoration:underline}a.site_nav{text-decoration:none;color:#e78a53}a.site_nav:hover{text-decoration:underline}a.homepage-list_title{flex:1;word-wrap:break-word;text-decoration:none;font-weight:bold;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;color:#fbcb97}a.homepage-list_title:hover{text-decoration:underline}a code{text-decoration-color:rgba(251,203,151,.9)}a.footer{color:#888}a.footer:hover{color:#fbcb97}.pipe{color:#202020}time.site_time{font-size:90%;color:#888}span.page_time{padding:1.2rem auto;color:#888}:target{background-color:#000}hr{border:none;height:1px;background-color:#202020}::selection{background:#333}main{margin:auto;max-width:650px}header{padding-top:1rem;padding-bottom:0rem;font-weight:900}code{font-family:cmu_typewriter_textlight,ui-monospace,"SFMono-Regular","SF Mono","Cascadia Code","Source Code Pro",Menlo,Consolas,"DejaVu Sans Mono",monospace;color:rgba(251,203,151,.9)}code a{text-decoration-color:rgba(251,203,151,.9)}pre{position:relative;font-family:cmu_typewriter_textlight,ui-monospace,"SFMono-Regular","SF Mono","Cascadia Code","Source Code Pro",Menlo,Consolas,"DejaVu Sans Mono",monospace;overflow:auto;border:thin solid #202020;margin:2rem 0rem;padding:1.5rem;background-color:#000}pre code{padding:initial;color:inherit;background-color:inherit}.pre-wrapper{position:relative;margin:2rem 0}.copy-button{position:absolute;top:0px;right:0px;color:#fbcb97;background-color:#000;border:thin solid #202020;width:60px;height:28px;padding:5px 10px;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;cursor:pointer;opacity:.8;transition:all .1s ease}.copy-button:hover{opacity:1}.copy-button.copied{border:thin solid #fbcb97}table{border-collapse:collapse;width:100%}th,td{border:1px solid #202020;padding:1.1rem}img{height:auto;margin:2rem 0rem;max-width:100%}.homepage-list,.taxonomies__list{list-style:none;padding:1rem 0}.homepage-list li,.taxonomies__list li{align-items:center;display:flex;flex-wrap:nowrap;justify-content:space-between;margin-bottom:10px}.center{margin-left:auto;margin-right:auto;max-width:100%;text-align:center}.imageClass,.videoClass{padding:.5rem}.imageClass figure,.videoClass figure{display:table}.imageClass figure img,.videoClass figure img{user-select:none}.imageClass figure figcaption,.videoClass figure figcaption{display:table-caption;caption-side:bottom;padding:.2rem;margin:.2rem auto;background-color:#fbcb97;color:#000}.imageClass figure figcaption::selection,.videoClass figure figcaption::selection{background-color:#e78a53}@media (max-width: 38rem){.homepage-list li a{width:100%}}footer{margin-top:2rem;color:#888}.pagination_title{width:100%;text-align:center;border-bottom:1px solid #202020;line-height:.1em;margin:2.5rem auto}.pagination_title span{background:#000;font-size:.8rem;padding:0 10px}.post_nav{display:flex;align-items:center;justify-content:center;text-align:center;margin:2.5rem auto 4rem auto}.post_nav .button{position:relative;display:inline-flex;flex:1;align-items:center;justify-content:center;overflow:hidden;text-decoration:none;margin:auto 1.5rem;font-weight:bold}.post_nav .button .previous,.post_nav .button .next{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.time_tag_sep{padding:.5rem;color:#888;user-select:none}.post_tags a{padding:0 .5rem 0 0;color:#888;text-decoration:none}.post_tags a:hover{color:#fbcb97}.taxonomies__title{color:#888}.taxonomies__list a{text-decoration:none}#toc-inline,#toc-aside{font-size:90%;line-height:1.6;color:#888}#toc-inline a,#toc-aside a{color:#888;text-decoration:none}#toc-inline a:hover,#toc-aside a:hover{color:#fbcb97}#toc-inline ul,#toc-aside ul{padding-left:1rem}#toc-inline li li,#toc-aside li li{list-style:disc}#toc-inline li.active>a,#toc-aside li.active>a{color:#fbcb97;font-weight:bold}#toc-inline{font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;padding:1.25rem 0rem .5rem 0rem}#toc-inline summary:hover{cursor:pointer;color:#fbcb97}#toc-aside{font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;display:block;width:15rem;position:sticky;float:left;top:3.5rem;margin-top:-1.2rem;margin-left:-20rem}@media (max-width: 80rem){#toc-aside{display:none}}@media (min-width: 80rem){#toc-inline{display:none}}sup{line-height:0}.footnote-reference{color:#fbcb97}.footnote-reference:after{content:"]"}.footnote-reference:before{content:"["}.footnote-reference a{color:#fbcb97;text-decoration:none}hr{margin-top:2rem;margin-bottom:2rem}.footnote-definition{display:flex;flex-direction:row;font-size:.85rem}.footnote-definition sup{all:initial;color:rgba(255,255,255,.9);text-rendering:optimizeLegibility;font-variant-ligatures:contextual;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;font-weight:450;font-size:1rem;line-height:1.58;letter-spacing:-.02em;font-size:.7rem;margin:0rem;margin-right:.5rem}.footnote-definition p{margin:0rem;margin-bottom:1rem}.footnote-definition p .footnote-backlink{margin:0rem;margin-left:.5rem;color:#fbcb97;text-decoration:none}</style>
+
+    <meta property="og:site_name" content="Gunwant Jain - @wantguns">
+      <meta name="author" content="Gunwant Jain" />
+      <meta name="keywords" content="Gunwant Jain, wantguns, Gunwant, WantGuns" />
+      <meta property="og:title" content="Installing Gentoo on Android">
+      <meta property="og:description" content="I am tired of re-installing gentoo on my phone by connecting parts from different resources and so here is the guide to do it all in a go.">
+      <meta property="og:url" content="https://wantguns.dev/install-gentoo/">
+      <meta property="og:image" content="">
+
+      <meta name="twitter:card" content="summary">
+      <meta name="twitter:title" content="Gunwant Jain - @wantguns">
+      <meta name="twitter:description" content="Gunwant Jain&#x27;s (@wantguns) writings and musings">
+
+      <meta property="og:type" content="article" />
+        <meta property="article:published_time" content="2020-04-15T00:00:00+00:00" />
+
+      
+      
+    
+
+  </head>
+  
+
+  <body>
+    <main id="main" role="main">
+      
+      <header role="banner">
+          
+            
+            <nav style="margin-bottom:1rem;" role="navigation">
+              
+                <a class="site_nav" href="https://wantguns.dev/about">about</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev">blog</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev/tags">tags</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://bin.wantguns.dev/cv">resume</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev/atom.xml">rss</a>
+                
+              
+            </nav>
+            
+          
+      </header>
+      
+
+
+    <div>
+
+      
+<article>
+  <h1 class="page_title">Installing Gentoo on Android</h1>
+
+  
+    <span class="page_time">Posted on <time datetime="2020-04-15T00:00:00+00:00">April 15, 2020</time></span>
+    
+    <span class="time_tag_sep">&middot;</span>
+    <span class="post_tags">
+        
+            <a href="https://wantguns.dev/tags/android/">#android</a>
+        
+            <a href="https://wantguns.dev/tags/gsoc2020/">#gsoc2020</a>
+        
+            <a href="https://wantguns.dev/tags/sharkbait/">#sharkbait</a>
+        
+    </span>
+    
+  
+
+  
+  
+    
+    <details id = "toc-inline">
+        <summary><b>Table of Contents</b></summary>
+        <ul>
+            <li>
+                <a href="#configuring-portage-and-emerging-packages">Configuring Portage and Emerging Packages:</a>
+                
+            </li><li>
+                <a href="#configuring-timezone-and-locales">Configuring Timezone and Locales</a>
+                
+            </li>
+        </ul>
+    </details>
+
+    
+  <aside id="toc-aside">
+          <h4>Table of Contents</h4>
+      <ul>
+          
+          <li>
+              <a href="#configuring-portage-and-emerging-packages">Configuring Portage and Emerging Packages:</a>
+              
+          </li>
+          <li>
+              <a href="#configuring-timezone-and-locales">Configuring Timezone and Locales</a>
+              
+          </li>
+      </ul>
+  </aside>
+
+  
+  
+
+  <p>I am tired of re-installing gentoo (from an chroot approach) on my phone by connecting parts from different resources and so here is the guide to do it all in a go.</p>
+<hr />
+<p><em>This guide assumes the prerequisite of a rooted phone. Just fire up an adb shell / termux and follow this :</em></p>
+<p>First we proceed with downloading the correct <a href="http://distfiles.gentoo.org/experimental/arm64/">stage3 tarballs</a>. Copy it in your phone's storage.</p>
+<p>Then we make a folder for the Gentoo root. Since we are following SharkBait, we will use <code>data/gnu</code> as root. Copy the stage3 into it.</p>
+<pre data-lang="bash" style="background-color:#000000;color:#c1c1c1;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#5f8787;">mkdir</span><span style="font-style:italic;color:#5f8787;"> -p</span><span> /data/gnu
+</span><span style="color:#5f8787;">cp</span><span> /sdcard/stage3-arm64-</span><span style="color:#e78a53;">*</span><span> /data/gnu/
+</span><span style="color:#fbcb97;">cd</span><span> /data/gnu
+</span></code></pre>
+<p>Then we extract the stage3</p>
+<pre data-lang="bash" style="background-color:#000000;color:#c1c1c1;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#5f8787;">tar</span><span> xpvf stage3-</span><span style="color:#e78a53;">* </span><span>`</span><span style="color:#5f8787;">--xattrs-include</span><span style="color:#e78a53;">=</span><span style="color:#fbcb97;">&#39;*.*&#39;</span><span>`</span><span style="font-style:italic;color:#5f8787;"> --numeric-owner
+</span><span style="color:#888888;"># no those backticks are not just a content generation error
+</span></code></pre>
+<p>After this we will copy the DNS information in <code>/etc/resolve.conf</code> so that networking works after entering the new environment.</p>
+<pre data-lang="bash" style="background-color:#000000;color:#c1c1c1;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#5f8787;">cp</span><span style="font-style:italic;color:#5f8787;"> --dereference</span><span> /etc/resolv.conf /data/gnu/etc/
+</span></code></pre>
+<p>Mount the required filesystems:</p>
+<pre data-lang="bash" style="background-color:#000000;color:#c1c1c1;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#fbcb97;">cd</span><span> /
+</span><span style="color:#5f8787;">mount</span><span style="font-style:italic;color:#5f8787;"> -t</span><span> proc proc /data/gnu/proc
+</span><span style="color:#5f8787;">busybox</span><span> mount</span><span style="font-style:italic;color:#5f8787;"> --rbind</span><span> /dev /data/gnu/dev
+</span><span style="color:#5f8787;">busybox</span><span> mount</span><span style="font-style:italic;color:#5f8787;"> --rbind</span><span> /sys /data/gnu/sys
+</span></code></pre>
+<p>Finally we enter the new environment:</p>
+<pre data-lang="bash" style="background-color:#000000;color:#c1c1c1;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#5f8787;">chroot</span><span> /data/gnu /bin/bash
+</span><span style="color:#fbcb97;">source</span><span> /etc/profile
+</span><span style="color:#fbcb97;">export </span><span style="color:#5f8787;">PS1</span><span style="color:#e78a53;">=</span><span style="color:#fbcb97;">&quot;(chroot) ${</span><span style="color:#5f8787;">PS1</span><span style="color:#fbcb97;">}&quot;
+</span></code></pre>
+<p>Add Portage to gid 3003(inet):</p>
+<pre data-lang="bash" style="background-color:#000000;color:#c1c1c1;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#5f8787;">groupadd</span><span style="font-style:italic;color:#5f8787;"> -g</span><span> 3003 inet </span><span style="color:#e78a53;">&amp;&amp; </span><span style="color:#5f8787;">gpasswd</span><span style="font-style:italic;color:#5f8787;"> -a</span><span> portage inet
+</span></code></pre>
+<h4 id="configuring-portage-and-emerging-packages">Configuring Portage and Emerging Packages:</h4>
+<p>These for preventing mount errors while emerging:</p>
+<pre data-lang="bash" style="background-color:#000000;color:#c1c1c1;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#5f8787;">mkdir</span><span style="font-style:italic;color:#5f8787;"> -p</span><span> /dev/shm
+</span><span style="color:#5f8787;">mount</span><span style="font-style:italic;color:#5f8787;"> -t</span><span> tmpfs</span><span style="font-style:italic;color:#5f8787;"> -o</span><span> nodev,nosuid,noexec,mode=1777,size=6144m tmpfs /dev/shm
+</span><span style="color:#5f8787;">mount</span><span> /dev/pts</span><span style="font-style:italic;color:#5f8787;"> -o</span><span> remount,gid=5,mode=620
+</span></code></pre>
+<p>Unless you want to stare at your phone for more than 4 hours, or just have a lot of time, I would recommend you to perform these steps while before going to bed, because this takes time. The best approach would be to do all this in a wake-lock(ed) termux session.</p>
+<pre data-lang="bash" style="background-color:#000000;color:#c1c1c1;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#5f8787;">emerge-webrsync
+</span><span style="color:#5f8787;">emerge</span><span style="font-style:italic;color:#5f8787;"> --ask --verbose --update --deep --newuse</span><span> @world
+</span></code></pre>
+<h4 id="configuring-timezone-and-locales">Configuring Timezone and Locales</h4>
+<p>Set your timezone with the correct one from <code>/usr/share/zoneinfo</code> :</p>
+<pre data-lang="bash" style="background-color:#000000;color:#c1c1c1;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#fbcb97;">echo &quot;Asia/Calcutta&quot; </span><span style="color:#e78a53;">&gt;</span><span> /etc/timezone
+</span><span style="color:#5f8787;">emerge</span><span style="font-style:italic;color:#5f8787;"> --config</span><span> sys-libs/timezone-data
+</span></code></pre>
+<p>Configure locales by uncommenting the correct one from <code>/etc/locale.gen</code>.</p>
+<pre data-lang="bash" style="background-color:#000000;color:#c1c1c1;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#5f8787;">locale-gen
+</span><span style="color:#5f8787;">eselect</span><span> locale list
+</span><span style="color:#888888;"># proceed to chose the desired locale
+</span><span style="color:#5f8787;">env-update </span><span style="color:#e78a53;">&amp;&amp; </span><span style="color:#fbcb97;">source</span><span> /etc/profile </span><span style="color:#e78a53;">&amp;&amp; </span><span style="color:#fbcb97;">export </span><span style="color:#5f8787;">PS1</span><span style="color:#e78a53;">=</span><span style="color:#fbcb97;">&quot;(chroot) ${</span><span style="color:#5f8787;">PS1</span><span style="color:#fbcb97;">}&quot;
+</span></code></pre>
+<hr />
+<p>I believe I have covered the information required until device specific steps. Now the part left is to add your device specific unofficial overlay, or continue with the official one, if your device is enlisted in it. An upcoming guide will guide you to make your kernel for SharkBait and finally, deploy SharkBait. Deploying SharkBait currently is a breeze for devices shipping with Android version lower than 9. Since mine did not, I would have to hack around the current script. If the results turn out to be positive, expect another blog coming up. Till then, Happy Hacking !</p>
+
+</article>
+
+
+  <div class="pagination_title">
+    <span>Read other posts</span>
+  </div>
+  <div class="post_nav">
+      
+      
+        <div class="button">
+          <a class="button" href="&#x2F;android-boot-high-jinks&#x2F;">
+            <span class="previous">Android Boot High Jinks: And What it Means for SharkBait</span>
+            &nbsp;→
+          </a>
+        </div>
+      
+    </div>
+
+
+
+    </div>
+    </main>
+
+    
+    
+
+    <footer class=center>
+      <sub>
+        <div>
+            &copy;
+            <span id="copyright">
+                <script>document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))</script>
+            </span>
+            &middot;
+            Gunwant Jain. Built <a class="footer" href="https://github.com/wantguns/wantguns.dev">openly</a> with <a class="footer" href="https://www.getzola.org">Zola</a>
+        </div>
+      </sub>
+    </footer>
+  </body>
+  
+ <script src=https://wantguns.dev/js/page.js></script> 
+
+</html>

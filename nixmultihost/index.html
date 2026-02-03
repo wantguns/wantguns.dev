@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Single flake, multiple hosts &middot; Gunwant Jain - @wantguns</title>
+    <meta name="description" content="Gunwant Jain&amp;#x27;s (@wantguns) writings and musings" />
+    <link rel="apple-touch-icon" sizes="180x180" href="https://wantguns.dev/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="https://wantguns.dev/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="https://wantguns.dev/favicon-16x16.png" />
+    <link rel="manifest" href="https://wantguns.dev/site.webmanifest" />
+    <link rel="alternate" type="application/atom+xml" title="RSS" href="https://wantguns.dev/atom.xml">
+
+    <style>@import url("/fonts/cmuserif_roman_macroman/stylesheet.css");@import url("/fonts/cmutypewritertext_light_macroman/stylesheet.css");:root{color-scheme:dark}html,body{background:#000;color:rgba(255,255,255,.9);padding:.3rem;margin:.3rem;text-rendering:optimizeLegibility;font-variant-ligatures:contextual;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;font-size:16.5px}h1,h2,h3,h4,h5,h6{color:#fbcb97;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif}h1.page_title{font-size:200%;line-height:normal;color:#fbcb97;margin-bottom:1rem;line-height:1.1}a{text-decoration:underline;text-underline-offset:3px;color:rgba(255,255,255,.9)}a:active{color:#fbcb97}a:hover{color:rgba(251,203,151,.9)}a.site_title{text-decoration:none;color:#e78a53;list-style:1}a.site_title:hover{text-decoration:underline}a.site_nav{text-decoration:none;color:#e78a53}a.site_nav:hover{text-decoration:underline}a.homepage-list_title{flex:1;word-wrap:break-word;text-decoration:none;font-weight:bold;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;color:#fbcb97}a.homepage-list_title:hover{text-decoration:underline}a code{text-decoration-color:rgba(251,203,151,.9)}a.footer{color:#888}a.footer:hover{color:#fbcb97}.pipe{color:#202020}time.site_time{font-size:90%;color:#888}span.page_time{padding:1.2rem auto;color:#888}:target{background-color:#000}hr{border:none;height:1px;background-color:#202020}::selection{background:#333}main{margin:auto;max-width:650px}header{padding-top:1rem;padding-bottom:0rem;font-weight:900}code{font-family:cmu_typewriter_textlight,ui-monospace,"SFMono-Regular","SF Mono","Cascadia Code","Source Code Pro",Menlo,Consolas,"DejaVu Sans Mono",monospace;color:rgba(251,203,151,.9)}code a{text-decoration-color:rgba(251,203,151,.9)}pre{position:relative;font-family:cmu_typewriter_textlight,ui-monospace,"SFMono-Regular","SF Mono","Cascadia Code","Source Code Pro",Menlo,Consolas,"DejaVu Sans Mono",monospace;overflow:auto;border:thin solid #202020;margin:2rem 0rem;padding:1.5rem;background-color:#000}pre code{padding:initial;color:inherit;background-color:inherit}.pre-wrapper{position:relative;margin:2rem 0}.copy-button{position:absolute;top:0px;right:0px;color:#fbcb97;background-color:#000;border:thin solid #202020;width:60px;height:28px;padding:5px 10px;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;cursor:pointer;opacity:.8;transition:all .1s ease}.copy-button:hover{opacity:1}.copy-button.copied{border:thin solid #fbcb97}table{border-collapse:collapse;width:100%}th,td{border:1px solid #202020;padding:1.1rem}img{height:auto;margin:2rem 0rem;max-width:100%}.homepage-list,.taxonomies__list{list-style:none;padding:1rem 0}.homepage-list li,.taxonomies__list li{align-items:center;display:flex;flex-wrap:nowrap;justify-content:space-between;margin-bottom:10px}.center{margin-left:auto;margin-right:auto;max-width:100%;text-align:center}.imageClass,.videoClass{padding:.5rem}.imageClass figure,.videoClass figure{display:table}.imageClass figure img,.videoClass figure img{user-select:none}.imageClass figure figcaption,.videoClass figure figcaption{display:table-caption;caption-side:bottom;padding:.2rem;margin:.2rem auto;background-color:#fbcb97;color:#000}.imageClass figure figcaption::selection,.videoClass figure figcaption::selection{background-color:#e78a53}@media (max-width: 38rem){.homepage-list li a{width:100%}}footer{margin-top:2rem;color:#888}.pagination_title{width:100%;text-align:center;border-bottom:1px solid #202020;line-height:.1em;margin:2.5rem auto}.pagination_title span{background:#000;font-size:.8rem;padding:0 10px}.post_nav{display:flex;align-items:center;justify-content:center;text-align:center;margin:2.5rem auto 4rem auto}.post_nav .button{position:relative;display:inline-flex;flex:1;align-items:center;justify-content:center;overflow:hidden;text-decoration:none;margin:auto 1.5rem;font-weight:bold}.post_nav .button .previous,.post_nav .button .next{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.time_tag_sep{padding:.5rem;color:#888;user-select:none}.post_tags a{padding:0 .5rem 0 0;color:#888;text-decoration:none}.post_tags a:hover{color:#fbcb97}.taxonomies__title{color:#888}.taxonomies__list a{text-decoration:none}#toc-inline,#toc-aside{font-size:90%;line-height:1.6;color:#888}#toc-inline a,#toc-aside a{color:#888;text-decoration:none}#toc-inline a:hover,#toc-aside a:hover{color:#fbcb97}#toc-inline ul,#toc-aside ul{padding-left:1rem}#toc-inline li li,#toc-aside li li{list-style:disc}#toc-inline li.active>a,#toc-aside li.active>a{color:#fbcb97;font-weight:bold}#toc-inline{font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;padding:1.25rem 0rem .5rem 0rem}#toc-inline summary:hover{cursor:pointer;color:#fbcb97}#toc-aside{font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;display:block;width:15rem;position:sticky;float:left;top:3.5rem;margin-top:-1.2rem;margin-left:-20rem}@media (max-width: 80rem){#toc-aside{display:none}}@media (min-width: 80rem){#toc-inline{display:none}}sup{line-height:0}.footnote-reference{color:#fbcb97}.footnote-reference:after{content:"]"}.footnote-reference:before{content:"["}.footnote-reference a{color:#fbcb97;text-decoration:none}hr{margin-top:2rem;margin-bottom:2rem}.footnote-definition{display:flex;flex-direction:row;font-size:.85rem}.footnote-definition sup{all:initial;color:rgba(255,255,255,.9);text-rendering:optimizeLegibility;font-variant-ligatures:contextual;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;font-weight:450;font-size:1rem;line-height:1.58;letter-spacing:-.02em;font-size:.7rem;margin:0rem;margin-right:.5rem}.footnote-definition p{margin:0rem;margin-bottom:1rem}.footnote-definition p .footnote-backlink{margin:0rem;margin-left:.5rem;color:#fbcb97;text-decoration:none}</style>
+
+    <meta property="og:site_name" content="Gunwant Jain - @wantguns">
+      <meta name="author" content="Gunwant Jain" />
+      <meta name="keywords" content="Gunwant Jain, wantguns, Gunwant, WantGuns" />
+      <meta property="og:title" content="Single flake, multiple hosts">
+      <meta property="og:description" content="">
+      <meta property="og:url" content="https://wantguns.dev/nixmultihost/">
+      <meta property="og:image" content="">
+
+      <meta name="twitter:card" content="summary">
+      <meta name="twitter:title" content="Gunwant Jain - @wantguns">
+      <meta name="twitter:description" content="Gunwant Jain&#x27;s (@wantguns) writings and musings">
+
+      <meta property="og:type" content="article" />
+        <meta property="article:published_time" content="2025-03-14T00:00:00+00:00" />
+
+      
+      
+    
+
+  </head>
+  
+
+  <body>
+    <main id="main" role="main">
+      
+      <header role="banner">
+          
+            
+            <nav style="margin-bottom:1rem;" role="navigation">
+              
+                <a class="site_nav" href="https://wantguns.dev/about">about</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev">blog</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev/tags">tags</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://bin.wantguns.dev/cv">resume</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev/atom.xml">rss</a>
+                
+              
+            </nav>
+            
+          
+      </header>
+      
+
+
+    <div>
+
+      
+<article>
+  <h1 class="page_title">Single flake, multiple hosts</h1>
+
+  
+    <span class="page_time">Posted on <time datetime="2025-03-14T00:00:00+00:00">March 14, 2025</time></span>
+    
+    <span class="time_tag_sep">&middot;</span>
+    <span class="post_tags">
+        
+            <a href="https://wantguns.dev/tags/yakshaving/">#yakshaving</a>
+        
+            <a href="https://wantguns.dev/tags/selfhosting/">#selfhosting</a>
+        
+            <a href="https://wantguns.dev/tags/nix/">#nix</a>
+        
+    </span>
+    
+  
+
+  
+  
+    
+    <details id = "toc-inline">
+        <summary><b>Table of Contents</b></summary>
+        <ul>
+            <li>
+                <a href="#abstractions">Abstractions</a>
+                <ul>
+                    <li>
+                        <a href="#modules-features-default-nix">modules/features/default.nix</a>
+                    </li><li>
+                        <a href="#modules-features-implementation-nix">modules/features/implementation.nix</a>
+                    </li>
+                </ul>
+            </li><li>
+                <a href="#implementation">Implementation</a>
+                <ul>
+                    <li>
+                        <a href="#hosts-attribute-set">Hosts attribute set</a>
+                    </li><li>
+                        <a href="#lib-mkhostconfig-nix">lib/mkHostConfig.nix</a>
+                    </li><li>
+                        <a href="#lib-utils-nix">lib/utils.nix</a>
+                    </li><li>
+                        <a href="#lib-mkhost-nix">lib/mkHost.nix</a>
+                    </li><li>
+                        <a href="#lib-mkhomeconfig-nix">lib/mkHomeConfig.nix</a>
+                    </li><li>
+                        <a href="#lib-default-nix">lib/default.nix</a>
+                    </li><li>
+                        <a href="#flake-nix">flake.nix</a>
+                    </li>
+                </ul>
+            </li><li>
+                <a href="#remote-deployment-flake-apps">Remote deployment & Flake apps</a>
+                
+            </li><li>
+                <a href="#future">Future</a>
+                
+            </li>
+        </ul>
+    </details>
+
+    
+  <aside id="toc-aside">
+          <h4>Table of Contents</h4>
+      <ul>
+          
+          <li>
+              <a href="#abstractions">Abstractions</a>
+              
+              <ul>
+                  
+                  <li>
+                      <a href="#modules-features-default-nix">modules/features/default.nix</a>
+                  </li>
+                  
+                  <li>
+                      <a href="#modules-features-implementation-nix">modules/features/implementation.nix</a>
+                  </li>
+                  
+              </ul>
+              
+          </li>
+          <li>
+              <a href="#implementation">Implementation</a>
+              
+              <ul>
+                  
+                  <li>
+                      <a href="#hosts-attribute-set">Hosts attribute set</a>
+                  </li>
+                  
+                  <li>
+                      <a href="#lib-mkhostconfig-nix">lib/mkHostConfig.nix</a>
+                  </li>
+                  
+                  <li>
+                      <a href="#lib-utils-nix">lib/utils.nix</a>
+                  </li>
+                  
+                  <li>
+                      <a href="#lib-mkhost-nix">lib/mkHost.nix</a>
+                  </li>
+                  
+                  <li>
+                      <a href="#lib-mkhomeconfig-nix">lib/mkHomeConfig.nix</a>
+                  </li>
+                  
+                  <li>
+                      <a href="#lib-default-nix">lib/default.nix</a>
+                  </li>
+                  
+                  <li>
+                      <a href="#flake-nix">flake.nix</a>
+                  </li>
+                  
+              </ul>
+              
+          </li>
+          <li>
+              <a href="#remote-deployment-flake-apps">Remote deployment & Flake apps</a>
+              
+          </li>
+          <li>
+              <a href="#future">Future</a>
+              
+          </li>
+      </ul>
+  </aside>
+
+  
+  
+
+  <p>I am done with setting up darwin machines now, and look forward to
+expand our nix files to declare state for linux hosts as well. The linux
+landscape is vast though, I could be logging into a work server, an
+embedded device, a server I rent, my personal workstation, etc. There is
+different amounts of state I want similar in these machines. And so it
+warrants for a better file structure.</p>
+<pre data-lang="tree" style="background-color:#000000;color:#c1c1c1;" class="language-tree "><code class="language-tree" data-lang="tree"><span>.
+</span><span>├── flake.lock
+</span><span>├── flake.nix
+</span><span>├── hosts
+</span><span>│   ├── common
+</span><span>│   │   └── default.nix
+</span><span>│   ├── darwin
+</span><span>│   │     ├── common.nix
+</span><span>│   │     └── C02GH2V9MD6M
+</span><span>│   │         ├── default.nix
+</span><span>│   │         ├── git
+</span><span>│   │         │   ├── ola
+</span><span>│   │         │   └── olamessage
+</span><span>│   │         └── home.nix
+</span><span>│   └── linux
+</span><span>│       ├── common.nix
+</span><span>│       └── rigel
+</span><span>│           ├── default.nix
+</span><span>│           └── home.nix
+</span><span>├── lib
+</span><span>│   ├── default.nix
+</span><span>│   ├── deploy.nix
+</span><span>│   ├── mkHomeConfig.nix
+</span><span>│   ├── mkHost.nix
+</span><span>│   ├── mkHostConfig.nix
+</span><span>│   └── utils.nix
+</span><span>└──modules
+</span><span>    └── features
+</span><span>        ├── default.nix
+</span><span>        ├── implementation.nix
+</span><span>        ├── git
+</span><span>        │   ├── config.nix
+</span><span>        │   └── message
+</span><span>        ├── nvim
+</span><span>        │   ├── base.lua
+</span><span>        │   └── treesitter.lua
+</span><span>        ├── tmux
+</span><span>        │   └── tmux.conf
+</span><span>        └── zsh
+</span><span>            ├── p10k.zsh
+</span><span>            └── zshrc
+</span></code></pre>
+<h2 id="abstractions">Abstractions</h2>
+<p>The idea is to basically have common sets of attributes at different
+levels - per os and per host.</p>
+<p>Also, I don't frequently change my dotfiles, I have the opportunity to
+abstract features like if I want neovim to be configured with LSP or
+not, basically have a features attribute for home manager.</p>
+<h3 id="modules-features-default-nix">modules/features/default.nix</h3>
+<p>I'll declare all the abstractions for home manager options in this file.</p>
+<pre data-lang="nix" style="background-color:#000000;color:#c1c1c1;" class="language-nix "><code class="language-nix" data-lang="nix"><span>{ </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">, ... </span><span>}:
+</span><span>
+</span><span style="color:#e78a53;">with </span><span style="font-style:italic;color:#5f8787;">lib</span><span>;
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#e78a53;">options</span><span>.</span><span style="color:#e78a53;">features = </span><span>{
+</span><span>    </span><span style="color:#e78a53;">editors = </span><span>{
+</span><span>      </span><span style="color:#e78a53;">nvim = </span><span>{
+</span><span>        </span><span style="color:#e78a53;">enable = </span><span style="font-style:italic;color:#5f8787;">mkEnableOption </span><span style="color:#fbcb97;">&quot;neovim editor&quot;</span><span>;
+</span><span>        </span><span style="color:#e78a53;">ui = </span><span style="font-style:italic;color:#5f8787;">mkEnableOption </span><span style="color:#fbcb97;">&quot;add ui elements&quot;</span><span>;
+</span><span>        </span><span style="color:#e78a53;">lsp = </span><span style="font-style:italic;color:#5f8787;">mkEnableOption </span><span style="color:#fbcb97;">&quot;neovim LSP and treesitter support&quot;</span><span>;
+</span><span>        </span><span style="color:#888888;"># ...
+</span><span>      };
+</span><span>    };
+</span><span>
+</span><span>    </span><span style="color:#e78a53;">shell = </span><span>{
+</span><span>      </span><span style="color:#e78a53;">zsh = </span><span>{
+</span><span>        </span><span style="color:#e78a53;">enable = </span><span style="font-style:italic;color:#5f8787;">mkEnableOption </span><span style="color:#fbcb97;">&quot;zsh shell&quot;</span><span>;
+</span><span>        </span><span style="color:#e78a53;">powerlevel10k = </span><span style="font-style:italic;color:#5f8787;">mkEnableOption </span><span style="color:#fbcb97;">&quot;powerlevel10k theme&quot;</span><span>;
+</span><span>      };
+</span><span>    };
+</span><span>
+</span><span>    </span><span style="color:#e78a53;">tmux = </span><span style="font-style:italic;color:#5f8787;">mkEnableOption </span><span style="color:#fbcb97;">&quot;tmux terminal multiplexer&quot;</span><span>;
+</span><span>
+</span><span>    </span><span style="color:#e78a53;">git = </span><span>{
+</span><span>        </span><span style="color:#e78a53;">enable = </span><span style="font-style:italic;color:#5f8787;">mkEnableOption </span><span style="color:#fbcb97;">&quot;git with delta&quot;</span><span>;
+</span><span>        </span><span style="color:#e78a53;">delta = </span><span style="font-style:italic;color:#5f8787;">mkEnableOption </span><span style="color:#fbcb97;">&quot;git-delta&quot;</span><span>;
+</span><span>    };
+</span><span>  };
+</span><span>}
+</span></code></pre>
+<h3 id="modules-features-implementation-nix">modules/features/implementation.nix</h3>
+<p>I'll implement the declared options in this file.</p>
+<pre data-lang="nix" style="background-color:#000000;color:#c1c1c1;" class="language-nix "><code class="language-nix" data-lang="nix"><span>{ </span><span style="font-style:italic;color:#5f8787;">config</span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">pkgs</span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">, ... </span><span>}:
+</span><span>
+</span><span style="color:#e78a53;">let
+</span><span>  </span><span style="color:#e78a53;">cfg = </span><span style="font-style:italic;color:#5f8787;">config</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">features</span><span>;
+</span><span>  
+</span><span>  </span><span style="color:#e78a53;">toLua = </span><span style="font-style:italic;color:#5f8787;">str</span><span>: </span><span style="color:#fbcb97;">&quot;</span><span style="color:#aaaaaa;">\n</span><span style="color:#fbcb97;">lua &lt;&lt; EOF</span><span style="color:#aaaaaa;">\n</span><span style="color:#fbcb97;">${</span><span style="font-style:italic;color:#5f8787;">str</span><span style="color:#fbcb97;">}</span><span style="color:#aaaaaa;">\n</span><span style="color:#fbcb97;">EOF&quot;</span><span>;
+</span><span>  </span><span style="color:#e78a53;">toLuaFile = </span><span style="font-style:italic;color:#5f8787;">file</span><span>: </span><span style="color:#fbcb97;">&quot;</span><span style="color:#aaaaaa;">\n</span><span style="color:#fbcb97;">lua &lt;&lt; EOF</span><span style="color:#aaaaaa;">\n</span><span style="color:#fbcb97;">${</span><span style="color:#e78a53;">builtins.</span><span style="font-style:italic;color:#5f8787;">readFile file</span><span style="color:#fbcb97;">}</span><span style="color:#aaaaaa;">\n</span><span style="color:#fbcb97;">EOF&quot;</span><span>;
+</span><span>
+</span><span>  </span><span style="color:#e78a53;">fromGitHub = </span><span>{ </span><span style="font-style:italic;color:#5f8787;">ref</span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">repo</span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">sha256 </span><span style="color:#e78a53;">? </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">fakeSha256 </span><span>}:
+</span><span>    </span><span style="font-style:italic;color:#5f8787;">pkgs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">vimUtils</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">buildVimPlugin </span><span>{
+</span><span>      </span><span style="color:#e78a53;">pname = </span><span style="color:#fbcb97;">&quot;${</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">strings</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">sanitizeDerivationName repo</span><span style="color:#fbcb97;">}&quot;</span><span>;
+</span><span>      </span><span style="color:#e78a53;">version = </span><span style="font-style:italic;color:#5f8787;">ref</span><span>;
+</span><span>      </span><span style="color:#e78a53;">src = </span><span style="font-style:italic;color:#5f8787;">pkgs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">fetchFromGitHub </span><span>{
+</span><span>        </span><span style="color:#e78a53;">owner = </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">strings</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">elemAt </span><span>(</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">strings</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">splitString </span><span style="color:#fbcb97;">&quot;/&quot; </span><span style="font-style:italic;color:#5f8787;">repo</span><span>) </span><span style="color:#e78a53;">0</span><span>;
+</span><span>        </span><span style="color:#e78a53;">repo = </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">strings</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">elemAt </span><span>(</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">strings</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">splitString </span><span style="color:#fbcb97;">&quot;/&quot; </span><span style="font-style:italic;color:#5f8787;">repo</span><span>) </span><span style="color:#e78a53;">1</span><span>;
+</span><span>        </span><span style="color:#e78a53;">rev = </span><span style="font-style:italic;color:#5f8787;">ref</span><span>;
+</span><span>        </span><span style="color:#e78a53;">sha256 = </span><span style="font-style:italic;color:#5f8787;">sha256</span><span>;
+</span><span>      };
+</span><span>    };
+</span><span>
+</span><span>  </span><span style="color:#e78a53;">fakeVimPlugin = </span><span style="font-style:italic;color:#5f8787;">pkgs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">runCommand </span><span style="color:#fbcb97;">&quot;fakeVimPlugin&quot; </span><span>{ } </span><span style="color:#fbcb97;">&quot;mkdir $out&quot;</span><span>;
+</span><span style="color:#e78a53;">in
+</span><span>{
+</span><span>  </span><span style="color:#e78a53;">config = </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">mkMerge </span><span>[
+</span><span>    {
+</span><span>      </span><span style="color:#e78a53;">home = </span><span>{
+</span><span>        </span><span style="color:#e78a53;">stateVersion = </span><span style="color:#fbcb97;">&quot;24.11&quot;</span><span>;
+</span><span>        </span><span style="color:#e78a53;">packages = with </span><span style="font-style:italic;color:#5f8787;">pkgs</span><span>; [
+</span><span>          </span><span style="font-style:italic;color:#5f8787;">ripgrep
+</span><span>        ];
+</span><span>      };
+</span><span>
+</span><span>      </span><span style="color:#e78a53;">programs</span><span>.</span><span style="color:#e78a53;">home-manager</span><span>.</span><span style="color:#e78a53;">enable = true</span><span>;
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#888888;"># Neovim configuration
+</span><span>    (</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">mkIf cfg</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">editors</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">nvim</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">enable </span><span>{
+</span><span>      </span><span style="color:#e78a53;">programs</span><span>.</span><span style="color:#e78a53;">neovim = </span><span>{
+</span><span>        </span><span style="color:#e78a53;">enable = true</span><span>;
+</span><span>        </span><span style="color:#e78a53;">defaultEditor = true</span><span>;
+</span><span>        </span><span style="color:#e78a53;">viAlias = true</span><span>;
+</span><span>        </span><span style="color:#e78a53;">vimAlias = true</span><span>;
+</span><span>        </span><span style="color:#e78a53;">vimdiffAlias = true</span><span>;
+</span><span>
+</span><span>        </span><span style="color:#e78a53;">plugins = with </span><span style="font-style:italic;color:#5f8787;">pkgs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">vimPlugins</span><span>; [
+</span><span>          </span><span style="color:#888888;"># Base configuration
+</span><span>          {
+</span><span>            </span><span style="color:#e78a53;">plugin = </span><span style="font-style:italic;color:#5f8787;">fakeVimPlugin</span><span>;
+</span><span>            </span><span style="color:#e78a53;">config = </span><span style="font-style:italic;color:#5f8787;">toLuaFile </span><span style="color:#fbcb97;">./nvim/base.lua</span><span>;
+</span><span>          }
+</span><span>          </span><span style="font-style:italic;color:#5f8787;">plenary-nvim
+</span><span>        ] 
+</span><span>        
+</span><span>        </span><span style="color:#888888;"># UI Elements - each plugin individually conditioned
+</span><span>        </span><span style="color:#e78a53;">++ </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">optionals cfg</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">editors</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">nvim</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">ui </span><span>[
+</span><span>          {
+</span><span>            </span><span style="color:#e78a53;">plugin = </span><span style="font-style:italic;color:#5f8787;">fromGitHub </span><span>{
+</span><span>              </span><span style="color:#e78a53;">ref = </span><span style="color:#fbcb97;">&quot;HEAD&quot;</span><span>;
+</span><span>              </span><span style="color:#e78a53;">repo = </span><span style="color:#fbcb97;">&quot;bluz71/vim-moonfly-colors&quot;</span><span>;
+</span><span>              </span><span style="color:#e78a53;">sha256 = </span><span style="color:#fbcb97;">&quot;c5fxaT8Bc5MzOjJsuU95K9yzTpGqj/7QP4GuLfsY4VE=&quot;</span><span>;
+</span><span>            };
+</span><span>            </span><span style="color:#e78a53;">config = </span><span style="color:#fbcb97;">&quot;colorscheme moonfly&quot;</span><span>;
+</span><span>          }
+</span><span>        ]
+</span><span>        
+</span><span>        </span><span style="color:#888888;"># LSP and Treesitter
+</span><span>        </span><span style="color:#e78a53;">++ </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">optionals cfg</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">editors</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">nvim</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">lsp </span><span>[
+</span><span>          {
+</span><span>            </span><span style="color:#e78a53;">plugin = </span><span style="font-style:italic;color:#5f8787;">nvim-treesitter</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">withAllGrammars</span><span>;
+</span><span>            </span><span style="color:#e78a53;">config = </span><span style="font-style:italic;color:#5f8787;">toLuaFile </span><span style="color:#fbcb97;">./nvim/treesitter.lua</span><span>;
+</span><span>          }
+</span><span>          {
+</span><span>            </span><span style="color:#e78a53;">plugin = </span><span style="font-style:italic;color:#5f8787;">nvim-lspconfig</span><span>;
+</span><span>            </span><span style="color:#e78a53;">config = </span><span style="font-style:italic;color:#5f8787;">toLuaFile </span><span style="color:#fbcb97;">./nvim/lsp.lua</span><span>;
+</span><span>          }
+</span><span>          {
+</span><span>            </span><span style="color:#e78a53;">plugin = </span><span style="font-style:italic;color:#5f8787;">nvim-cmp</span><span>;
+</span><span>            </span><span style="color:#e78a53;">config = </span><span style="font-style:italic;color:#5f8787;">toLuaFile </span><span style="color:#fbcb97;">./nvim/cmp.lua</span><span>;
+</span><span>          }
+</span><span>          </span><span style="font-style:italic;color:#5f8787;">cmp-nvim-lsp
+</span><span>        ]
+</span><span>      </span><span style="background-color:#5f8787;color:#000000;">}</span><span>;
+</span><span>    }</span><span style="background-color:#5f8787;color:#000000;">)</span><span>
+</span><span>
+</span><span>    </span><span style="color:#888888;"># Shell configuration
+</span><span>    (</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">mkIf cfg</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">shell</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">zsh</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">enable </span><span>{
+</span><span>      </span><span style="color:#e78a53;">programs</span><span>.</span><span style="color:#e78a53;">zsh = </span><span>{
+</span><span>        </span><span style="color:#e78a53;">enable = true</span><span>;
+</span><span>        </span><span style="color:#e78a53;">syntaxHighlighting</span><span>.</span><span style="color:#e78a53;">enable = true</span><span>;
+</span><span>        </span><span style="color:#e78a53;">autosuggestion</span><span>.</span><span style="color:#e78a53;">enable = true</span><span>;
+</span><span>        </span><span style="color:#e78a53;">enableCompletion = true</span><span>;
+</span><span>        </span><span style="color:#e78a53;">defaultKeymap = </span><span style="color:#fbcb97;">&quot;viins&quot;</span><span>;
+</span><span>
+</span><span>        </span><span style="color:#e78a53;">completionInit = </span><span style="color:#fbcb97;">&#39;&#39;autoload -U compinit &amp;&amp; compinit -u&#39;&#39;</span><span>;
+</span><span>
+</span><span>        </span><span style="color:#e78a53;">history = </span><span>{
+</span><span>          </span><span style="color:#e78a53;">append = true</span><span>;
+</span><span>          </span><span style="color:#e78a53;">extended = true</span><span>;
+</span><span>          </span><span style="color:#e78a53;">size = 10000</span><span>;
+</span><span>          </span><span style="color:#e78a53;">save = 1000000</span><span>;
+</span><span>        };
+</span><span>
+</span><span>        </span><span style="color:#e78a53;">initExtraFirst = builtins.</span><span style="font-style:italic;color:#5f8787;">readFile </span><span style="color:#fbcb97;">./zsh/zshrc</span><span>;
+</span><span>
+</span><span>        </span><span style="color:#e78a53;">plugins = </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">optional cfg</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">shell</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">zsh</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">powerlevel10k </span><span>{
+</span><span>          </span><span style="color:#e78a53;">name = </span><span style="color:#fbcb97;">&quot;zsh-powerlevel10k&quot;</span><span>;
+</span><span>          </span><span style="color:#e78a53;">src = </span><span style="color:#fbcb97;">&quot;${</span><span style="font-style:italic;color:#5f8787;">pkgs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">zsh-powerlevel10k</span><span style="color:#fbcb97;">}/share/zsh-powerlevel10k/&quot;</span><span>;
+</span><span>          </span><span style="color:#e78a53;">file = </span><span style="color:#fbcb97;">&quot;powerlevel10k.zsh-theme&quot;</span><span>;
+</span><span>        };
+</span><span>      };
+</span><span>    })
+</span><span>
+</span><span>    </span><span style="color:#888888;"># Powerlevel10k configuration
+</span><span>    (</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">mkIf </span><span>(</span><span style="font-style:italic;color:#5f8787;">cfg</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">shell</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">zsh</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">enable </span><span style="color:#e78a53;">&amp;&amp; </span><span style="font-style:italic;color:#5f8787;">cfg</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">shell</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">zsh</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">powerlevel10k</span><span>) {
+</span><span>      </span><span style="color:#e78a53;">home</span><span>.</span><span style="color:#e78a53;">file</span><span>.</span><span style="color:#fbcb97;">&quot;.p10k.zsh&quot;</span><span>.</span><span style="color:#e78a53;">source = </span><span style="color:#fbcb97;">./zsh/p10k.zsh</span><span>;
+</span><span>    })
+</span><span>
+</span><span>    (</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">mkIf cfg</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">tmux </span><span>{
+</span><span>      </span><span style="color:#e78a53;">programs</span><span>.</span><span style="color:#e78a53;">tmux = </span><span>{
+</span><span>        </span><span style="color:#e78a53;">enable = true</span><span>;
+</span><span>        </span><span style="color:#e78a53;">extraConfig = builtins.</span><span style="font-style:italic;color:#5f8787;">readFile </span><span style="color:#fbcb97;">./tmux/tmux.conf</span><span>;
+</span><span>      };
+</span><span>    })
+</span><span>
+</span><span>    (</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">mkIf cfg</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">git</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">enable </span><span>{
+</span><span>      </span><span style="color:#e78a53;">programs</span><span>.</span><span style="color:#e78a53;">git = </span><span>{
+</span><span>        </span><span style="color:#e78a53;">enable = true</span><span>;
+</span><span>        </span><span style="color:#e78a53;">extraConfig = </span><span style="color:#fbcb97;">import ./git/config.nix</span><span>;
+</span><span>        </span><span style="color:#e78a53;">delta</span><span>.</span><span style="color:#e78a53;">enable = </span><span style="font-style:italic;color:#5f8787;">cfg</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">git</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">delta</span><span>;
+</span><span>      };
+</span><span>
+</span><span>      </span><span style="color:#e78a53;">home</span><span>.</span><span style="color:#e78a53;">file</span><span>.</span><span style="color:#fbcb97;">&quot;.config/git/message&quot;</span><span>.</span><span style="color:#e78a53;">source = </span><span style="color:#fbcb97;">./git/message</span><span>;
+</span><span>    })
+</span><span>  </span><span style="background-color:#5f8787;color:#000000;">]</span><span>;
+</span><span>}
+</span></code></pre>
+<p>This enables me to have a <code>hosts/darwin/&lt;hostname&gt;/home.nix</code> like:</p>
+<pre data-lang="nix" style="background-color:#000000;color:#c1c1c1;" class="language-nix "><code class="language-nix" data-lang="nix"><span>{ </span><span style="font-style:italic;color:#5f8787;">config</span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">pkgs</span><span style="color:#e78a53;">, ... </span><span>}: {
+</span><span>  </span><span style="color:#e78a53;">features = </span><span>{
+</span><span>    </span><span style="color:#e78a53;">editors</span><span>.</span><span style="color:#e78a53;">nvim = </span><span>{
+</span><span>      </span><span style="color:#e78a53;">enable = true</span><span>;
+</span><span>      </span><span style="color:#e78a53;">ui = true</span><span>;
+</span><span>      </span><span style="color:#e78a53;">lsp = true</span><span>;
+</span><span>    };
+</span><span>
+</span><span>    </span><span style="color:#e78a53;">shell</span><span>.</span><span style="color:#e78a53;">zsh = </span><span>{
+</span><span>      </span><span style="color:#e78a53;">enable = true</span><span>;
+</span><span>      </span><span style="color:#e78a53;">powerlevel10k = true</span><span>;
+</span><span>    };
+</span><span>
+</span><span>    </span><span style="color:#e78a53;">git = </span><span>{
+</span><span>      </span><span style="color:#e78a53;">enable = true</span><span>;
+</span><span>      </span><span style="color:#e78a53;">delta = true</span><span>;
+</span><span>    };
+</span><span>
+</span><span>    </span><span style="color:#e78a53;">tmux = true</span><span>;
+</span><span>  };
+</span><span>
+</span><span>  </span><span style="color:#e78a53;">programs</span><span>.</span><span style="color:#e78a53;">git</span><span>.</span><span style="color:#e78a53;">includes = </span><span>[ { </span><span style="color:#e78a53;">path = </span><span style="color:#fbcb97;">&quot;~/dev/.gitconfig&quot;</span><span>; } ];
+</span><span>}
+</span></code></pre>
+<p>and the their system config, <code>hosts/darwin/&lt;hostname&gt;/default.nix</code> like:</p>
+<pre data-lang="nix" style="background-color:#000000;color:#c1c1c1;" class="language-nix "><code class="language-nix" data-lang="nix"><span style="color:#888888;"># Host-specific system configuration
+</span><span>{ </span><span style="font-style:italic;color:#5f8787;">config</span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">pkgs</span><span style="color:#e78a53;">, ... </span><span>}: {
+</span><span>  </span><span style="color:#e78a53;">nix = </span><span>{
+</span><span>    </span><span style="color:#e78a53;">settings = </span><span>{
+</span><span>      </span><span style="color:#fbcb97;">&quot;ssl-cert-file&quot; </span><span style="color:#e78a53;">= </span><span style="color:#fbcb97;">&quot;/opt/nix-and-zscaler.crt&quot;</span><span>;
+</span><span>    };
+</span><span>  };
+</span><span>
+</span><span>  </span><span style="color:#e78a53;">users</span><span>.</span><span style="color:#e78a53;">users</span><span>.</span><span style="color:#fbcb97;">&quot;&lt;username&gt;&quot; </span><span style="color:#e78a53;">= </span><span>{
+</span><span>    </span><span style="color:#e78a53;">shell = </span><span style="font-style:italic;color:#5f8787;">pkgs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">zsh</span><span>;
+</span><span>    </span><span style="color:#e78a53;">home = </span><span style="color:#fbcb97;">&quot;/Users/&lt;username&gt;&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">packages = with </span><span style="font-style:italic;color:#5f8787;">pkgs</span><span>; [
+</span><span>       </span><span style="font-style:italic;color:#5f8787;">xh
+</span><span>       </span><span style="font-style:italic;color:#5f8787;">jq
+</span><span>       </span><span style="font-style:italic;color:#5f8787;">tree
+</span><span>    ];
+</span><span>  };
+</span><span>
+</span><span>  </span><span style="color:#e78a53;">homebrew = </span><span>{
+</span><span>    </span><span style="color:#e78a53;">enable = true</span><span>;
+</span><span>    </span><span style="color:#e78a53;">brews = </span><span>[
+</span><span>     </span><span style="color:#fbcb97;">&quot;k9s&quot;
+</span><span>     </span><span style="color:#fbcb97;">&quot;kubectl&quot;
+</span><span>    ];
+</span><span>  };
+</span><span>}
+</span></code></pre>
+<p>Pretty simple right ? I can onboard new hosts and create similar "knobs"
+to control state quickly.</p>
+<h2 id="implementation">Implementation</h2>
+<p>In this series, we started with a standalone home-manager installation,
+then pushed the home-manager configs into our nix-darwin config.</p>
+<p>A layman's definition for a nix flake would be that it accepts some
+inputs and returns some outputs. Normally, these inputs are the source
+to the definition of the packages you want in your outputs, and your
+outputs are json like attribute sets which are parsed by a program like
+nixos-rebuild or home-manager and do something with it, like building a
+new nix profile.</p>
+<p>For my concerns, a nix flake that accepts home-manager, nix-darwin and
+nixpkgs of course, and returns a set of <code>homeConfigurations</code>,
+<code>darwinConfigurations</code> and <code>nixosConfigurations</code> would make
+everything easier. Because then I could then call home-manager,
+darwin-rebuild or nix-rebuild on the same flake, which will become a
+consolidated source of truth for all my hosts.</p>
+<h3 id="hosts-attribute-set">Hosts attribute set</h3>
+<p>To declare the entrypoints and metadata for different hosts, lets
+design a spec for hosts. Ideally I want to also be able to perform
+<em>remote builds</em> and remote deployments, thats possible for NAT'd hosts
+if they are a part of my wireguard mesh. Basically we should declare a
+set of reachable IPs (public, private) for every host. And of course the
+username, hostname and the system.</p>
+<p>Something like this should work:</p>
+<pre data-lang="nix" style="background-color:#000000;color:#c1c1c1;" class="language-nix "><code class="language-nix" data-lang="nix"><span style="font-style:italic;color:#5f8787;">hosts </span><span style="background-color:#5f8787;color:#000000;">=</span><span> {
+</span><span>  </span><span style="color:#fbcb97;">&quot;C02GH2V9MD6M&quot; </span><span style="color:#e78a53;">= </span><span>{
+</span><span>    </span><span style="color:#e78a53;">hostname = </span><span style="color:#fbcb97;">&quot;C02GH2V9MD6M&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">system = </span><span style="color:#fbcb97;">&quot;x86_64-darwin&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">username = </span><span style="color:#fbcb97;">&quot;gunwant.jain1&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">justHome = false</span><span>;
+</span><span>    </span><span style="color:#e78a53;">remoteBuild = false</span><span>;
+</span><span>  };
+</span><span>
+</span><span>  </span><span style="color:#fbcb97;">&quot;mintaka&quot; </span><span style="color:#e78a53;">= </span><span>{
+</span><span>    </span><span style="color:#e78a53;">hostname = </span><span style="color:#fbcb97;">&quot;mintaka&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">system = </span><span style="color:#fbcb97;">&quot;x86_64-linux&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">username = </span><span style="color:#fbcb97;">&quot;wantguns&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">remoteBuild = true</span><span>;
+</span><span>    </span><span style="color:#e78a53;">ips = </span><span>{
+</span><span>      </span><span style="color:#e78a53;">private = </span><span style="color:#fbcb97;">&quot;192.168.1.5&quot;</span><span>;
+</span><span>    };
+</span><span>  };
+</span><span>}</span><span style="background-color:#5f8787;color:#000000;">;</span><span>
+</span></code></pre>
+<p>I added <code>justHome</code> for letting the flake work on just
+homeConfigurations, and <code>remoteBuild</code> for <em>building</em> the nix profile on
+the remote host.</p>
+<p>Lets make a library function which defines this attribute for us:</p>
+<h3 id="lib-mkhostconfig-nix">lib/mkHostConfig.nix</h3>
+<pre data-lang="nix" style="background-color:#000000;color:#c1c1c1;" class="language-nix "><code class="language-nix" data-lang="nix"><span style="color:#888888;"># inside ./lib/mkHostConfig.nix
+</span><span>{ </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">, ... </span><span>}:
+</span><span>
+</span><span style="color:#e78a53;">let
+</span><span>  </span><span style="color:#e78a53;">utils = </span><span style="color:#fbcb97;">import ./utils.nix </span><span>{ </span><span style="color:#e78a53;">inherit lib</span><span>; };
+</span><span>  </span><span style="color:#e78a53;">inherit </span><span>(</span><span style="font-style:italic;color:#5f8787;">utils</span><span>) </span><span style="color:#e78a53;">isDarwin isLinux</span><span>;
+</span><span style="color:#e78a53;">in
+</span><span>{
+</span><span>  </span><span style="color:#e78a53;">mkHostConfig = </span><span style="font-style:italic;color:#5f8787;">config</span><span>:
+</span><span>    </span><span style="color:#e78a53;">let
+</span><span>      </span><span style="color:#e78a53;">platform =
+</span><span>        </span><span style="color:#e78a53;">if </span><span style="font-style:italic;color:#5f8787;">isDarwin config</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">system </span><span style="color:#e78a53;">then </span><span style="color:#fbcb97;">&quot;darwin&quot;
+</span><span>        </span><span style="color:#e78a53;">else if </span><span style="font-style:italic;color:#5f8787;">isLinux config</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">system </span><span style="color:#e78a53;">then </span><span style="color:#fbcb97;">&quot;linux&quot;
+</span><span>        </span><span style="color:#e78a53;">else </span><span style="color:#fbcb97;">throw &quot;Unsupported system: ${</span><span style="font-style:italic;color:#5f8787;">config</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">system</span><span style="color:#fbcb97;">}&quot;</span><span>;
+</span><span>
+</span><span>      </span><span style="color:#e78a53;">defaults = </span><span>{
+</span><span>        </span><span style="color:#e78a53;">remoteBuild = false</span><span>;
+</span><span>        </span><span style="color:#e78a53;">justHome = false</span><span>;
+</span><span>        </span><span style="color:#e78a53;">platform = </span><span style="font-style:italic;color:#5f8787;">platform</span><span>;
+</span><span>      };
+</span><span>    </span><span style="color:#e78a53;">in
+</span><span>    </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">recursiveUpdate defaults config</span><span>;
+</span><span>}
+</span></code></pre>
+<p>I added a <code>platform</code> field for the downstream libraries I will pass our
+<code>hosts</code> attribute into.</p>
+<h3 id="lib-utils-nix">lib/utils.nix</h3>
+<p>Here is the <code>utils.nix</code> file:</p>
+<pre data-lang="nix" style="background-color:#000000;color:#c1c1c1;" class="language-nix "><code class="language-nix" data-lang="nix"><span style="color:#888888;"># inside lib/utils.nix
+</span><span>{ </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">, ... </span><span>}:
+</span><span>
+</span><span style="color:#e78a53;">let
+</span><span>  </span><span style="color:#e78a53;">isPlatform = </span><span style="font-style:italic;color:#5f8787;">system</span><span>: </span><span style="font-style:italic;color:#5f8787;">platform</span><span>: </span><span style="color:#e78a53;">builtins.</span><span style="font-style:italic;color:#5f8787;">match </span><span style="color:#fbcb97;">&quot;.*-${</span><span style="font-style:italic;color:#5f8787;">platform</span><span style="color:#fbcb97;">}&quot; </span><span style="font-style:italic;color:#5f8787;">system </span><span style="color:#e78a53;">!= null</span><span>;
+</span><span>  </span><span style="color:#e78a53;">isDarwin = </span><span style="font-style:italic;color:#5f8787;">system</span><span>: </span><span style="font-style:italic;color:#5f8787;">isPlatform system </span><span style="color:#fbcb97;">&quot;darwin&quot;</span><span>;
+</span><span>  </span><span style="color:#e78a53;">isLinux = </span><span style="font-style:italic;color:#5f8787;">system</span><span>: </span><span style="font-style:italic;color:#5f8787;">isPlatform system </span><span style="color:#fbcb97;">&quot;linux&quot;</span><span>;
+</span><span style="color:#e78a53;">in
+</span><span>{
+</span><span>  </span><span style="color:#e78a53;">inherit isPlatform isDarwin isLinux</span><span>;
+</span><span>}
+</span></code></pre>
+<h3 id="lib-mkhost-nix">lib/mkHost.nix</h3>
+<p>Next, we'll make a library function that consumes this host attribute
+set and returns a <code>darwinConfiguration</code> or a <code>nixosConfiguration</code>
+depending on the <code>system</code> and the <code>platform</code> fields:</p>
+<pre data-lang="nix" style="background-color:#000000;color:#c1c1c1;" class="language-nix "><code class="language-nix" data-lang="nix"><span style="color:#888888;"># inside lib/mkHost.nix
+</span><span>{ </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">inputs</span><span style="color:#e78a53;">, ... </span><span>}:
+</span><span>
+</span><span style="color:#e78a53;">let
+</span><span>  </span><span style="color:#e78a53;">utils = </span><span style="color:#fbcb97;">import ./utils.nix </span><span>{ </span><span style="color:#e78a53;">inherit lib</span><span>; };
+</span><span>  </span><span style="color:#e78a53;">inherit </span><span>(</span><span style="font-style:italic;color:#5f8787;">utils</span><span>) </span><span style="color:#e78a53;">isDarwin isLinux</span><span>;
+</span><span style="color:#e78a53;">in
+</span><span>{
+</span><span>  </span><span style="color:#e78a53;">mkHost =
+</span><span>    </span><span style="font-style:italic;color:#5f8787;">hostConfig</span><span>@{ </span><span style="font-style:italic;color:#5f8787;">hostname
+</span><span>    </span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">platform
+</span><span>    </span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">system
+</span><span>    </span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">username </span><span style="color:#e78a53;">? </span><span style="color:#fbcb97;">&quot;wantguns&quot;
+</span><span>    </span><span style="color:#e78a53;">, ...
+</span><span style="color:#e78a53;">    </span><span>}:
+</span><span>    </span><span style="color:#e78a53;">let
+</span><span>      </span><span style="color:#e78a53;">hostDarwin = </span><span style="font-style:italic;color:#5f8787;">isDarwin system</span><span>;
+</span><span>      </span><span style="color:#e78a53;">homeDirectory = if </span><span style="font-style:italic;color:#5f8787;">hostDarwin 
+</span><span>                      </span><span style="color:#e78a53;">then </span><span style="color:#fbcb97;">&quot;/Users/${</span><span style="font-style:italic;color:#5f8787;">username</span><span style="color:#fbcb97;">}&quot;
+</span><span>                      </span><span style="color:#e78a53;">else </span><span style="color:#fbcb97;">&quot;/home/${</span><span style="font-style:italic;color:#5f8787;">username</span><span style="color:#fbcb97;">}&quot;</span><span>;
+</span><span>
+</span><span>      </span><span style="color:#e78a53;">hmModule = if </span><span style="font-style:italic;color:#5f8787;">hostDarwin
+</span><span>                 </span><span style="color:#e78a53;">then </span><span style="font-style:italic;color:#5f8787;">inputs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">home-manager</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">darwinModules</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">home-manager
+</span><span>                 </span><span style="color:#e78a53;">else </span><span style="font-style:italic;color:#5f8787;">inputs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">home-manager</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">nixosModules</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">home-manager</span><span>;
+</span><span>
+</span><span>      </span><span style="color:#e78a53;">hostPath = </span><span style="color:#fbcb97;">../hosts</span><span style="color:#e78a53;">/</span><span>${</span><span style="font-style:italic;color:#5f8787;">platform</span><span>}</span><span style="color:#e78a53;">/</span><span>${</span><span style="font-style:italic;color:#5f8787;">hostname</span><span>};
+</span><span>      </span><span style="color:#e78a53;">commonPath = </span><span style="color:#fbcb97;">../hosts</span><span style="color:#e78a53;">/</span><span>${</span><span style="font-style:italic;color:#5f8787;">platform</span><span>}</span><span style="color:#fbcb97;">/common.nix</span><span>;
+</span><span>      </span><span style="color:#e78a53;">sharedPath = </span><span style="color:#fbcb97;">../hosts/common/default.nix</span><span>;
+</span><span>
+</span><span>      </span><span style="color:#e78a53;">diskoConfigPath = </span><span style="color:#fbcb97;">&quot;${</span><span style="font-style:italic;color:#5f8787;">hostPath</span><span style="color:#fbcb97;">}/disk-config.nix&quot;</span><span>;
+</span><span>      </span><span style="color:#e78a53;">facterJsonPath = </span><span style="color:#fbcb97;">&quot;${</span><span style="font-style:italic;color:#5f8787;">hostPath</span><span style="color:#fbcb97;">}/facter.json&quot;</span><span>;
+</span><span>      </span><span style="color:#e78a53;">hasDiskoConfig = !</span><span style="font-style:italic;color:#5f8787;">hostDarwin </span><span style="color:#e78a53;">&amp;&amp; builtins.</span><span style="font-style:italic;color:#5f8787;">pathExists diskoConfigPath</span><span>;
+</span><span>      </span><span style="color:#e78a53;">hasFacterJson = !</span><span style="font-style:italic;color:#5f8787;">hostDarwin </span><span style="color:#e78a53;">&amp;&amp; builtins.</span><span style="font-style:italic;color:#5f8787;">pathExists facterJsonPath</span><span>;
+</span><span>
+</span><span>      </span><span style="color:#e78a53;">baseModules = </span><span>[
+</span><span>        </span><span style="font-style:italic;color:#5f8787;">sharedPath
+</span><span>        </span><span style="font-style:italic;color:#5f8787;">commonPath
+</span><span>        </span><span style="color:#fbcb97;">&quot;${</span><span style="font-style:italic;color:#5f8787;">hostPath</span><span style="color:#fbcb97;">}/default.nix&quot;
+</span><span>        </span><span style="font-style:italic;color:#5f8787;">hmModule
+</span><span>      ];
+</span><span>
+</span><span>      </span><span style="color:#e78a53;">linuxModules = if </span><span style="font-style:italic;color:#5f8787;">hostDarwin </span><span style="color:#e78a53;">then </span><span>[] </span><span style="color:#e78a53;">else
+</span><span>        (</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">optional hasDiskoConfig inputs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">disko</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">nixosModules</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">disko</span><span>) </span><span style="color:#e78a53;">++
+</span><span>        (</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">optional hasDiskoConfig diskoConfigPath</span><span>) </span><span style="color:#e78a53;">++
+</span><span>        (</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">optional hasFacterJson inputs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">nixos-facter-modules</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">nixosModules</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">facter</span><span>) </span><span style="color:#e78a53;">++
+</span><span>        (</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">optional hasFacterJson </span><span>{
+</span><span>          </span><span style="color:#e78a53;">facter</span><span>.</span><span style="color:#e78a53;">reportPath = </span><span style="font-style:italic;color:#5f8787;">facterJsonPath</span><span>;
+</span><span>        });
+</span><span>
+</span><span>      </span><span style="color:#e78a53;">systemBuilder = if </span><span style="font-style:italic;color:#5f8787;">hostDarwin
+</span><span>                      </span><span style="color:#e78a53;">then </span><span style="font-style:italic;color:#5f8787;">inputs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">darwin</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">darwinSystem
+</span><span>                      </span><span style="color:#e78a53;">else </span><span style="font-style:italic;color:#5f8787;">inputs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">nixpkgs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">nixosSystem</span><span>;
+</span><span>    </span><span style="color:#e78a53;">in
+</span><span>    </span><span style="font-style:italic;color:#5f8787;">systemBuilder </span><span>{
+</span><span>      </span><span style="color:#e78a53;">inherit system</span><span>;
+</span><span>      </span><span style="color:#e78a53;">specialArgs = </span><span>{ </span><span style="color:#e78a53;">inherit inputs</span><span>; };
+</span><span>      </span><span style="color:#e78a53;">modules = </span><span style="font-style:italic;color:#5f8787;">baseModules </span><span style="color:#e78a53;">++ </span><span style="font-style:italic;color:#5f8787;">linuxModules </span><span style="color:#e78a53;">++ </span><span>[{
+</span><span>        </span><span style="color:#e78a53;">nixpkgs = </span><span>{
+</span><span>          </span><span style="color:#e78a53;">config</span><span>.</span><span style="color:#e78a53;">allowUnfree = true</span><span>;
+</span><span>          </span><span style="color:#e78a53;">hostPlatform = </span><span style="font-style:italic;color:#5f8787;">system</span><span>;
+</span><span>        };
+</span><span>
+</span><span>        </span><span style="color:#e78a53;">home-manager = </span><span>{
+</span><span>          </span><span style="color:#e78a53;">useGlobalPkgs = true</span><span>;
+</span><span>          </span><span style="color:#e78a53;">useUserPackages = true</span><span>;
+</span><span>          </span><span style="color:#e78a53;">extraSpecialArgs = </span><span>{ </span><span style="color:#e78a53;">inherit inputs</span><span>; };
+</span><span>          </span><span style="color:#e78a53;">sharedModules = </span><span>[
+</span><span>            </span><span style="font-style:italic;color:#5f8787;">inputs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">sops-nix</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">homeManagerModules</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">sops
+</span><span>          ];
+</span><span>          </span><span style="color:#e78a53;">users</span><span>.${</span><span style="font-style:italic;color:#5f8787;">username</span><span>} </span><span style="color:#e78a53;">= </span><span>{ </span><span style="color:#e78a53;">... </span><span>}: {
+</span><span>            </span><span style="color:#e78a53;">imports = </span><span>[
+</span><span>              </span><span style="color:#fbcb97;">../modules/features/default.nix
+</span><span>              </span><span style="color:#fbcb97;">../modules/features/implementation.nix
+</span><span>              </span><span style="color:#fbcb97;">&quot;${</span><span style="font-style:italic;color:#5f8787;">hostPath</span><span style="color:#fbcb97;">}/home.nix&quot;
+</span><span>            ];
+</span><span>          };
+</span><span>        };
+</span><span>      }];
+</span><span>    };
+</span><span>}
+</span></code></pre>
+<p>You must be wondering what is <code>disko</code> or <code>facter</code> or <code>sops</code>, and for
+that, I'll be publishing a separate article. For now this config should
+still work on darwin hosts, since all the linux related things are not
+included if the <code>system</code> is darwin.</p>
+<p>We are basically calling <code>nixosSystem</code> or <code>darwinSystem</code> and then using
+the homeManager module specific to that system. Since many of our Home
+Manager options are abstracted as à la carte features, we need to
+include the features module we created.</p>
+<h3 id="lib-mkhomeconfig-nix">lib/mkHomeConfig.nix</h3>
+<p>Next lets create another library function to create
+<code>homeConfigurations</code>:</p>
+<pre data-lang="nix" style="background-color:#000000;color:#c1c1c1;" class="language-nix "><code class="language-nix" data-lang="nix"><span style="color:#888888;"># inside lib/mkHomeConfig.nix
+</span><span>{ </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">inputs</span><span style="color:#e78a53;">, ... </span><span>}:
+</span><span>
+</span><span style="color:#e78a53;">let
+</span><span>  </span><span style="color:#e78a53;">utils = </span><span style="color:#fbcb97;">import ./utils.nix </span><span>{ </span><span style="color:#e78a53;">inherit lib</span><span>; };
+</span><span>  </span><span style="color:#e78a53;">inherit </span><span>(</span><span style="font-style:italic;color:#5f8787;">utils</span><span>) </span><span style="color:#e78a53;">isDarwin isLinux</span><span>;
+</span><span style="color:#e78a53;">in
+</span><span>{
+</span><span>  </span><span style="color:#e78a53;">mkHomeConfig = </span><span style="font-style:italic;color:#5f8787;">hostname</span><span>: </span><span style="font-style:italic;color:#5f8787;">hostConfig</span><span>:
+</span><span>    </span><span style="color:#e78a53;">let
+</span><span>      </span><span style="color:#e78a53;">system = </span><span style="font-style:italic;color:#5f8787;">hostConfig</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">system</span><span>;
+</span><span>      </span><span style="color:#e78a53;">username = </span><span style="font-style:italic;color:#5f8787;">hostConfig</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">username</span><span>;
+</span><span>      </span><span style="color:#e78a53;">platform = if </span><span style="font-style:italic;color:#5f8787;">isDarwin system </span><span style="color:#e78a53;">then </span><span style="color:#fbcb97;">&quot;darwin&quot; </span><span style="color:#e78a53;">else </span><span style="color:#fbcb97;">&quot;linux&quot;</span><span>;
+</span><span>      </span><span style="color:#e78a53;">hostPath = </span><span style="color:#fbcb97;">../hosts</span><span style="color:#e78a53;">/</span><span>${</span><span style="font-style:italic;color:#5f8787;">platform</span><span>}</span><span style="color:#e78a53;">/</span><span>${</span><span style="font-style:italic;color:#5f8787;">hostname</span><span>};
+</span><span>      </span><span style="color:#e78a53;">homeDirectory =
+</span><span>        </span><span style="color:#e78a53;">if </span><span style="font-style:italic;color:#5f8787;">isDarwin system
+</span><span>        </span><span style="color:#e78a53;">then </span><span style="color:#fbcb97;">&quot;/Users/${</span><span style="font-style:italic;color:#5f8787;">username</span><span style="color:#fbcb97;">}&quot;
+</span><span>        </span><span style="color:#e78a53;">else </span><span style="color:#fbcb97;">&quot;/home/${</span><span style="font-style:italic;color:#5f8787;">username</span><span style="color:#fbcb97;">}&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">in
+</span><span>    </span><span style="font-style:italic;color:#5f8787;">inputs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">home-manager</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">homeManagerConfiguration </span><span>{
+</span><span>      </span><span style="color:#e78a53;">pkgs = </span><span style="font-style:italic;color:#5f8787;">inputs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">nixpkgs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">legacyPackages</span><span style="color:#e78a53;">.</span><span>${</span><span style="font-style:italic;color:#5f8787;">system</span><span>};
+</span><span>      </span><span style="color:#e78a53;">extraSpecialArgs = </span><span>{ </span><span style="color:#e78a53;">inherit inputs</span><span>; };
+</span><span>      </span><span style="color:#e78a53;">modules = </span><span>[
+</span><span>        </span><span style="color:#fbcb97;">../modules/features/default.nix
+</span><span>        </span><span style="color:#fbcb97;">../modules/features/implementation.nix
+</span><span>        </span><span style="color:#fbcb97;">&quot;${</span><span style="font-style:italic;color:#5f8787;">hostPath</span><span style="color:#fbcb97;">}/home.nix&quot;
+</span><span>        {
+</span><span>          </span><span style="color:#e78a53;">home = </span><span>{
+</span><span>            </span><span style="color:#e78a53;">inherit username homeDirectory</span><span>;
+</span><span>          };
+</span><span>        }
+</span><span>      ];
+</span><span>    };
+</span><span>}
+</span></code></pre>
+<p>This should be pretty explanatory. You can go through my blogs on
+<code>home-manager</code> and <code>nix-darwin</code> to have a better picture how our
+abstraction is growing.</p>
+<h3 id="lib-default-nix">lib/default.nix</h3>
+<p>We'll import all of our library functions through the default nix file in this directory.</p>
+<pre data-lang="nix" style="background-color:#000000;color:#c1c1c1;" class="language-nix "><code class="language-nix" data-lang="nix"><span style="color:#888888;"># inside lib/default.nix
+</span><span>{ </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">inputs </span><span>}:
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#e78a53;">mkHost = </span><span>(</span><span style="color:#fbcb97;">import ./mkHost.nix </span><span>{ </span><span style="color:#e78a53;">inherit lib inputs</span><span>; })</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">mkHost</span><span>;
+</span><span>  </span><span style="color:#e78a53;">mkHomeConfig = </span><span>(</span><span style="color:#fbcb97;">import ./mkHomeConfig.nix </span><span>{ </span><span style="color:#e78a53;">inherit lib inputs</span><span>; })</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">mkHomeConfig</span><span>;
+</span><span>  </span><span style="color:#e78a53;">mkHostConfig = </span><span>(</span><span style="color:#fbcb97;">import ./mkHostConfig.nix </span><span>{ </span><span style="color:#e78a53;">inherit lib</span><span>; })</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">mkHostConfig</span><span>;
+</span><span>  </span><span style="color:#e78a53;">isPlatform = </span><span>(</span><span style="color:#fbcb97;">import ./utils.nix </span><span>{ </span><span style="color:#e78a53;">inherit lib</span><span>; })</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">isPlatform</span><span>;
+</span><span>  </span><span style="color:#e78a53;">isDarwin = </span><span>(</span><span style="color:#fbcb97;">import ./utils.nix </span><span>{ </span><span style="color:#e78a53;">inherit lib</span><span>; })</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">isDarwin</span><span>;
+</span><span>  </span><span style="color:#e78a53;">isLinux = </span><span>(</span><span style="color:#fbcb97;">import ./utils.nix </span><span>{ </span><span style="color:#e78a53;">inherit lib</span><span>; })</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">isLinux</span><span>;
+</span><span>}
+</span></code></pre>
+<h3 id="flake-nix">flake.nix</h3>
+<p>Finally, we have all the required nix code to iterate our flake:</p>
+<pre data-lang="nix" style="background-color:#000000;color:#c1c1c1;" class="language-nix "><code class="language-nix" data-lang="nix"><span>{
+</span><span>  </span><span style="color:#e78a53;">description = </span><span style="color:#fbcb97;">&quot;Nix System Configurations&quot;</span><span>;
+</span><span>
+</span><span>  </span><span style="color:#e78a53;">inputs = </span><span>{
+</span><span>    </span><span style="color:#e78a53;">nixpkgs</span><span>.</span><span style="color:#e78a53;">url = </span><span style="color:#fbcb97;">&quot;github:nixos/nixpkgs/nixos-unstable&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">darwin</span><span>.</span><span style="color:#e78a53;">url = </span><span style="color:#fbcb97;">&quot;github:lnl7/nix-darwin/master&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">home-manager</span><span>.</span><span style="color:#e78a53;">url = </span><span style="color:#fbcb97;">&quot;github:nix-community/home-manager&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">disko</span><span>.</span><span style="color:#e78a53;">url = </span><span style="color:#fbcb97;">&quot;github:nix-community/disko/latest&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">nixos-facter-modules</span><span>.</span><span style="color:#e78a53;">url = </span><span style="color:#fbcb97;">&quot;github:numtide/nixos-facter-modules&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">sops-nix</span><span>.</span><span style="color:#e78a53;">url = </span><span style="color:#fbcb97;">&quot;github:Mic92/sops-nix&quot;</span><span>;
+</span><span>
+</span><span>    </span><span style="color:#e78a53;">darwin</span><span>.</span><span style="color:#e78a53;">inputs</span><span>.</span><span style="color:#e78a53;">nixpkgs</span><span>.</span><span style="color:#e78a53;">follows = </span><span style="color:#fbcb97;">&quot;nixpkgs&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">home-manager</span><span>.</span><span style="color:#e78a53;">inputs</span><span>.</span><span style="color:#e78a53;">nixpkgs</span><span>.</span><span style="color:#e78a53;">follows = </span><span style="color:#fbcb97;">&quot;nixpkgs&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">disko</span><span>.</span><span style="color:#e78a53;">inputs</span><span>.</span><span style="color:#e78a53;">nixpkgs</span><span>.</span><span style="color:#e78a53;">follows = </span><span style="color:#fbcb97;">&quot;nixpkgs&quot;</span><span>;
+</span><span>    </span><span style="color:#e78a53;">sops-nix</span><span>.</span><span style="color:#e78a53;">inputs</span><span>.</span><span style="color:#e78a53;">nixpkgs</span><span>.</span><span style="color:#e78a53;">follows = </span><span style="color:#fbcb97;">&quot;nixpkgs&quot;</span><span>;
+</span><span>  };
+</span><span>
+</span><span>  </span><span style="color:#e78a53;">outputs = </span><span style="font-style:italic;color:#5f8787;">inputs</span><span>@{ </span><span style="font-style:italic;color:#5f8787;">self</span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">nixpkgs</span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">darwin</span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">home-manager</span><span style="color:#e78a53;">, ... </span><span>}:
+</span><span>    </span><span style="color:#e78a53;">let
+</span><span>      </span><span style="color:#e78a53;">lib = </span><span style="font-style:italic;color:#5f8787;">nixpkgs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">extend </span><span>(</span><span style="font-style:italic;color:#5f8787;">final</span><span>: </span><span style="font-style:italic;color:#5f8787;">prev</span><span>: {
+</span><span>        </span><span style="color:#e78a53;">my = </span><span style="color:#fbcb97;">import ./lib </span><span>{ </span><span style="color:#e78a53;">inherit inputs</span><span>; </span><span style="color:#e78a53;">lib = </span><span style="font-style:italic;color:#5f8787;">prev</span><span>; };
+</span><span>      });
+</span><span>
+</span><span>      </span><span style="color:#e78a53;">systems = </span><span>[ </span><span style="color:#fbcb97;">&quot;x86_64-linux&quot; &quot;x86_64-darwin&quot; &quot;aarch64-linux&quot; &quot;aarch64-darwin&quot; </span><span>];
+</span><span>      </span><span style="color:#e78a53;">forAllSystems = </span><span style="font-style:italic;color:#5f8787;">nixpkgs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">genAttrs systems</span><span>;
+</span><span>
+</span><span>      </span><span style="color:#e78a53;">hosts = </span><span>{
+</span><span>        </span><span style="color:#fbcb97;">&quot;C02GH2V9MD6M&quot; </span><span style="color:#e78a53;">= </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">my</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">mkHostConfig </span><span>{
+</span><span>          </span><span style="color:#e78a53;">hostname = </span><span style="color:#fbcb97;">&quot;C02GH2V9MD6M&quot;</span><span>;
+</span><span>          </span><span style="color:#e78a53;">system = </span><span style="color:#fbcb97;">&quot;x86_64-darwin&quot;</span><span>;
+</span><span>          </span><span style="color:#e78a53;">username = </span><span style="color:#fbcb97;">&quot;gunwant.jain1&quot;</span><span>;
+</span><span>          </span><span style="color:#e78a53;">justHome = false</span><span>;
+</span><span>          </span><span style="color:#e78a53;">remoteBuild = false</span><span>;
+</span><span>        };
+</span><span>
+</span><span>        </span><span style="color:#fbcb97;">&quot;mintaka&quot; </span><span style="color:#e78a53;">= </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">my</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">mkHostConfig </span><span>{
+</span><span>          </span><span style="color:#e78a53;">hostname = </span><span style="color:#fbcb97;">&quot;mintaka&quot;</span><span>;
+</span><span>          </span><span style="color:#e78a53;">system = </span><span style="color:#fbcb97;">&quot;x86_64-linux&quot;</span><span>;
+</span><span>          </span><span style="color:#e78a53;">username = </span><span style="color:#fbcb97;">&quot;wantguns&quot;</span><span>;
+</span><span>          </span><span style="color:#e78a53;">remoteBuild = true</span><span>;
+</span><span>          </span><span style="color:#e78a53;">ips = </span><span>{
+</span><span>            </span><span style="color:#e78a53;">private = </span><span style="color:#fbcb97;">&quot;192.168.1.5&quot;</span><span>;
+</span><span>          };
+</span><span>        };
+</span><span>      };
+</span><span>
+</span><span>      </span><span style="color:#e78a53;">forAllHosts = </span><span style="font-style:italic;color:#5f8787;">f</span><span>: </span><span style="color:#e78a53;">builtins.</span><span style="font-style:italic;color:#5f8787;">mapAttrs f hosts</span><span>;
+</span><span>
+</span><span>    </span><span style="color:#e78a53;">in
+</span><span>    {
+</span><span>      </span><span style="color:#e78a53;">inherit hosts</span><span>;
+</span><span>
+</span><span>      </span><span style="color:#e78a53;">darwinConfigurations = builtins.</span><span style="font-style:italic;color:#5f8787;">mapAttrs
+</span><span>        (</span><span style="font-style:italic;color:#5f8787;">name</span><span>: </span><span style="font-style:italic;color:#5f8787;">hostConfig</span><span>: </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">my</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">mkHost hostConfig</span><span>)
+</span><span>        (</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">filterAttrs </span><span>(</span><span style="font-style:italic;color:#5f8787;">name</span><span>: </span><span style="font-style:italic;color:#5f8787;">hostConfig</span><span>: </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">my</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">isDarwin hostConfig</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">system</span><span>) </span><span style="font-style:italic;color:#5f8787;">hosts</span><span>);
+</span><span>
+</span><span>      </span><span style="color:#e78a53;">nixosConfigurations = builtins.</span><span style="font-style:italic;color:#5f8787;">mapAttrs
+</span><span>        (</span><span style="font-style:italic;color:#5f8787;">name</span><span>: </span><span style="font-style:italic;color:#5f8787;">hostConfig</span><span>: </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">my</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">mkHost hostConfig</span><span>)
+</span><span>        (</span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">filterAttrs </span><span>(</span><span style="font-style:italic;color:#5f8787;">name</span><span>: </span><span style="font-style:italic;color:#5f8787;">hostConfig</span><span>: </span><span style="font-style:italic;color:#5f8787;">lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">my</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">isLinux hostConfig</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">system</span><span>) </span><span style="font-style:italic;color:#5f8787;">hosts</span><span>);
+</span><span>
+</span><span>      </span><span style="color:#e78a53;">homeConfigurations = </span><span style="font-style:italic;color:#5f8787;">forAllHosts lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">my</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">mkHomeConfig</span><span>;
+</span><span>    };
+</span><span>}
+</span></code></pre>
+<p>Simple enough, we can now use this flake for multiple tools:</p>
+<pre data-lang="bash" style="background-color:#000000;color:#c1c1c1;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#888888;"># for home-manager
+</span><span style="color:#5f8787;">nix</span><span> run github:nix-community/home-manager/master</span><span style="color:#e78a53;"> --</span><span> switch --flake .#</span><span style="color:#fbcb97;">&quot;hostname&quot;
+</span><span>
+</span><span style="color:#888888;"># for darwin-rebuild
+</span><span style="color:#5f8787;">nix</span><span> run github:lnl7/nix-darwin/master#darwin-rebuild</span><span style="color:#e78a53;"> --</span><span> switch --flake .#</span><span style="color:#fbcb97;">&quot;hostname&quot;
+</span><span>
+</span><span style="color:#888888;"># for nixos-rebuild
+</span><span style="color:#5f8787;">nix</span><span> run nixpkgs#nixos-rebuild</span><span style="color:#e78a53;"> --</span><span> switch --flake .#</span><span style="color:#fbcb97;">&quot;hostname&quot;
+</span></code></pre>
+<h2 id="remote-deployment-flake-apps">Remote deployment &amp; Flake apps</h2>
+<p>I also want the ability to execute these commands remotely and push
+changes remotely to all my hosts. There are a few tools which are
+popular - <code>deploy-rs</code>, <code>colmena</code>, <code>clan.lol</code>. I tried each of them and found
+out that:</p>
+<ul>
+<li><strong>Colmena</strong> does not support hosts of different systems in the same flake (<a href="https://matrix.to/#/#colmena:nixos.org/$zmv3rJLkqDapZUTVuH3QFtZnw7f8wgz8FbKI9srWFN8">issue</a>)</li>
+<li><strong>Deploy-rs</strong> does not support <strong>building on remote</strong>, it only supports copying the build artifacts to remote (<a href="https://github.com/serokell/deploy-rs/issues/300">issue</a>)</li>
+<li><strong>Clan.lol</strong> is too restrictive for my taste</li>
+</ul>
+<p>I recently found out that nixos-rebuild has the remote build ability innately:</p>
+<pre data-lang="bash" style="background-color:#000000;color:#c1c1c1;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#5f8787;">nix</span><span> run nixpkgs#nixos-rebuild</span><span style="color:#e78a53;"> --</span><span> switch \
+</span><span>  --flake .#</span><span style="color:#fbcb97;">&quot;$</span><span style="color:#5f8787;">HOSTNAME</span><span style="color:#fbcb97;">&quot; </span><span>\
+</span><span>  --build-host </span><span style="color:#fbcb97;">&quot;$</span><span style="color:#5f8787;">USERNAME</span><span style="color:#fbcb97;">@$</span><span style="color:#5f8787;">IP</span><span style="color:#fbcb97;">&quot; </span><span>\
+</span><span>  --target-host </span><span style="color:#fbcb97;">&quot;$</span><span style="color:#5f8787;">USERNAME</span><span style="color:#fbcb97;">@$</span><span style="color:#5f8787;">IP</span><span style="color:#fbcb97;">&quot; </span><span>\
+</span><span>  --use-remote-sudo \
+</span><span>  --fast \
+</span><span>  --use-substitutes \
+</span><span>  --option builders-use-substitutes true
+</span></code></pre>
+<p>this command will build the nixosConfiguration remotely and activate it
+as well. This is great, we naturally reduce our dependencies for a
+deployment tool. Now we can just create a new <a href="https://nix.dev/manual/nix/2.18/command-ref/new-cli/nix3-run#apps">flake app</a> and call <code>nix run</code> on our flake:</p>
+<pre data-lang="nix" style="background-color:#000000;color:#c1c1c1;" class="language-nix "><code class="language-nix" data-lang="nix"><span style="color:#888888;"># inside flake.nix
+</span><span>
+</span><span style="color:#888888;"># ... rest of the config
+</span><span>      </span><span style="font-style:italic;color:#5f8787;">homeConfigurations </span><span style="background-color:#5f8787;color:#000000;">=</span><span> </span><span style="font-style:italic;color:#5f8787;">forAllHosts lib</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">my</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">mkHomeConfig</span><span style="background-color:#5f8787;color:#000000;">;</span><span>
+</span><span>
+</span><span>      </span><span style="font-style:italic;color:#5f8787;">apps </span><span style="background-color:#5f8787;color:#000000;">=</span><span> </span><span style="font-style:italic;color:#5f8787;">forAllSystems </span><span>(</span><span style="font-style:italic;color:#5f8787;">system</span><span>: {
+</span><span>        </span><span style="color:#e78a53;">deploy = </span><span>{
+</span><span>          </span><span style="color:#e78a53;">type = </span><span style="color:#fbcb97;">&quot;app&quot;</span><span>;
+</span><span>          </span><span style="color:#e78a53;">program = </span><span style="color:#fbcb97;">&quot;${import ./lib/deploy.nix { 
+</span><span style="color:#fbcb97;">            </span><span style="color:#e78a53;">pkgs = </span><span style="font-style:italic;color:#5f8787;">nixpkgs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">legacyPackages</span><span style="color:#e78a53;">.</span><span style="color:#fbcb97;">${</span><span style="font-style:italic;color:#5f8787;">system</span><span style="color:#fbcb97;">}; 
+</span><span style="color:#fbcb97;">            </span><span style="color:#e78a53;">inherit nixpkgs</span><span style="color:#fbcb97;">;
+</span><span style="color:#fbcb97;">          }}/bin/deploy&quot;</span><span>;
+</span><span>        };
+</span><span>      })</span><span style="background-color:#5f8787;color:#000000;">;</span><span>
+</span><span>  </span><span style="background-color:#5f8787;color:#000000;">}</span><span>
+</span></code></pre>
+<p>and our deploy app is basically a shell script:</p>
+<pre data-lang="nix" style="background-color:#000000;color:#c1c1c1;" class="language-nix "><code class="language-nix" data-lang="nix"><span style="color:#888888;"># inside lib/deploy.nix
+</span><span>{ </span><span style="font-style:italic;color:#5f8787;">pkgs</span><span style="color:#e78a53;">, </span><span style="font-style:italic;color:#5f8787;">nixpkgs </span><span>}:
+</span><span>
+</span><span style="font-style:italic;color:#5f8787;">pkgs</span><span style="color:#e78a53;">.</span><span style="font-style:italic;color:#5f8787;">writeShellScriptBin </span><span style="color:#fbcb97;">&quot;deploy&quot; &#39;&#39;
+</span><span style="color:#fbcb97;">  #!/usr/bin/env bash
+</span><span style="color:#fbcb97;">  set -e
+</span><span style="color:#fbcb97;">
+</span><span style="color:#fbcb97;">  RAW_HOSTNAME=</span><span style="color:#aaaaaa;">&#39;&#39;$</span><span style="color:#fbcb97;">{1:-$(hostname)}
+</span><span style="color:#fbcb97;">  HOSTNAME=$(echo &quot;$RAW_HOSTNAME&quot; | cut -d &#39;.&#39; -f 1)
+</span><span style="color:#fbcb97;">  REMOTE_BUILD=</span><span style="color:#aaaaaa;">&#39;&#39;$</span><span style="color:#fbcb97;">{2:-false}
+</span><span style="color:#fbcb97;">
+</span><span style="color:#fbcb97;">  SYSTEM=$(nix eval --raw .#hosts.&quot;$HOSTNAME&quot;.system)
+</span><span style="color:#fbcb97;">  USERNAME=$(nix eval --raw .#hosts.&quot;$HOSTNAME&quot;.username)
+</span><span style="color:#fbcb97;">  JUST_HOME=$(nix eval --json .#hosts.&quot;$HOSTNAME&quot;.justHome 2&gt;/dev/null | grep -q &quot;true&quot; &amp;&amp; echo &quot;true&quot; || echo &quot;false&quot;)
+</span><span style="color:#fbcb97;">  REMOTE_BUILD_ENABLED=$(nix eval --json .#hosts.&quot;$HOSTNAME&quot;.remoteBuild | grep -q &quot;true&quot; &amp;&amp; echo &quot;true&quot; || echo &quot;false&quot;)
+</span><span style="color:#fbcb97;">
+</span><span style="color:#fbcb97;">  deploy_home() {
+</span><span style="color:#fbcb97;">    local host=$1
+</span><span style="color:#fbcb97;">    local remote=$2
+</span><span style="color:#fbcb97;">    echo &quot;Deploying home configuration for $host...&quot;
+</span><span style="color:#fbcb97;">  
+</span><span style="color:#fbcb97;">    if [ &quot;$remote&quot; == &quot;true&quot; ]; then
+</span><span style="color:#fbcb97;">      ssh &quot;$USERNAME@$IP&quot; &quot;nix run &#39;github:nix-community/home-manager/master&#39; -- switch --flake &#39;.#$host&#39;&quot;
+</span><span style="color:#fbcb97;">    else
+</span><span style="color:#fbcb97;">      nix run github:nix-community/home-manager/master -- switch --flake .#&quot;$host&quot;
+</span><span style="color:#fbcb97;">    fi
+</span><span style="color:#fbcb97;">  }
+</span><span style="color:#fbcb97;">
+</span><span style="color:#fbcb97;">  if [[ &quot;$REMOTE_BUILD&quot; == &quot;true&quot; &amp;&amp; &quot;$REMOTE_BUILD_ENABLED&quot; == &quot;true&quot; ]]; then
+</span><span style="color:#fbcb97;">    PUBLIC_IP=$(nix eval --raw .#hosts.&quot;$HOSTNAME&quot;.ips.public 2&gt;/dev/null || echo &quot;&quot;)
+</span><span style="color:#fbcb97;">    PRIVATE_IP=$(nix eval --raw .#hosts.&quot;$HOSTNAME&quot;.ips.private 2&gt;/dev/null || echo &quot;&quot;)
+</span><span style="color:#fbcb97;">  
+</span><span style="color:#fbcb97;">    IP=&quot;$PUBLIC_IP&quot;
+</span><span style="color:#fbcb97;">    if ! ping -c 1 -W 1 &quot;$IP&quot; &amp;&gt;/dev/null &amp;&amp; [ -n &quot;$PRIVATE_IP&quot; ]; then
+</span><span style="color:#fbcb97;">      IP=&quot;$PRIVATE_IP&quot;
+</span><span style="color:#fbcb97;">    fi
+</span><span style="color:#fbcb97;">  
+</span><span style="color:#fbcb97;">    if [ -z &quot;$IP&quot; ]; then
+</span><span style="color:#fbcb97;">      echo &quot;Error: No IP address available for remote build&quot;
+</span><span style="color:#fbcb97;">      exit 1
+</span><span style="color:#fbcb97;">    fi
+</span><span style="color:#fbcb97;">  
+</span><span style="color:#fbcb97;">    if [[ &quot;$JUST_HOME&quot; == &quot;true&quot; ]]; then
+</span><span style="color:#fbcb97;">      deploy_home &quot;$HOSTNAME&quot; true
+</span><span style="color:#fbcb97;">    else
+</span><span style="color:#fbcb97;">      echo &quot;Deploying to $HOSTNAME ($IP) with remote build...&quot;
+</span><span style="color:#fbcb97;">    
+</span><span style="color:#fbcb97;">      if [[ &quot;$SYSTEM&quot; == *&quot;-linux&quot; ]]; then
+</span><span style="color:#fbcb97;">        nix run nixpkgs#nixos-rebuild -- switch \
+</span><span style="color:#fbcb97;">          --flake .#&quot;$HOSTNAME&quot; \
+</span><span style="color:#fbcb97;">          --build-host &quot;$USERNAME@$IP&quot; \
+</span><span style="color:#fbcb97;">          --target-host &quot;$USERNAME@$IP&quot; \
+</span><span style="color:#fbcb97;">          --use-remote-sudo \
+</span><span style="color:#fbcb97;">          --fast \
+</span><span style="color:#fbcb97;">          --use-substitutes \
+</span><span style="color:#fbcb97;">          --option builders-use-substitutes true
+</span><span style="color:#fbcb97;">      else
+</span><span style="color:#fbcb97;">        nix run github:lnl7/nix-darwin/master#darwin-rebuild -- switch \
+</span><span style="color:#fbcb97;">          --flake .#&quot;$HOSTNAME&quot; \
+</span><span style="color:#fbcb97;">          --build-host &quot;$USERNAME@$IP&quot; \
+</span><span style="color:#fbcb97;">          --target-host &quot;$USERNAME@$IP&quot; \
+</span><span style="color:#fbcb97;">          --fast
+</span><span style="color:#fbcb97;">      fi
+</span><span style="color:#fbcb97;">    fi
+</span><span style="color:#fbcb97;">  else
+</span><span style="color:#fbcb97;">    if [[ &quot;$JUST_HOME&quot; == &quot;true&quot; ]]; then
+</span><span style="color:#fbcb97;">      deploy_home &quot;$HOSTNAME&quot; false
+</span><span style="color:#fbcb97;">    else
+</span><span style="color:#fbcb97;">      echo &quot;Deploying to $HOSTNAME locally...&quot;
+</span><span style="color:#fbcb97;">    
+</span><span style="color:#fbcb97;">      if [[ &quot;$SYSTEM&quot; == *&quot;-linux&quot; ]]; then
+</span><span style="color:#fbcb97;">        sudo nix run nixpkgs#nixos-rebuild -- switch --flake .#&quot;$HOSTNAME&quot;
+</span><span style="color:#fbcb97;">      else
+</span><span style="color:#fbcb97;">        nix run github:lnl7/nix-darwin/master#darwin-rebuild -- switch --flake .#&quot;$HOSTNAME&quot;
+</span><span style="color:#fbcb97;">      fi
+</span><span style="color:#fbcb97;">    fi
+</span><span style="color:#fbcb97;">  fi
+</span><span style="color:#fbcb97;">&#39;&#39;
+</span></code></pre>
+<p>Now we can run commands like:</p>
+<pre data-lang="bash" style="background-color:#000000;color:#c1c1c1;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#888888;"># Deploy to current host
+</span><span style="color:#5f8787;">nix</span><span> run .#deploy
+</span><span>
+</span><span style="color:#888888;"># Deploy to specific host
+</span><span style="color:#5f8787;">nix</span><span> run .#deploy</span><span style="color:#e78a53;"> --</span><span> mintaka 
+</span><span>
+</span><span style="color:#888888;"># Deploy to specific host with remote build
+</span><span style="color:#5f8787;">nix</span><span> run .#deploy</span><span style="color:#e78a53;"> --</span><span> mintaka true
+</span></code></pre>
+<h2 id="future">Future</h2>
+<p>I have uploaded these files on my <a href="https://github.com/wantguns/dotfiles">github</a>. I
+will keep tracking them and hopefully make abstractions for easier syncing if
+necessary.</p>
+<p>Since we now have a good abstraction for our hosts, I am going to start
+using this flake alongside nixos-anywhere and nixos-infect to start
+installing nix on my servers. The plan is to onboard them and build a
+wireguard mesh, and a K3S cluster. Starting with my Dell Optiplex 3040, <code>mintaka</code>.</p>
+
+</article>
+
+
+  <div class="pagination_title">
+    <span>Read other posts</span>
+  </div>
+  <div class="post_nav">
+      
+        <div class="button">
+          <a class="button" href="&#x2F;nixdarwin&#x2F;">
+            ←&nbsp;
+            <span class="next">
+              Nix Darwin
+            </span>
+          </a>
+        </div>
+      
+      
+        <div class="button">
+          <a class="button" href="&#x2F;nixos-anywhere&#x2F;">
+            <span class="previous">nixos-anywhere</span>
+            &nbsp;→
+          </a>
+        </div>
+      
+    </div>
+
+
+
+    </div>
+    </main>
+
+    
+    
+
+    <footer class=center>
+      <sub>
+        <div>
+            &copy;
+            <span id="copyright">
+                <script>document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))</script>
+            </span>
+            &middot;
+            Gunwant Jain. Built <a class="footer" href="https://github.com/wantguns/wantguns.dev">openly</a> with <a class="footer" href="https://www.getzola.org">Zola</a>
+        </div>
+      </sub>
+    </footer>
+  </body>
+  
+ <script src=https://wantguns.dev/js/page.js></script> 
+
+</html>

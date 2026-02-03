@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>Gunwant Jain - @wantguns - flowdrive</title>
+    <subtitle>Gunwant Jain&#x27;s (@wantguns) writings and musings</subtitle>
+    <link rel="self" type="application/atom+xml" href="https://wantguns.dev/tags/flowdrive/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://wantguns.dev"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2022-01-29T00:00:00+00:00</updated>
+    <id>https://wantguns.dev/tags/flowdrive/atom.xml</id>
+    <entry xml:lang="en">
+        <title>IPC between Termux and Other Android Apps using ZMQ</title>
+        <published>2022-01-29T00:00:00+00:00</published>
+        <updated>2022-01-29T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://wantguns.dev/ipc-on-termux/"/>
+        <id>https://wantguns.dev/ipc-on-termux/</id>
+        
+        <content type="html" xml:base="https://wantguns.dev/ipc-on-termux/">&lt;h2 id=&quot;preface&quot;&gt;Preface&lt;&#x2F;h2&gt;
+&lt;p&gt;At FlowDrive, we do not have the luxury of travelling heavy. Everything
+has to be the fastest it can, every millisecond counts in a single loop.
+Which is why we turned to ZeroMQ for handling all the networking between
+different services. ZeroMQ is battle-tested, extremely fast and supports
+a whole variety of platforms.&lt;&#x2F;p&gt;
+&lt;p&gt;ZMQ has a Java implementation,
+&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;zeromq&#x2F;jeromq&quot;&gt;JeroMQ&lt;&#x2F;a&gt; which is a complete rewrite
+of ZMQ in Java. It would be our first choice, but it does not support
+many protocols due to their lack of implementations in Java, and IPC is
+one of it.&lt;&#x2F;p&gt;
+&lt;p&gt;But as justified earlier, we could not afford to have our messages go
+through the entire TCP stack, IPCs are just simpler and much faster.&lt;&#x2F;p&gt;
+&lt;p&gt;Fortunately, there exists &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;zeromq&#x2F;jzmq%20&quot;&gt;JZMQ&lt;&#x2F;a&gt; ,
+the Java bindings for libzmq. I gotta mention that using it on our apps
+introduced more complexity, due to lack of packages for different
+architectures. We made it work though, by building it ourselves, and
+cross-compiling it for whatever architectures we needed to support.&lt;&#x2F;p&gt;
+&lt;p&gt;To make sure that the reader follows the context, I have to explain the
+environment FlowPilot works in.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;termux&quot;&gt;Termux&lt;&#x2F;h2&gt;
+&lt;p&gt;Not everything we write is in Java. Some services can have the liberty to be
+written in much slower languages like Python. We run those services inside
+Termux, an Android app which gives us a unix-like userland on Android. One of
+the key softwares I worked with was an init-system &#x2F; process-manager for
+FlowPilot -- &lt;code&gt;FlowInit&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;FlowInit is written in Python, and therefore has to start in Termux. FlowInit
+communicates with FlowPilot over Pub&#x2F;Sub and Req&#x2F;Rep. Some communications are
+sensitive and making them over TCP would increase the attack vector
+substantially. This was the perfect time to utilise IPC.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;ipc-b-w-termux-and-android&quot;&gt;IPC b&#x2F;w Termux and Android&lt;&#x2F;h3&gt;
+&lt;p&gt;I mounted the Android directories on the termux land and binded a ZMQ
+REP socket on a shared path between Android and Termux.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;python&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-python &quot;&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span style=&quot;font-style:italic;color:#e78a53;&quot;&gt;def &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;wait_for_green_flag&lt;&#x2F;span&gt;&lt;span&gt;():
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;&amp;quot;&amp;quot;&amp;quot;Waits for a ready signal from javaland to start FlowInit&amp;quot;&amp;quot;&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    context &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;zmq.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;Context&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;    socket &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;context.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;socket&lt;&#x2F;span&gt;&lt;span&gt;(zmq.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;REP&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;    socket.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;bind&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;ipc:&#x2F;&#x2F;&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;home&#x2F;storage&#x2F;shared&#x2F;Documents&#x2F;houston&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;while True&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# This is asynchronous, so sleeping doesn&amp;#39;t matter as long as an
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# infinite loop is running
+&lt;&#x2F;span&gt;&lt;span&gt;        time.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;sleep&lt;&#x2F;span&gt;&lt;span&gt;(Config.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;FREQUENCY&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Wait on getting a flag, then send an ACK and initiate flowinit
+&lt;&#x2F;span&gt;&lt;span&gt;        flag &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;socket.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;recv_string&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;flag &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;== &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;green_flag&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;            socket.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;send_string&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;ACK&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;break
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;But I faced with this unusual error:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;Traceback&lt;&#x2F;span&gt;&lt;span&gt; (most recent call last)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;File &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;home&#x2F;dev&#x2F;flowinit&#x2F;venv&#x2F;bin&#x2F;flowinit&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;, line 33, in &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&amp;lt;&lt;&#x2F;span&gt;&lt;span&gt;module&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;sys.exit&lt;&#x2F;span&gt;&lt;span&gt;(load_entry_point(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;#39;flowinit==0.1.0&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;#39;console_scripts&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;#39;flowinit&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;)())
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;File &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;home&#x2F;dev&#x2F;flowinit&#x2F;venv&#x2F;lib&#x2F;python3.10&#x2F;site-packages&#x2F;flowinit-0.1.0-py3.10.egg&#x2F;flowinit&#x2F;flowinit.py&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;, line 132, in main
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;wait_for_green_flag&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;  File &amp;quot;&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;home&#x2F;dev&#x2F;flowinit&#x2F;venv&#x2F;lib&#x2F;python3.10&#x2F;site-packages&#x2F;flowinit-0.1.0-py3.10.egg&#x2F;flowinit&#x2F;flowinit.py&amp;quot;, line 58, in wait_for_green_flag
+&lt;&#x2F;span&gt;&lt;span&gt;    socket.bind(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;HOST&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;File &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;usr&#x2F;lib&#x2F;python3.10&#x2F;site-packages&#x2F;zmq&#x2F;sugar&#x2F;socket.py&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;, line 208, in bind
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;super&lt;&#x2F;span&gt;&lt;span&gt;().bind(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;addr&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;File &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;zmq&#x2F;backend&#x2F;cython&#x2F;socket.pyx&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;, line 540, in zmq.backend.cython.socket.Socket.bind
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;File &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;zmq&#x2F;backend&#x2F;cython&#x2F;checkrc.pxd&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;, line 28, in zmq.backend.cython.checkrc._check_rc
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;zmq.error.ZMQError:&lt;&#x2F;span&gt;&lt;span&gt; Invalid argument
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;make: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;*** [&lt;&#x2F;span&gt;&lt;span&gt;Makefile:30: run&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;]&lt;&#x2F;span&gt;&lt;span&gt; Error 1
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;I cross-checked with the PyZMQ repository, this error was not explicitly
+defined.&lt;&#x2F;p&gt;
+&lt;p&gt;Then I checked with the libzmq codebase, this error was again not
+explicitly defined.&lt;&#x2F;p&gt;
+&lt;p&gt;Finally I went on to systrace&#x27;ing this:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# ...
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;unlinkat&lt;&#x2F;span&gt;&lt;span&gt;(AT_FDCWD,&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;home&#x2F;storage&#x2F;shared&#x2F;Documents&#x2F;houston&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;, 0) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;-1&lt;&#x2F;span&gt;&lt;span&gt; ENOENT (No such file or directory)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;socket&lt;&#x2F;span&gt;&lt;span&gt;(AF_UNIX, SOCK_STREAM, 0)         &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;13
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;fcntl&lt;&#x2F;span&gt;&lt;span&gt;(13, F_SETFD, FD_CLOEXEC)          &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;0
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;bind&lt;&#x2F;span&gt;&lt;span&gt;(13, {sa_family=AF_UNIX, sun_path=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;home&#x2F;storage&#x2F;shared&#x2F;Documents&#x2F;houston&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;}, 67) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;-1&lt;&#x2F;span&gt;&lt;span&gt; EINVAL (Invalid argument)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;close&lt;&#x2F;span&gt;&lt;span&gt;(13)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# ...
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The actual error was arising from the &lt;code&gt;bind&lt;&#x2F;code&gt; syscall. Onto reading the
+manpage of bind:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;man&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-man &quot;&gt;&lt;code class=&quot;language-man&quot; data-lang=&quot;man&quot;&gt;&lt;span&gt;ERRORS
+&lt;&#x2F;span&gt;&lt;span&gt;       EINVAL addrlen is wrong, or addr is not a valid address for this
+&lt;&#x2F;span&gt;&lt;span&gt;              socket&amp;#39;s domain.
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;But as clearly shown in the strace log, the &lt;code&gt;sun_path&lt;&#x2F;code&gt; is well under 104
+chars. Clearly some other goof was at play here. I tried this again
+after setting my SELinux to permissive, but the error still came up.&lt;br &#x2F;&gt;
+Till date I have not realised what was wrong with the path I provided
+for an IPC socket. But all evidence points to something wrong (maybe for
+the sake of security) on how android symlinks directories &lt;sup class=&quot;footnote-reference&quot;&gt;&lt;a href=&quot;#first&quot;&gt;1&lt;&#x2F;a&gt;&lt;&#x2F;sup&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;After some more research on Unix Domain Sockets, I came across this
+paper &lt;sup class=&quot;footnote-reference&quot;&gt;&lt;a href=&quot;#second&quot;&gt;2&lt;&#x2F;a&gt;&lt;&#x2F;sup&gt; which has been now removed from clearnet, but the
+WayBack machine has 1 copy.&lt;&#x2F;p&gt;
+&lt;p&gt;I learned more about IPC on Linux, and came across &lt;strong&gt;Abstract Sockets.&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;abstract-sockets&quot;&gt;Abstract Sockets&lt;&#x2F;h2&gt;
+&lt;p&gt;Whenever you want to create sockets for IPC, you have two options on
+Linux --&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Filesystem namespace&lt;br &#x2F;&gt;
+An address in this namespace is associated with a file on the
+filesystem. When the server binds to an address (pathname), a socket
+file is automatically created.&lt;br &#x2F;&gt;
+The format for a Filesystem namespaced socket is simple:
+&lt;code&gt;ipc:&#x2F;&#x2F;&#x2F;path&#x2F;to&#x2F;some&#x2F;file&lt;&#x2F;code&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;Abstract namespace&lt;br &#x2F;&gt;
+Abstractly namespaced address are neat. Addresses under this namespace
+are actually not associated to a file on the filesystem. Instead they
+are created under &lt;code&gt;&#x2F;proc&#x2F;net&#x2F;unix&#x2F;&lt;&#x2F;code&gt;.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;An Abstract socket address is distinguished from a Filesystem socket by
+setting &lt;code&gt;sun_path[0]&lt;&#x2F;code&gt; to a null byte &lt;code&gt;\0&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;Since any form of thin virtualisation like chroot, proot, whatever
+Termux does, bind-mount the &lt;code&gt;&#x2F;dev&lt;&#x2F;code&gt; , &lt;code&gt;&#x2F;sys&lt;&#x2F;code&gt;  and &lt;code&gt;&#x2F;proc&lt;&#x2F;code&gt; pseudo
+filesystems on their userland, Abstract namespaced addresses would solve
+the notion of having a shared filesystem between Android and Termux by
+completely eliminating it on a deeper level.&lt;&#x2F;p&gt;
+&lt;p&gt;We could just make an Abstract IPC socket with the same name on both
+Termux and an Android app, and both would look for a file with the of
+the socket under &lt;code&gt;&#x2F;proc&#x2F;net&#x2F;unix&lt;&#x2F;code&gt; .&lt;&#x2F;p&gt;
+&lt;p&gt;Who needs block-based filesystems when the Kernel&#x27;s synthetic
+filesystems are so versatile.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;zmq-and-abstract-sockets&quot;&gt;ZMQ and Abstract Sockets&lt;&#x2F;h3&gt;
+&lt;p&gt;The only thing remaining was to confirm whether ZMQ supports abstract
+sockets. And by perusing through the code-base several times earlier, I
+remembered that it did indeed&lt;sup class=&quot;footnote-reference&quot;&gt;&lt;a href=&quot;#third&quot;&gt;3&lt;&#x2F;a&gt;&lt;&#x2F;sup&gt; We just need to prefix our paths
+with &lt;code&gt;@&lt;&#x2F;code&gt; and ZMQ would identify it as an Abstract namespace address.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;final-implementation&quot;&gt;Final Implementation&lt;&#x2F;h2&gt;
+&lt;p&gt;Before implementing my hypothesis, I cross-checked Android docs if
+somehow their security policies block this behavior and I found that
+Android says that it blocks app-level access to
+&lt;code&gt;&#x2F;proc&#x2F;net&#x2F;unix&lt;&#x2F;code&gt;&lt;sup class=&quot;footnote-reference&quot;&gt;&lt;a href=&quot;#fourth&quot;&gt;4&lt;&#x2F;a&gt;&lt;&#x2F;sup&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;I quickly coded the Android app, and assigned new hosts with the
+Abstract namespaces for the sockets to connect to.&lt;&#x2F;p&gt;
+&lt;p&gt;It worked !&lt;&#x2F;p&gt;
+&lt;div  class=videoClass &gt;
+    &lt;figure  class=center &gt;
+        &lt;video controls
+            
+             class=center &gt;
+            &lt;source src=&quot;liverun.mp4&quot;&gt;
+        &lt;&#x2F;video&gt;
+        
+            &lt;figcaption  class=center  
+                &gt;
+                Live Run
+            &lt;&#x2F;figcaption&gt;
+        
+    &lt;&#x2F;figure&gt;
+&lt;&#x2F;div&gt;
+
+&lt;hr &#x2F;&gt;
+&lt;div class=&quot;footnote-definition&quot; id=&quot;first&quot;&gt;&lt;sup class=&quot;footnote-definition-label&quot;&gt;1&lt;&#x2F;sup&gt;
+&lt;p&gt;Termux normally symlinks the directories, It would be better to study how Android practices its security when symlinking &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;termux&#x2F;termux-app&#x2F;blob&#x2F;81dd11315765814cc6b270f1126bd1565fa94f44&#x2F;app&#x2F;src&#x2F;main&#x2F;java&#x2F;com&#x2F;termux&#x2F;app&#x2F;TermuxInstaller.java#L265&quot;&gt;source&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;&#x2F;div&gt;
+&lt;div class=&quot;footnote-definition&quot; id=&quot;second&quot;&gt;&lt;sup class=&quot;footnote-definition-label&quot;&gt;2&lt;&#x2F;sup&gt;
+&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;web.archive.org&#x2F;web&#x2F;20200209211732&#x2F;http:&#x2F;&#x2F;web.eecs.umich.edu&#x2F;~yurushao&#x2F;pubs&#x2F;sinspector_ccs2016.pdf&quot;&gt;Wayback Machine&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;&#x2F;div&gt;
+&lt;div class=&quot;footnote-definition&quot; id=&quot;third&quot;&gt;&lt;sup class=&quot;footnote-definition-label&quot;&gt;3&lt;&#x2F;sup&gt;
+&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;zeromq&#x2F;libzmq&#x2F;blob&#x2F;a01d259db372bff5e049aa966da4efce7259af67&#x2F;src&#x2F;ipc_address.cpp#L59&quot;&gt;Source&lt;&#x2F;a&gt;  &lt;a href=&quot;http:&#x2F;&#x2F;api.zeromq.org&#x2F;4-1:zmq-ipc&quot;&gt;Man Page&lt;&#x2F;a&gt;, which I read after solving everything :(&lt;&#x2F;p&gt;
+&lt;&#x2F;div&gt;
+&lt;div class=&quot;footnote-definition&quot; id=&quot;fourth&quot;&gt;&lt;sup class=&quot;footnote-definition-label&quot;&gt;4&lt;&#x2F;sup&gt;
+&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;developer.android.com&#x2F;about&#x2F;versions&#x2F;10&#x2F;privacy&#x2F;changes#proc-net-filesystem&quot;&gt;Android docs&lt;&#x2F;a&gt; which are kind of misleading because I did not face any issues in setting my PoC up.&lt;&#x2F;p&gt;
+&lt;&#x2F;div&gt;
+</content>
+        
+    </entry>
+</feed>

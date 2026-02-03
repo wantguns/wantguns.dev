@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>Gunwant Jain - @wantguns - lmdb</title>
+    <subtitle>Gunwant Jain&#x27;s (@wantguns) writings and musings</subtitle>
+    <link rel="self" type="application/atom+xml" href="https://wantguns.dev/tags/lmdb/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://wantguns.dev"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2022-02-20T00:00:00+00:00</updated>
+    <id>https://wantguns.dev/tags/lmdb/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Building LMDB JNI for Jetson Nano</title>
+        <published>2022-02-20T00:00:00+00:00</published>
+        <updated>2022-02-20T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://wantguns.dev/lmdb-jni-jetson-nano/"/>
+        <id>https://wantguns.dev/lmdb-jni-jetson-nano/</id>
+        
+        <content type="html" xml:base="https://wantguns.dev/lmdb-jni-jetson-nano/">&lt;h2 id=&quot;building&quot;&gt;Building&lt;&#x2F;h2&gt;
+&lt;p&gt;Once again, I hate to use docker for automating VM purposes, but I acknowledge
+it as an ad-hoc method for this instance.&lt;&#x2F;p&gt;
+&lt;p&gt;We will be compiling natively for arm64 in a qemu image which is running
+inside a docker container.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;Dockerfile&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-Dockerfile &quot;&gt;&lt;code class=&quot;language-Dockerfile&quot; data-lang=&quot;Dockerfile&quot;&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Import info for 64-bit Qemu based build
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;FROM&lt;&#x2F;span&gt;&lt;span&gt; balenalib&#x2F;raspberrypi4-64-python:latest-bullseye-build
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;ARG &lt;&#x2F;span&gt;&lt;span&gt;LMDB_REPO=https:&#x2F;&#x2F;github.com&#x2F;deephacks&#x2F;lmdbjni
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;ARG &lt;&#x2F;span&gt;&lt;span&gt;LMDB_REPO_BRANCH=master
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Enforces cross-compilation through Qemu.
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;RUN &lt;&#x2F;span&gt;&lt;span&gt;[ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;cross-build-start&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt; ]
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;RUN &lt;&#x2F;span&gt;&lt;span&gt;sudo apt update -y &amp;amp;&amp;amp; sudo apt upgrade -y
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;RUN &lt;&#x2F;span&gt;&lt;span&gt;sudo apt install -y \
+&lt;&#x2F;span&gt;&lt;span&gt;    build-essential \
+&lt;&#x2F;span&gt;&lt;span&gt;    git \
+&lt;&#x2F;span&gt;&lt;span&gt;    tar \
+&lt;&#x2F;span&gt;&lt;span&gt;    default-jdk \
+&lt;&#x2F;span&gt;&lt;span&gt;    automake \
+&lt;&#x2F;span&gt;&lt;span&gt;    libtool \
+&lt;&#x2F;span&gt;&lt;span&gt;    maven \
+&lt;&#x2F;span&gt;&lt;span&gt;    neovim
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Prepare LMDB-JNI Repo
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;WORKDIR &lt;&#x2F;span&gt;&lt;span&gt;&#x2F;code
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;RUN &lt;&#x2F;span&gt;&lt;span&gt;git clone --single-branch --branch ${LMDB_REPO_BRANCH} --recursive ${LMDB_REPO} lmdb
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Start build
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;RUN &lt;&#x2F;span&gt;&lt;span&gt;cd lmdb &amp;amp;&amp;amp; \
+&lt;&#x2F;span&gt;&lt;span&gt;    sed pom.xml -i -e &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;s&#x2F;&amp;lt;hawtjni-version&amp;gt;.*&amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;\&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;hawtjni-version&amp;gt;&#x2F;&amp;lt;hawtjni-version&amp;gt;1.15&amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;\&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;hawtjni-version&amp;gt;&#x2F;&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt; &amp;amp;&amp;amp; \
+&lt;&#x2F;span&gt;&lt;span&gt;    mvn clean install -P linux64 -Dhttps.protocols=TLSv1.2
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#888888;&quot;&gt;# Build Output
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;RUN &lt;&#x2F;span&gt;&lt;span&gt;find . | grep *.jar*
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;VOLUME &lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;.&#x2F;artifacts&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;]
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;RUN &lt;&#x2F;span&gt;&lt;span&gt;[ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;cross-build-end&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt; ]%
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;pitfalls&quot;&gt;Pitfalls&lt;&#x2F;h2&gt;
+&lt;h3 id=&quot;ssl&quot;&gt;SSL&lt;&#x2F;h3&gt;
+&lt;pre data-lang=&quot;groovy&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-groovy &quot;&gt;&lt;code class=&quot;language-groovy&quot; data-lang=&quot;groovy&quot;&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;SSL&lt;&#x2F;span&gt;&lt;span&gt; peer shut down incorrectly
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;strong&gt;Fix&lt;&#x2F;strong&gt;: use the &lt;code&gt;-Dhttps.protocols=TLSv1.2&lt;&#x2F;code&gt; flag when invoking maven.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;hawtjni&quot;&gt;Hawtjni&lt;&#x2F;h3&gt;
+&lt;pre data-lang=&quot;groovy&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-groovy &quot;&gt;&lt;code class=&quot;language-groovy&quot; data-lang=&quot;groovy&quot;&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;]       |   ^~~~~~~~~~
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] src&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&#x2F;&lt;&#x2F;span&gt;&lt;span&gt;hawtjni&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span&gt;callback.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;c&lt;&#x2F;span&gt;&lt;span&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;479&lt;&#x2F;span&gt;&lt;span&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;3&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;error&lt;&#x2F;span&gt;&lt;span&gt;: initializer element &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;is&lt;&#x2F;span&gt;&lt;span&gt; not constant
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;]   &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;479&lt;&#x2F;span&gt;&lt;span&gt; |   (jintLong)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;FN&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;127&lt;&#x2F;span&gt;&lt;span&gt;, args), \
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;]       |   ^
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] src&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&#x2F;&lt;&#x2F;span&gt;&lt;span&gt;hawtjni&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span&gt;callback.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;c&lt;&#x2F;span&gt;&lt;span&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;498&lt;&#x2F;span&gt;&lt;span&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;3&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;note&lt;&#x2F;span&gt;&lt;span&gt;: in expansion of macro ‘&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;FN_A_BLOCK&lt;&#x2F;span&gt;&lt;span&gt;’
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;]   &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;498&lt;&#x2F;span&gt;&lt;span&gt; |   &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;FN_A_BLOCK&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;12&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;]       |   ^~~~~~~~~~
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] src&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&#x2F;&lt;&#x2F;span&gt;&lt;span&gt;hawtjni&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span&gt;callback.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;c&lt;&#x2F;span&gt;&lt;span&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;479&lt;&#x2F;span&gt;&lt;span&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;3&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;note&lt;&#x2F;span&gt;&lt;span&gt;: (near initialization &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;for&lt;&#x2F;span&gt;&lt;span&gt; ‘fnx_array[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;12&lt;&#x2F;span&gt;&lt;span&gt;][&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;127&lt;&#x2F;span&gt;&lt;span&gt;]’)
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;]   &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;479&lt;&#x2F;span&gt;&lt;span&gt; |   (jintLong)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;FN&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;127&lt;&#x2F;span&gt;&lt;span&gt;, args), \
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;]       |   ^
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] src&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;&#x2F;&lt;&#x2F;span&gt;&lt;span&gt;hawtjni&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span&gt;callback.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;c&lt;&#x2F;span&gt;&lt;span&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;498&lt;&#x2F;span&gt;&lt;span&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;3&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;note&lt;&#x2F;span&gt;&lt;span&gt;: in expansion of macro ‘&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;FN_A_BLOCK&lt;&#x2F;span&gt;&lt;span&gt;’
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;]   &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;498&lt;&#x2F;span&gt;&lt;span&gt; |   &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;FN_A_BLOCK&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;12&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;]       |   ^~~~~~~~~~
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;make&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;*** &lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt;Makefile&lt;&#x2F;span&gt;&lt;span&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;410&lt;&#x2F;span&gt;&lt;span&gt;: hawtjni&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span&gt;callback.lo] &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt;Error &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;1
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;rc&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;2
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;------------------------------------------------------------------------
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt;Reactor Summary &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;for&lt;&#x2F;span&gt;&lt;span&gt; lmdbjni&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span&gt;project &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;0.4.8-&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;SNAPSHOT&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;]
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] lmdbjni&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span&gt;project &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;.................................... &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;SUCCESS &lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;02&lt;&#x2F;span&gt;&lt;span&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;08&lt;&#x2F;span&gt;&lt;span&gt; min]
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] lmdbjni &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;............................................ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;SUCCESS &lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;04&lt;&#x2F;span&gt;&lt;span&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;50&lt;&#x2F;span&gt;&lt;span&gt; min]
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] lmdbjni&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span&gt;linux64 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;.................................... &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;FAILURE &lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;01&lt;&#x2F;span&gt;&lt;span&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;50&lt;&#x2F;span&gt;&lt;span&gt; min]
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;------------------------------------------------------------------------
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;BUILD FAILURE
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;------------------------------------------------------------------------
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt;Total &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;time&lt;&#x2F;span&gt;&lt;span&gt;:  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;08&lt;&#x2F;span&gt;&lt;span&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;49&lt;&#x2F;span&gt;&lt;span&gt; min
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt;Finished &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;at&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;2022-02-&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;21T09&lt;&#x2F;span&gt;&lt;span&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;40&lt;&#x2F;span&gt;&lt;span&gt;:07Z
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;INFO&lt;&#x2F;span&gt;&lt;span&gt;] &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;------------------------------------------------------------------------
+&lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;ERROR&lt;&#x2F;span&gt;&lt;span&gt;] &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt;Failed&lt;&#x2F;span&gt;&lt;span&gt; to execute goal org.fusesource.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;hawtjni&lt;&#x2F;span&gt;&lt;span&gt;:maven&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span&gt;hawtjni&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;plugin&lt;&#x2F;span&gt;&lt;span&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;1.11&lt;&#x2F;span&gt;&lt;span&gt;:build (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;default&lt;&#x2F;span&gt;&lt;span&gt;) on project lmdbjni&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;linux64&lt;&#x2F;span&gt;&lt;span&gt;: build &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;failed&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt;org.apache.maven.plugin.MojoExecutionException&lt;&#x2F;span&gt;&lt;span&gt;: make based build failed &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;with&lt;&#x2F;span&gt;&lt;span&gt; exit &lt;&#x2F;span&gt;&lt;span style=&quot;color:#aaaaaa;&quot;&gt;code&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;2 -&amp;gt; &lt;&#x2F;span&gt;&lt;span&gt;[&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt;Help &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e78a53;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;]
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The error arises due to hardcoding a macro defining the system
+architecture to &lt;code&gt;__x86_64__&lt;&#x2F;code&gt; instead of using something more generic.&lt;&#x2F;p&gt;
+&lt;p&gt;This &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;fusesource&#x2F;hawtjni&#x2F;pull&#x2F;20&quot;&gt;pull request&lt;&#x2F;a&gt; fixes
+the bug, but it got merged into hawtjni &lt;code&gt;v1.15&lt;&#x2F;code&gt; and LMDB-jni uses
+hawtjni &lt;code&gt;v1.11&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Fix&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Apply basic substitution&lt;sup class=&quot;footnote-reference&quot;&gt;&lt;a href=&quot;#1&quot;&gt;1&lt;&#x2F;a&gt;&lt;&#x2F;sup&gt;:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#000000;color:#c1c1c1;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#5f8787;&quot;&gt;sed&lt;&#x2F;span&gt;&lt;span&gt; pom.xml&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5f8787;&quot;&gt; -i -e &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbcb97;&quot;&gt;&amp;quot;s&#x2F;&amp;lt;hawtjni-version&amp;gt;.*&amp;lt;\&#x2F;hawtjni-version&amp;gt;&#x2F;&amp;lt;hawtjni-version&amp;gt;1.15&amp;lt;\&#x2F;hawtjni-version&amp;gt;&#x2F;&amp;quot;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;hr &#x2F;&gt;
+&lt;div class=&quot;footnote-definition&quot; id=&quot;1&quot;&gt;&lt;sup class=&quot;footnote-definition-label&quot;&gt;1&lt;&#x2F;sup&gt;
+&lt;p&gt;We could have used a more recent version, but &lt;a href=&quot;https:&#x2F;&#x2F;mvnrepository.com&#x2F;artifact&#x2F;org.fusesource.hawtjni&quot;&gt;org.fusesource.hawtjni&lt;&#x2F;a&gt; changed the package name &lt;a href=&quot;https:&#x2F;&#x2F;mvnrepository.com&#x2F;artifact&#x2F;org.fusesource.hawtjni&#x2F;hawtjni-maven-plugin&quot;&gt;after &lt;code&gt;v1.15&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; and would therefore require more work. tldr; i am lazy.&lt;&#x2F;p&gt;
+&lt;&#x2F;div&gt;
+</content>
+        
+    </entry>
+</feed>

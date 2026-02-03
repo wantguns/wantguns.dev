@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Final Report - GSoC 2020 &middot; Gunwant Jain - @wantguns</title>
+    <meta name="description" content="Spoiler alert, its not over yet" />
+    <link rel="apple-touch-icon" sizes="180x180" href="https://wantguns.dev/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="https://wantguns.dev/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="https://wantguns.dev/favicon-16x16.png" />
+    <link rel="manifest" href="https://wantguns.dev/site.webmanifest" />
+    <link rel="alternate" type="application/atom+xml" title="RSS" href="https://wantguns.dev/atom.xml">
+
+    <style>@import url("/fonts/cmuserif_roman_macroman/stylesheet.css");@import url("/fonts/cmutypewritertext_light_macroman/stylesheet.css");:root{color-scheme:dark}html,body{background:#000;color:rgba(255,255,255,.9);padding:.3rem;margin:.3rem;text-rendering:optimizeLegibility;font-variant-ligatures:contextual;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;font-size:16.5px}h1,h2,h3,h4,h5,h6{color:#fbcb97;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif}h1.page_title{font-size:200%;line-height:normal;color:#fbcb97;margin-bottom:1rem;line-height:1.1}a{text-decoration:underline;text-underline-offset:3px;color:rgba(255,255,255,.9)}a:active{color:#fbcb97}a:hover{color:rgba(251,203,151,.9)}a.site_title{text-decoration:none;color:#e78a53;list-style:1}a.site_title:hover{text-decoration:underline}a.site_nav{text-decoration:none;color:#e78a53}a.site_nav:hover{text-decoration:underline}a.homepage-list_title{flex:1;word-wrap:break-word;text-decoration:none;font-weight:bold;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;color:#fbcb97}a.homepage-list_title:hover{text-decoration:underline}a code{text-decoration-color:rgba(251,203,151,.9)}a.footer{color:#888}a.footer:hover{color:#fbcb97}.pipe{color:#202020}time.site_time{font-size:90%;color:#888}span.page_time{padding:1.2rem auto;color:#888}:target{background-color:#000}hr{border:none;height:1px;background-color:#202020}::selection{background:#333}main{margin:auto;max-width:650px}header{padding-top:1rem;padding-bottom:0rem;font-weight:900}code{font-family:cmu_typewriter_textlight,ui-monospace,"SFMono-Regular","SF Mono","Cascadia Code","Source Code Pro",Menlo,Consolas,"DejaVu Sans Mono",monospace;color:rgba(251,203,151,.9)}code a{text-decoration-color:rgba(251,203,151,.9)}pre{position:relative;font-family:cmu_typewriter_textlight,ui-monospace,"SFMono-Regular","SF Mono","Cascadia Code","Source Code Pro",Menlo,Consolas,"DejaVu Sans Mono",monospace;overflow:auto;border:thin solid #202020;margin:2rem 0rem;padding:1.5rem;background-color:#000}pre code{padding:initial;color:inherit;background-color:inherit}.pre-wrapper{position:relative;margin:2rem 0}.copy-button{position:absolute;top:0px;right:0px;color:#fbcb97;background-color:#000;border:thin solid #202020;width:60px;height:28px;padding:5px 10px;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;cursor:pointer;opacity:.8;transition:all .1s ease}.copy-button:hover{opacity:1}.copy-button.copied{border:thin solid #fbcb97}table{border-collapse:collapse;width:100%}th,td{border:1px solid #202020;padding:1.1rem}img{height:auto;margin:2rem 0rem;max-width:100%}.homepage-list,.taxonomies__list{list-style:none;padding:1rem 0}.homepage-list li,.taxonomies__list li{align-items:center;display:flex;flex-wrap:nowrap;justify-content:space-between;margin-bottom:10px}.center{margin-left:auto;margin-right:auto;max-width:100%;text-align:center}.imageClass,.videoClass{padding:.5rem}.imageClass figure,.videoClass figure{display:table}.imageClass figure img,.videoClass figure img{user-select:none}.imageClass figure figcaption,.videoClass figure figcaption{display:table-caption;caption-side:bottom;padding:.2rem;margin:.2rem auto;background-color:#fbcb97;color:#000}.imageClass figure figcaption::selection,.videoClass figure figcaption::selection{background-color:#e78a53}@media (max-width: 38rem){.homepage-list li a{width:100%}}footer{margin-top:2rem;color:#888}.pagination_title{width:100%;text-align:center;border-bottom:1px solid #202020;line-height:.1em;margin:2.5rem auto}.pagination_title span{background:#000;font-size:.8rem;padding:0 10px}.post_nav{display:flex;align-items:center;justify-content:center;text-align:center;margin:2.5rem auto 4rem auto}.post_nav .button{position:relative;display:inline-flex;flex:1;align-items:center;justify-content:center;overflow:hidden;text-decoration:none;margin:auto 1.5rem;font-weight:bold}.post_nav .button .previous,.post_nav .button .next{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.time_tag_sep{padding:.5rem;color:#888;user-select:none}.post_tags a{padding:0 .5rem 0 0;color:#888;text-decoration:none}.post_tags a:hover{color:#fbcb97}.taxonomies__title{color:#888}.taxonomies__list a{text-decoration:none}#toc-inline,#toc-aside{font-size:90%;line-height:1.6;color:#888}#toc-inline a,#toc-aside a{color:#888;text-decoration:none}#toc-inline a:hover,#toc-aside a:hover{color:#fbcb97}#toc-inline ul,#toc-aside ul{padding-left:1rem}#toc-inline li li,#toc-aside li li{list-style:disc}#toc-inline li.active>a,#toc-aside li.active>a{color:#fbcb97;font-weight:bold}#toc-inline{font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;padding:1.25rem 0rem .5rem 0rem}#toc-inline summary:hover{cursor:pointer;color:#fbcb97}#toc-aside{font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;display:block;width:15rem;position:sticky;float:left;top:3.5rem;margin-top:-1.2rem;margin-left:-20rem}@media (max-width: 80rem){#toc-aside{display:none}}@media (min-width: 80rem){#toc-inline{display:none}}sup{line-height:0}.footnote-reference{color:#fbcb97}.footnote-reference:after{content:"]"}.footnote-reference:before{content:"["}.footnote-reference a{color:#fbcb97;text-decoration:none}hr{margin-top:2rem;margin-bottom:2rem}.footnote-definition{display:flex;flex-direction:row;font-size:.85rem}.footnote-definition sup{all:initial;color:rgba(255,255,255,.9);text-rendering:optimizeLegibility;font-variant-ligatures:contextual;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;font-weight:450;font-size:1rem;line-height:1.58;letter-spacing:-.02em;font-size:.7rem;margin:0rem;margin-right:.5rem}.footnote-definition p{margin:0rem;margin-bottom:1rem}.footnote-definition p .footnote-backlink{margin:0rem;margin-left:.5rem;color:#fbcb97;text-decoration:none}</style>
+
+    <meta property="og:site_name" content="Gunwant Jain - @wantguns">
+      <meta name="author" content="Gunwant Jain" />
+      <meta name="keywords" content="Gunwant Jain, wantguns, Gunwant, WantGuns" />
+      <meta property="og:title" content="Final Report - GSoC 2020">
+      <meta property="og:description" content="Spoiler alert, its not over yet">
+      <meta property="og:url" content="https://wantguns.dev/final-report/">
+      <meta property="og:image" content="">
+
+      <meta name="twitter:card" content="summary">
+      <meta name="twitter:title" content="Gunwant Jain - @wantguns">
+      <meta name="twitter:description" content="Gunwant Jain&#x27;s (@wantguns) writings and musings">
+
+      <meta property="og:type" content="article" />
+        <meta property="article:published_time" content="2020-08-26T00:00:00+00:00" />
+
+      
+      
+    
+
+  </head>
+  
+
+  <body>
+    <main id="main" role="main">
+      
+      <header role="banner">
+          
+            
+            <nav style="margin-bottom:1rem;" role="navigation">
+              
+                <a class="site_nav" href="https://wantguns.dev/about">about</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev">blog</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev/tags">tags</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://bin.wantguns.dev/cv">resume</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev/atom.xml">rss</a>
+                
+              
+            </nav>
+            
+          
+      </header>
+      
+
+
+    <div>
+
+      
+<article>
+  <h1 class="page_title">Final Report - GSoC 2020</h1>
+
+  
+    <span class="page_time">Posted on <time datetime="2020-08-26T00:00:00+00:00">August 26, 2020</time></span>
+    
+    <span class="time_tag_sep">&middot;</span>
+    <span class="post_tags">
+        
+            <a href="https://wantguns.dev/tags/android/">#android</a>
+        
+            <a href="https://wantguns.dev/tags/gsoc2020/">#gsoc2020</a>
+        
+            <a href="https://wantguns.dev/tags/sharkbait/">#sharkbait</a>
+        
+    </span>
+    
+  
+
+  
+  
+    
+    <details id = "toc-inline">
+        <summary><b>Table of Contents</b></summary>
+        <ul>
+            <li>
+                <a href="#work-covered">Work Covered</a>
+                <ul>
+                    <li>
+                        <a href="#porting-sharkbaitos">Porting SharkBaitOS</a>
+                    </li><li>
+                        <a href="#introducing-android-builds-on-aarch64-hosts">Introducing Android builds on AArch64 Hosts</a>
+                    </li>
+                </ul>
+            </li><li>
+                <a href="#future-work">Future Work</a>
+                
+            </li><li>
+                <a href="#acknowledgements">Acknowledgements</a>
+                
+            </li>
+        </ul>
+    </details>
+
+    
+  <aside id="toc-aside">
+          <h4>Table of Contents</h4>
+      <ul>
+          
+          <li>
+              <a href="#work-covered">Work Covered</a>
+              
+              <ul>
+                  
+                  <li>
+                      <a href="#porting-sharkbaitos">Porting SharkBaitOS</a>
+                  </li>
+                  
+                  <li>
+                      <a href="#introducing-android-builds-on-aarch64-hosts">Introducing Android builds on AArch64 Hosts</a>
+                  </li>
+                  
+              </ul>
+              
+          </li>
+          <li>
+              <a href="#future-work">Future Work</a>
+              
+          </li>
+          <li>
+              <a href="#acknowledgements">Acknowledgements</a>
+              
+          </li>
+      </ul>
+  </aside>
+
+  
+  
+
+  <p>Its almost 3 months since I have been officially working with the
+SharkBait team at Gentoo. A lot of ground has been covered, a lot is
+still left. In this blog, I will explain the scope of SharkBait right
+now and how I plan its future.</p>
+<hr />
+<h2 id="work-covered">Work Covered</h2>
+<h3 id="porting-sharkbaitos">Porting SharkBaitOS</h3>
+<p>When KireinaHoro started working on SharkBait, the latest Android
+version of that time was 8 or Android Oreo. Sharkbait at that time,
+supported all the Android devices because it targeted only a specific
+boot order, which was common till Android 8.
+Then came Android 9, with its System-As-Root configuration, which
+rendered SharkBait's original boot order non functional for all devices
+shipping with Android 9. <br />
+The first month of my work revolved around porting SharkBait to SAR
+based devices. I succeeded in doing so, and wrote blogs about it:</p>
+<ul>
+<li><a href="https://wantguns.dev/android-boot-high-jinks/"><strong>Android Boot High Jinks</strong></a> <br />
+In this blog we discuss the different approaches at booting
+Android, Google has experimented with.</li>
+<li><a href="https://wantguns.dev/booting-gentoo-using-preinit/"><strong>Booting Gentoo from SAR-Preinit</strong></a> <br />
+This blog showcases how I patched my phone's kernel in order to
+boot Gentoo on my phone.</li>
+<li><a href="https://wantguns.dev/starting-android-in-gentoo/"><strong>Starting System-as-Root Android in a LXC container</strong></a> <br />
+This blog is the first class guide for launching SharkBait in
+System-As-Root devices.</li>
+</ul>
+<p>The projects made in efforts to port SharkBait for SAR were:</p>
+<ul>
+<li><a href="https://gitlab.com/WantGuns/sar-preinit"><strong>SAR-Preinit</strong></a> <br />
+This repository acts as the setup which patches your custom kernel
+and makes it boot a GNU/Linux distro, instead of Android on your
+phone.</li>
+<li><a href="https://gitlab.com/WantGuns/bootstrap-init"><strong>Bootstrap-init</strong></a> <br />
+This repository hosts the source of the init binary executed inside
+the LXC container which launches System-As-Root Android on top of
+Gentoo.</li>
+</ul>
+<h3 id="introducing-android-builds-on-aarch64-hosts">Introducing Android builds on AArch64 Hosts</h3>
+<p>As simple as it sounds, this part of my GSoC tenure turned out to be the
+exact opposite. <br />
+My first task was to provide a AArch64 native port of the LLVM toolchain
+AOSP uses. I was stuck on compiling and testing my modified scripts till
+the second month, when my mentor generously set up a beefy AArch64
+server for me. I succeeded in delivering that toolchain. Related sources
+are:</p>
+<ul>
+<li><a href="https://wantguns.dev/build-android/"><strong>Building Android: BTS</strong></a> <br />
+In this blog, I look what events get triggered under the hood when
+we build Android, as to seek insight on breaking down Android later.</li>
+<li><a href="https://github.com/WantGuns/toolchain_llvm_android"><strong>Toolchain_LLVM_Android</strong></a> <br />
+This repository hosts the build scripts and instructions on building
+AOSP's LLVM distribution on AArch64 Host, which targets AArch64 and
+Arm platforms</li>
+</ul>
+<p>Once I dealt with the toolchains, I could focus on building Android.
+Unfortunately this part is still unfinished due to the massive scale of
+thought-process and work it requires. Still, I will report on whatever I
+have been doing:</p>
+<ul>
+<li><a href="https://github.com/WantGuns/manifest/"><strong>Manifest</strong></a> <br />
+This is the (yet-to-be) SharkBait Manifest. It houses the different
+AOSP components SharkBait pulls in order to build Android. Some of
+which I have been working on:
+<ul>
+<li><a href="https://github.com/WantGuns/android_build_soong/commits?author=WantGuns">android_build_blueprint</a></li>
+<li><a href="https://github.com/WantGuns/android_build_soong/commits?author=WantGuns">android_build_soong</a></li>
+<li><a href="https://github.com/WantGuns/android_build/commits?author=WantGuns">android_build</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="future-work">Future Work</h2>
+<p>There are many things to be concerned with such as the flow of project
+development to follow, how exactly we should aim introducing
+arm64 as an host. <br />
+Plus the final goal of SharkBait is the ability to
+upgrade its Android container with the use of Portage, thus providing
+granular, GNU like updates to Android, quite possibly the first time
+ever. Keeping all this in mind we needed a proper roadmap on how to
+achieve this. My vision for it resembles somewhat like the following:</p>
+<ol>
+<li>Build Android as an whole separate entity on AArch64.</li>
+<li>Then compose a monolithic ebuild for the exact same thing.</li>
+<li>Start breaking parts from Android:
+<ul>
+<li>Ship the toolchains used by AOSP separately using Portage and
+possibly integrate it with crossdev.</li>
+<li>Ship the necessary prebuilt <a href="https://github.com/LineageOS/android_prebuilts_build-tools">build-tools</a> AOSP bundles as
+packages with Portage on arm64.</li>
+</ul>
+</li>
+<li>Capitalizing on the fact that AOSP code is highly modular, separate
+those modules into different packages under a common overlay.</li>
+</ol>
+<p>And since I consider myself apt in bringing this for SharkBait, I would
+love to work on it even after GSoC finishes.</p>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>I immensely appreciate the patience of my mentor, Benda Xu. He has
+always given me the helm when it comes to SharkBait, while still
+actively monitoring my work and helping me out. Without his generous
+efforts of providing me with an industry-standard arm64 server, I dont
+think I could consider this GSoC a success.</p>
+<p>My co-mentors - Pengcheng Xu, Lucas Ramage and Stephen Christie helped
+me whenever I got stuck in my work. Pengcheng offered me assistance in
+getting UART work for my Phone, Lucas actively kept a lookout on my work
+and Stephen would offer me assistance in getting better hardware without
+two thoughts.</p>
+<p>All of them offered crucial personal help whenever I was stuck, be it my
+work, understanding the project or even my proposal writing, something
+which I can never overlook.</p>
+<p>The least I can do to return their favours is to bring SharkBait to all
+its glory, which I eagerly wait for.</p>
+
+</article>
+
+
+  <div class="pagination_title">
+    <span>Read other posts</span>
+  </div>
+  <div class="post_nav">
+      
+        <div class="button">
+          <a class="button" href="&#x2F;build-android&#x2F;">
+            ←&nbsp;
+            <span class="next">
+              Building Android: BTS
+            </span>
+          </a>
+        </div>
+      
+      
+        <div class="button">
+          <a class="button" href="&#x2F;ipc-on-termux&#x2F;">
+            <span class="previous">IPC between Termux and Other Android Apps using ZMQ</span>
+            &nbsp;→
+          </a>
+        </div>
+      
+    </div>
+
+
+
+    </div>
+    </main>
+
+    
+    
+
+    <footer class=center>
+      <sub>
+        <div>
+            &copy;
+            <span id="copyright">
+                <script>document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))</script>
+            </span>
+            &middot;
+            Gunwant Jain. Built <a class="footer" href="https://github.com/wantguns/wantguns.dev">openly</a> with <a class="footer" href="https://www.getzola.org">Zola</a>
+        </div>
+      </sub>
+    </footer>
+  </body>
+  
+ <script src=https://wantguns.dev/js/page.js></script> 
+
+</html>

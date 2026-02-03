@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Building Android: BTS &middot; Gunwant Jain - @wantguns</title>
+    <meta name="description" content="So you&#x27;ve successfully compiled AOSP. But you are still not entertained and rather inquisitive about how things worked under the hood after you hit `make bacon` or `brunch` on your Lineage tree" />
+    <link rel="apple-touch-icon" sizes="180x180" href="https://wantguns.dev/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="https://wantguns.dev/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="https://wantguns.dev/favicon-16x16.png" />
+    <link rel="manifest" href="https://wantguns.dev/site.webmanifest" />
+    <link rel="alternate" type="application/atom+xml" title="RSS" href="https://wantguns.dev/atom.xml">
+
+    <style>@import url("/fonts/cmuserif_roman_macroman/stylesheet.css");@import url("/fonts/cmutypewritertext_light_macroman/stylesheet.css");:root{color-scheme:dark}html,body{background:#000;color:rgba(255,255,255,.9);padding:.3rem;margin:.3rem;text-rendering:optimizeLegibility;font-variant-ligatures:contextual;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;font-size:16.5px}h1,h2,h3,h4,h5,h6{color:#fbcb97;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif}h1.page_title{font-size:200%;line-height:normal;color:#fbcb97;margin-bottom:1rem;line-height:1.1}a{text-decoration:underline;text-underline-offset:3px;color:rgba(255,255,255,.9)}a:active{color:#fbcb97}a:hover{color:rgba(251,203,151,.9)}a.site_title{text-decoration:none;color:#e78a53;list-style:1}a.site_title:hover{text-decoration:underline}a.site_nav{text-decoration:none;color:#e78a53}a.site_nav:hover{text-decoration:underline}a.homepage-list_title{flex:1;word-wrap:break-word;text-decoration:none;font-weight:bold;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;color:#fbcb97}a.homepage-list_title:hover{text-decoration:underline}a code{text-decoration-color:rgba(251,203,151,.9)}a.footer{color:#888}a.footer:hover{color:#fbcb97}.pipe{color:#202020}time.site_time{font-size:90%;color:#888}span.page_time{padding:1.2rem auto;color:#888}:target{background-color:#000}hr{border:none;height:1px;background-color:#202020}::selection{background:#333}main{margin:auto;max-width:650px}header{padding-top:1rem;padding-bottom:0rem;font-weight:900}code{font-family:cmu_typewriter_textlight,ui-monospace,"SFMono-Regular","SF Mono","Cascadia Code","Source Code Pro",Menlo,Consolas,"DejaVu Sans Mono",monospace;color:rgba(251,203,151,.9)}code a{text-decoration-color:rgba(251,203,151,.9)}pre{position:relative;font-family:cmu_typewriter_textlight,ui-monospace,"SFMono-Regular","SF Mono","Cascadia Code","Source Code Pro",Menlo,Consolas,"DejaVu Sans Mono",monospace;overflow:auto;border:thin solid #202020;margin:2rem 0rem;padding:1.5rem;background-color:#000}pre code{padding:initial;color:inherit;background-color:inherit}.pre-wrapper{position:relative;margin:2rem 0}.copy-button{position:absolute;top:0px;right:0px;color:#fbcb97;background-color:#000;border:thin solid #202020;width:60px;height:28px;padding:5px 10px;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;cursor:pointer;opacity:.8;transition:all .1s ease}.copy-button:hover{opacity:1}.copy-button.copied{border:thin solid #fbcb97}table{border-collapse:collapse;width:100%}th,td{border:1px solid #202020;padding:1.1rem}img{height:auto;margin:2rem 0rem;max-width:100%}.homepage-list,.taxonomies__list{list-style:none;padding:1rem 0}.homepage-list li,.taxonomies__list li{align-items:center;display:flex;flex-wrap:nowrap;justify-content:space-between;margin-bottom:10px}.center{margin-left:auto;margin-right:auto;max-width:100%;text-align:center}.imageClass,.videoClass{padding:.5rem}.imageClass figure,.videoClass figure{display:table}.imageClass figure img,.videoClass figure img{user-select:none}.imageClass figure figcaption,.videoClass figure figcaption{display:table-caption;caption-side:bottom;padding:.2rem;margin:.2rem auto;background-color:#fbcb97;color:#000}.imageClass figure figcaption::selection,.videoClass figure figcaption::selection{background-color:#e78a53}@media (max-width: 38rem){.homepage-list li a{width:100%}}footer{margin-top:2rem;color:#888}.pagination_title{width:100%;text-align:center;border-bottom:1px solid #202020;line-height:.1em;margin:2.5rem auto}.pagination_title span{background:#000;font-size:.8rem;padding:0 10px}.post_nav{display:flex;align-items:center;justify-content:center;text-align:center;margin:2.5rem auto 4rem auto}.post_nav .button{position:relative;display:inline-flex;flex:1;align-items:center;justify-content:center;overflow:hidden;text-decoration:none;margin:auto 1.5rem;font-weight:bold}.post_nav .button .previous,.post_nav .button .next{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.time_tag_sep{padding:.5rem;color:#888;user-select:none}.post_tags a{padding:0 .5rem 0 0;color:#888;text-decoration:none}.post_tags a:hover{color:#fbcb97}.taxonomies__title{color:#888}.taxonomies__list a{text-decoration:none}#toc-inline,#toc-aside{font-size:90%;line-height:1.6;color:#888}#toc-inline a,#toc-aside a{color:#888;text-decoration:none}#toc-inline a:hover,#toc-aside a:hover{color:#fbcb97}#toc-inline ul,#toc-aside ul{padding-left:1rem}#toc-inline li li,#toc-aside li li{list-style:disc}#toc-inline li.active>a,#toc-aside li.active>a{color:#fbcb97;font-weight:bold}#toc-inline{font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;padding:1.25rem 0rem .5rem 0rem}#toc-inline summary:hover{cursor:pointer;color:#fbcb97}#toc-aside{font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;display:block;width:15rem;position:sticky;float:left;top:3.5rem;margin-top:-1.2rem;margin-left:-20rem}@media (max-width: 80rem){#toc-aside{display:none}}@media (min-width: 80rem){#toc-inline{display:none}}sup{line-height:0}.footnote-reference{color:#fbcb97}.footnote-reference:after{content:"]"}.footnote-reference:before{content:"["}.footnote-reference a{color:#fbcb97;text-decoration:none}hr{margin-top:2rem;margin-bottom:2rem}.footnote-definition{display:flex;flex-direction:row;font-size:.85rem}.footnote-definition sup{all:initial;color:rgba(255,255,255,.9);text-rendering:optimizeLegibility;font-variant-ligatures:contextual;font-family:cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;font-weight:450;font-size:1rem;line-height:1.58;letter-spacing:-.02em;font-size:.7rem;margin:0rem;margin-right:.5rem}.footnote-definition p{margin:0rem;margin-bottom:1rem}.footnote-definition p .footnote-backlink{margin:0rem;margin-left:.5rem;color:#fbcb97;text-decoration:none}</style>
+
+    <meta property="og:site_name" content="Gunwant Jain - @wantguns">
+      <meta name="author" content="Gunwant Jain" />
+      <meta name="keywords" content="Gunwant Jain, wantguns, Gunwant, WantGuns" />
+      <meta property="og:title" content="Building Android: BTS">
+      <meta property="og:description" content="So you&#x27;ve successfully compiled AOSP. But you are still not entertained and rather inquisitive about how things worked under the hood after you hit `make bacon` or `brunch` on your Lineage tree">
+      <meta property="og:url" content="https://wantguns.dev/build-android/">
+      <meta property="og:image" content="">
+
+      <meta name="twitter:card" content="summary">
+      <meta name="twitter:title" content="Gunwant Jain - @wantguns">
+      <meta name="twitter:description" content="Gunwant Jain&#x27;s (@wantguns) writings and musings">
+
+      <meta property="og:type" content="article" />
+        <meta property="article:published_time" content="2020-07-13T00:00:00+00:00" />
+
+      
+      
+    
+
+  </head>
+  
+
+  <body>
+    <main id="main" role="main">
+      
+      <header role="banner">
+          
+            
+            <nav style="margin-bottom:1rem;" role="navigation">
+              
+                <a class="site_nav" href="https://wantguns.dev/about">about</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev">blog</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev/tags">tags</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://bin.wantguns.dev/cv">resume</a>
+                
+                  <span>&nbsp</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev/atom.xml">rss</a>
+                
+              
+            </nav>
+            
+          
+      </header>
+      
+
+
+    <div>
+
+      
+<article>
+  <h1 class="page_title">Building Android: BTS</h1>
+
+  
+    <span class="page_time">Posted on <time datetime="2020-07-13T00:00:00+00:00">July 13, 2020</time></span>
+    
+    <span class="time_tag_sep">&middot;</span>
+    <span class="post_tags">
+        
+            <a href="https://wantguns.dev/tags/android/">#android</a>
+        
+            <a href="https://wantguns.dev/tags/gsoc2020/">#gsoc2020</a>
+        
+            <a href="https://wantguns.dev/tags/sharkbait/">#sharkbait</a>
+        
+    </span>
+    
+  
+
+  
+  
+    
+    <details id = "toc-inline">
+        <summary><b>Table of Contents</b></summary>
+        <ul>
+            <li>
+                <a href="#toolchains">Toolchains</a>
+                <ul>
+                    <li>
+                        <a href="#llvm-android">LLVM_android</a>
+                    </li>
+                </ul>
+            </li><li>
+                <a href="#building-android-using-the-toolchain-we-just-made">Building Android using the toolchain we just made</a>
+                <ul>
+                    <li>
+                        <a href="#compiling-bionic">Compiling Bionic</a>
+                    </li>
+                </ul>
+            </li><li>
+                <a href="#conclusion">Conclusion</a>
+                
+            </li>
+        </ul>
+    </details>
+
+    
+  <aside id="toc-aside">
+          <h4>Table of Contents</h4>
+      <ul>
+          
+          <li>
+              <a href="#toolchains">Toolchains</a>
+              
+              <ul>
+                  
+                  <li>
+                      <a href="#llvm-android">LLVM_android</a>
+                  </li>
+                  
+              </ul>
+              
+          </li>
+          <li>
+              <a href="#building-android-using-the-toolchain-we-just-made">Building Android using the toolchain we just made</a>
+              
+              <ul>
+                  
+                  <li>
+                      <a href="#compiling-bionic">Compiling Bionic</a>
+                  </li>
+                  
+              </ul>
+              
+          </li>
+          <li>
+              <a href="#conclusion">Conclusion</a>
+              
+          </li>
+      </ul>
+  </aside>
+
+  
+  
+
+  <p>So you've successfully compiled AOSP. But you are still not entertained
+and rather inquisitive about how things worked under the hood after you
+hit <code>make bacon</code> or <code>brunch</code> on your Lineage tree.</p>
+<p>I am too and so I decided to take a look under the myriad that AOSP is.
+In this blog, I would share what I have learned so far, also being
+relevent to my GSoC obligations and therefore prepping hand by hand for a native aarch64 build.</p>
+<p>So just setup your build environment and follow along.</p>
+<hr />
+<h2 id="toolchains">Toolchains</h2>
+<p>Android has decided to phase out of using a GCC toolchain to the
+LLVM/Clang based solution since Android 8.0. People usually see a
+performance boost after the switch.</p>
+<p>The actual Toolchain AOSP uses is already prebuilt and bundled with the
+entire AOSP source. But since AOSP only supports a Linux/Darwin x86 host
+enviroment for building, we will have to build our own toolchain
+supporting aarch64 hosts.</p>
+<p>In order to do that we shall dive deep first and study <a href="https://android.googlesource.com/toolchain/llvm_android/">llvm_android</a>,
+the source of the prebuilt toolchain.</p>
+<h3 id="llvm-android">LLVM_android</h3>
+<p><em>I should mention that we could have used vanilla LLVM, but Google pushes some <a href="https://android.googlesource.com/toolchain/llvm_android/+/refs/heads/master/patches/">patches</a> along with its LLVM fork which is required by AOSP. So it is better if we stick to the way Google handles it. These patches are applied to the toolchain in between its compilation.</em></p>
+<p>After setting that toolchain up and doing a build test on x86, we
+realise that LLVM_android ships with prebuilt GCC and Clang toolchains.
+It uses Clang as its compiler and GCC's libs and binaries to build the
+stage 1 of the LLVM_android compiler.</p>
+<p>LLVM_android also ships with the Bionic (Android's libc) sources. Though we notice while building the toolchain that only Bionic's headers are copied to the building toolchain. Bionic is not compiled at this stage.</p>
+<p>After building <code>swig</code> and <code>libedit</code> we finally reach the start of stage
+2.
+As expected the script now calls CMake again but with debug flags
+referring to the newly built Clang/++ and its libraries. It also calls
+the prebuilt libraries like it did earlier.</p>
+<p>Briefly put these are all the building parts, in order:</p>
+<ul>
+<li>For Linux:
+<ul>
+<li>Stage 1:  builds the crude Clang</li>
+<li>swig:     required for Stage 2</li>
+<li>libedit:  required for Stage 2</li>
+<li>Stage 2:  builds the final Clang</li>
+</ul>
+</li>
+<li>For Android { arm, aarch64, x86, i386 }:
+<ul>
+<li>sysroots</li>
+<li>compiler-rt</li>
+<li>compiler-rt-i386-host (only for linux)</li>
+<li>libomp</li>
+<li>lldb-server</li>
+<li>asan-mapfile</li>
+</ul>
+</li>
+</ul>
+<p>We will have to patch <a href="https://android.googlesource.com/toolchain/llvm_android/+/refs/heads/master/paths.py">paths.py</a> and replace the paths where the script calls its tools with the host's to compensate for the aarch64 host.
+Additionally, we should only <code>sync</code> the repositories which are necessary by editing the <code>.repo/manifest.xml</code>.</p>
+<p>But enough of that, let's move on to building Android now.</p>
+<h2 id="building-android-using-the-toolchain-we-just-made">Building Android using the toolchain we just made</h2>
+<p>If not done already, sync Lineage's Android Manifest.
+Put the newly made toolchain at <code>prebuilts/clang/host/linux-x86/</code>
+and change the Clang version to that of the one we just built at
+<code>build/soong/cmd/cc/config/global.go</code>.</p>
+<p>Now setup the environment and brunch your device.</p>
+<pre data-lang="bash" style="background-color:#000000;color:#c1c1c1;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#fbcb97;">source</span><span> build/envsetup.sh
+</span><span style="color:#5f8787;">brunch</span><span> _TARGET_NAME_
+</span></code></pre>
+<p>You'll notice that Building would give errors due to warnings.
+We come to yet another realisation that AOSP uses an older version of Clang (9.0.3 currently).
+The toolchain we just built is at bleeding edge, and is throwing errors at the old code as it
+finds vulnerabilities in it.
+We should recall that the lineage tree we synced is stable and so all
+the warnings generated by the newer compiler can actually be avoided. We
+could approach this in two ways:</p>
+<ul>
+<li>Disable certain flags which throws those errors.</li>
+<li>compile the current supported version of clang and use it instead.</li>
+</ul>
+<p>Approach 1 would be time intensive and not scalable in any way, since we
+don't control the main tree and upstream could make our forks fatal.
+So we should follow the second approach.</p>
+<p>And so once we get a hold of the correct toolchain version, the builds
+should not be throwing errors.</p>
+<p>Let me explain the build process now. Once you <code>make bacon</code> or <code>brunch</code>,
+the soong build system is called and is compiled.
+The very first program built is <code>soong_ui</code> which is the build
+system used to iniate the build process. The target you lunch will be
+passed to the newly built <code>soong_ui</code>.</p>
+<p>Go is used to build all of <code>soong</code>, and AOSP ships its prebuilt version of Go.
+We will have to change the location of GOROOT to use host's tools.
+GOROOT is called at <code>build/blueprint/microfactory/microfactory.bash</code>
+so we will edit it there.</p>
+<p>Eventually it parses all the blueprint files (.bp extensions), and kati parses all
+the makefiles. Once the <code>build.ninja</code> file is created, the Android build
+is ready to start.</p>
+<p><code>build.ninja</code> is called and it starts building certain intermediates
+first which would be used later in assistance to build Android. One of
+these intermediates which is of concern to us is <strong><code>Bionic</code></strong>.</p>
+<h3 id="compiling-bionic">Compiling Bionic</h3>
+<p>Like we discussed earlier, Bionic's header files are already included in
+the llvm_android toolchain. But the <code>libc</code> sources are not compiled then.</p>
+<p><code>libc</code> and friends are actually compiled within the build as
+intermediates and then copied to some different folder under <code>/out</code>, from where it
+gets called later in the build process.</p>
+<p>So, as I believe, once we have the toolchain ready, we should be good to
+go for building Android using aarch64 host. I will be setting up an
+ARM based VPS for the same, since I only have 32 gig of storage on my
+phone.</p>
+<hr />
+<h2 id="conclusion">Conclusion</h2>
+<p>We need to build llvm_android on aarch64 host, by patching the build scripts provided by Google.
+Also we need to build the <a href="https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+/master/README.md#llvm-users">latest supported version</a> of Clang/LLVM.
+Once that is done, we will have to edit the paths of various tools called in the AOSP tree with our host's. And then finally, test a build.</p>
+<p>Achieving this should mark my task of building Android on aarch64 Host,
+which is incomplete in the sense that I don't have a separatable
+toolchain. But once we are through with this process, Separating Bionic
+and implementing crossdev for the toolchain would be easier.</p>
+
+</article>
+
+
+  <div class="pagination_title">
+    <span>Read other posts</span>
+  </div>
+  <div class="post_nav">
+      
+        <div class="button">
+          <a class="button" href="&#x2F;starting-android-in-gentoo&#x2F;">
+            ←&nbsp;
+            <span class="next">
+              Starting System-as-Root Android in a LXC container
+            </span>
+          </a>
+        </div>
+      
+      
+        <div class="button">
+          <a class="button" href="&#x2F;final-report&#x2F;">
+            <span class="previous">Final Report - GSoC 2020</span>
+            &nbsp;→
+          </a>
+        </div>
+      
+    </div>
+
+
+
+    </div>
+    </main>
+
+    
+    
+
+    <footer class=center>
+      <sub>
+        <div>
+            &copy;
+            <span id="copyright">
+                <script>document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))</script>
+            </span>
+            &middot;
+            Gunwant Jain. Built <a class="footer" href="https://github.com/wantguns/wantguns.dev">openly</a> with <a class="footer" href="https://www.getzola.org">Zola</a>
+        </div>
+      </sub>
+    </footer>
+  </body>
+  
+ <script src=https://wantguns.dev/js/page.js></script> 
+
+</html>
