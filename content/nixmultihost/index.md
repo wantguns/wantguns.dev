@@ -1,5 +1,6 @@
 +++
 title = "Single flake, multiple hosts"
+description = "Designing a single Nix flake that manages multiple hosts across macOS and Linux, with shared modules, feature toggles, and remote deployment."
 date = "2025-03-14"
 [taxonomies]
 tags = ["yakshaving", "selfhosting", "nix"]

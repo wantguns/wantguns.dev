@@ -1,5 +1,6 @@
 +++
 title = "Building ONNX Runtime for Jetson Nano"
+description = "Cross-compiling ONNX Runtime with Java bindings for the ARM64 Jetson Nano using Docker and QEMU emulation."
 date = "2022-02-20"
 [taxonomies]
 tags = ["jetson-nano", "onnx", "compilation"]

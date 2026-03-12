@@ -1,5 +1,6 @@
 +++
-title = "Home Manager"
+title = "Getting Started with Nix Home Manager on macOS"
+description = "Setting up Nix Home Manager with flakes on macOS to declaratively manage shell config, tmux, git, and neovim."
 date = "2025-03-06"
 [taxonomies]
 tags = ["yakshaving", "selfhosting", "nix"]

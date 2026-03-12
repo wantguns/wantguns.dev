@@ -1,5 +1,6 @@
 +++
 title = "hey !"
+description = "I'm Gunwant, a software engineer who writes about infrastructure, debugging adventures, and the occasional yak shave."
 [extra]
 notoc = true
 +++

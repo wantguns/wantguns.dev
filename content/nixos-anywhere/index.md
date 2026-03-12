@@ -1,5 +1,6 @@
 +++
-title = "nixos-anywhere"
+title = "Installing NixOS Remotely with nixos-anywhere"
+description = "Using nixos-anywhere to install NixOS on a physical Dell Optiplex with ZFS and on an Oracle Cloud ARM VM via kexec, with disko disk configuration."
 date = "2025-04-10"
 [taxonomies]
 tags = ["yakshaving", "selfhosting", "nix"]

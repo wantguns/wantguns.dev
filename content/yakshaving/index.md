@@ -1,5 +1,6 @@
 +++
 title = "Setting up my homelab and cloud with Nix"
+description = "An overview of my homelab and cloud server setup - buying a Dell Optiplex for $60, planning orchestration with Nix, K3s, Wireguard, and FluxCD."
 date = "2025-03-04"
 [taxonomies]
 tags = ["yakshaving", "selfhosting", "nix"]

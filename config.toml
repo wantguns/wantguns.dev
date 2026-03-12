@@ -1,5 +1,5 @@
 base_url = "https://wantguns.dev"
-description = "Gunwant Jain's (@wantguns) writings and musings"
+description = "Gunwant Jain's blog"
 title = "Gunwant Jain - @wantguns"
 
 compile_sass = true

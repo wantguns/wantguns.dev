@@ -1,6 +1,17 @@
 {% import "macros.html" as macros %}
 {% extends "index.html" %}
 
+{% block title %}{{ section.title }} &middot; {{ config.title }}{% endblock title %}
+{% block description %}{{ section.description | default(value=config.description) }}{% endblock description %}
+{% block canonical %}<link rel="canonical" href="{{ section.permalink | safe }}" />{% endblock canonical %}
+
+{% block ogtitle %}{{ section.title }}{% endblock ogtitle %}
+{% block ogdesc %}{{ section.description | default(value=config.description) }}{% endblock ogdesc %}
+{% block ogurl %}{{ section.permalink | safe }}{% endblock ogurl %}
+
+{% block twtitle %}{{ section.title }}{% endblock twtitle %}
+{% block twdesc %}{{ section.description | default(value=config.description) }}{% endblock twdesc %}
+
 {% block content %}
     <h1 class="page_title">{{ section.title }}</h1>
     <article>

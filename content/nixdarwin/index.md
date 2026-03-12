@@ -1,5 +1,6 @@
 +++
-title = "Nix Darwin"
+title = "System-Level macOS Configuration with nix-darwin"
+description = "Expanding from Home Manager to nix-darwin for managing system-level macOS settings like keyboard repeat rate, Finder preferences, and Homebrew packages."
 date = "2025-03-08"
 [taxonomies]
 tags = ["yakshaving", "selfhosting", "nix"]

@@ -1,5 +1,6 @@
 +++
 title = "Building LMDB JNI for Jetson Nano"
+description = "Cross-compiling LMDB JNI bindings for the ARM64 Jetson Nano using Docker and QEMU, with fixes for SSL/TLS and hawtjni version issues."
 date = "2022-02-20"
 [taxonomies]
 tags = ["jetson-nano", "lmdb", "compilation"]
