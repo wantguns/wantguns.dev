@@ -3,7 +3,7 @@
 @import url('https://iosevka-webfonts.github.io/iosevka/Iosevka.css');
 
 $bgColor: #000;
-$textColor: rgba(255, 255, 255, 0.85);
+$textColor: rgba(255, 255, 255, 0.8);
 $headColor: #e78a53;
 $uLinkColor: #fbcb97;
 $vLinkColor: $textColor;
@@ -193,37 +193,48 @@ pre {
 	}
 }
 
-.pre-wrapper {
-  position: relative;
-  margin: 2rem 0;
-}
-
-.copy-button {
-	position: absolute;
-	top: 0px;
-	right: 0px;
-	color: $uLinkColor;
+details:not(#toc-inline) {
+	border: thin solid $darkGreyColor;
+	margin: 2rem 0rem;
 	background-color: $bgColor;
-    border: thin solid $darkGreyColor;
-	width: 60px;
-	height: 28px;
-	padding: 5px 10px;
-	// font-size: 12px;
-	font-family: $sansSerifFontFamily;
-    // font-weight: 400;
-	cursor: pointer;
-	opacity: 0.8;
-	transition: all 0.1s ease;
-    // z-index: 3;
 
-	&:hover {
-		opacity: 1;
+	summary {
+		padding: 1rem 1.5rem;
+		cursor: pointer;
+		color: $uLinkColor;
+		font-family: $monospaceFontFamily;
+		user-select: none;
+
+		&:hover {
+			color: $headColor;
+		}
 	}
 
-	&.copied {
-        border: thin solid $uLinkColor;
+	pre {
+		margin: 0;
+		border: none;
+		border-top: thin solid $darkGreyColor;
 	}
 }
+
+
+// Required Giallo (Zola syntax highlighting) CSS
+.giallo-l {
+	display: inline-block;
+	min-height: 1lh;
+	width: 100%;
+}
+
+.giallo-ln {
+	display: inline-block;
+	user-select: none;
+	margin-right: 0.4em;
+	padding: 0.4em;
+	min-width: 3ch;
+	text-align: right;
+	opacity: 0.8;
+}
+
 
 table {
 	border-collapse: collapse;

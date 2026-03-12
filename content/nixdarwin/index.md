@@ -9,6 +9,10 @@ Lets expand on our flake from before and also make system level changes
 like `KeyInputDelay`:
 
 This is the new `flake.nix`:
+
+<details>
+  <summary>flake.nix</summary>
+
 ```nix
 {
   description = "Home Manager configuration of gunwant.jain1";
@@ -49,10 +53,16 @@ This is the new `flake.nix`:
 }
 ```
 
+</details>
+
 You'll notice that we have abstracted the home manager outputs and are
 now using them as modules inside the nix-darwin configuration modules.
 
 And here is the `configuration.nix` module:
+
+<details>
+  <summary>configuration.nix</summary>
+
 ```nix
 { config, pkgs, ... }:
 
@@ -103,10 +113,12 @@ And here is the `configuration.nix` module:
 }
 ```
 
+</details>
+
 ## File tree
 
 After making the required changes, this is how my file tree looks like:
-```
+```plain
 ├── flake.nix           ---> Edited
 ├── flake.lock          ---> Edited
 ├── configuration.nix   ---> New

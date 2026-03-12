@@ -108,7 +108,7 @@ close(13)
 
 The actual error was arising from the `bind` syscall. Onto reading the
 manpage of bind:   
-```man
+```plain
 ERRORS
        EINVAL addrlen is wrong, or addr is not a valid address for this
               socket's domain.

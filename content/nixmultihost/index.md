@@ -12,7 +12,7 @@ embedded device, a server I rent, my personal workstation, etc. There is
 different amounts of state I want similar in these machines. And so it
 warrants for a better file structure.
 
-```tree
+```plain
 .
 ├── flake.lock
 ├── flake.nix
@@ -69,6 +69,9 @@ not, basically have a features attribute for home manager.
 
 I'll declare all the abstractions for home manager options in this file.
 
+<details>
+  <summary>modules/features/default.nix</summary>
+
 ```nix
 { lib, ... }:
 
@@ -102,9 +105,14 @@ with lib;
 }
 ```
 
+</details>
+
 ### modules/features/implementation.nix
 
 I'll implement the declared options in this file.
+
+<details>
+  <summary>modules/features/implementation.nix</summary>
 
 ```nix
 { config, pkgs, lib, ... }:
@@ -244,6 +252,8 @@ in
 }
 ```
 
+</details>
+
 This enables me to have a `hosts/darwin/<hostname>/home.nix` like:
 ```nix
 { config, pkgs, ... }: {
@@ -273,6 +283,9 @@ This enables me to have a `hosts/darwin/<hostname>/home.nix` like:
 
 and the their system config, `hosts/darwin/<hostname>/default.nix` like:
 
+<details>
+  <summary>hosts/darwin/&lt;hostname&gt;/default.nix</summary>
+
 ```nix
 # Host-specific system configuration
 { config, pkgs, ... }: {
@@ -301,6 +314,8 @@ and the their system config, `hosts/darwin/<hostname>/default.nix` like:
   };
 }
 ```
+
+</details>
 
 Pretty simple right ? I can onboard new hosts and create similar "knobs"
 to control state quickly.
@@ -364,6 +379,10 @@ the remote host.
 Lets make a library function which defines this attribute for us:
 
 ### lib/mkHostConfig.nix
+
+<details>
+  <summary>lib/mkHostConfig.nix</summary>
+
 ```nix
 # inside ./lib/mkHostConfig.nix
 { lib, ... }:
@@ -390,12 +409,18 @@ in
 }
 ```
 
+</details>
+
 I added a `platform` field for the downstream libraries I will pass our
 `hosts` attribute into.
 
 ### lib/utils.nix
 
 Here is the `utils.nix` file:
+
+<details>
+  <summary>lib/utils.nix</summary>
+
 ```nix
 # inside lib/utils.nix
 { lib, ... }:
@@ -410,11 +435,16 @@ in
 }
 ```
 
+</details>
+
 ### lib/mkHost.nix
 
 Next, we'll make a library function that consumes this host attribute
 set and returns a `darwinConfiguration` or a `nixosConfiguration`
 depending on the `system` and the `platform` fields:
+
+<details>
+  <summary>lib/mkHost.nix</summary>
 
 ```nix
 # inside lib/mkHost.nix
@@ -499,6 +529,8 @@ in
 }
 ```
 
+</details>
+
 You must be wondering what is `disko` or `facter` or `sops`, and for
 that, I'll be publishing a separate article. For now this config should
 still work on darwin hosts, since all the linux related things are not
@@ -513,6 +545,9 @@ include the features module we created.
 
 Next lets create another library function to create
 `homeConfigurations`:
+
+<details>
+  <summary>lib/mkHomeConfig.nix</summary>
 
 ```nix
 # inside lib/mkHomeConfig.nix
@@ -551,6 +586,8 @@ in
 }
 ```
 
+</details>
+
 This should be pretty explanatory. You can go through my blogs on
 `home-manager` and `nix-darwin` to have a better picture how our
 abstraction is growing.
@@ -558,6 +595,9 @@ abstraction is growing.
 ### lib/default.nix
 
 We'll import all of our library functions through the default nix file in this directory.
+
+<details>
+  <summary>lib/default.nix</summary>
 
 ```nix
 # inside lib/default.nix
@@ -573,9 +613,14 @@ We'll import all of our library functions through the default nix file in this d
 }
 ```
 
+</details>
+
 ### flake.nix
 
 Finally, we have all the required nix code to iterate our flake:
+
+<details>
+  <summary>flake.nix</summary>
 
 ```nix
 {
@@ -643,6 +688,8 @@ Finally, we have all the required nix code to iterate our flake:
 }
 ```
 
+</details>
+
 Simple enough, we can now use this flake for multiple tools:
 
 ```bash
@@ -701,6 +748,9 @@ deployment tool. Now we can just create a new [flake app](https://nix.dev/manual
 ```
 
 and our deploy app is basically a shell script:
+
+<details>
+  <summary>lib/deploy.nix</summary>
 
 ```nix
 # inside lib/deploy.nix
@@ -782,6 +832,8 @@ pkgs.writeShellScriptBin "deploy" ''
   fi
 ''
 ```
+
+</details>
 
 Now we can run commands like:
 

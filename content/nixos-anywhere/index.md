@@ -76,6 +76,9 @@ Next, I'll declare my disk layout. I am choosing to try ZFS for the
 first time. Other machines that I own run on BTRFS, and I haven't faced
 any data loss as of now, but I also wanted to give OpenZFS a shot:
 
+<details>
+  <summary>hosts/linux/mintaka/disk-config.nix</summary>
+
 ```nix
 # inside hosts/linux/mintaka/disk-config.nix
 {
@@ -169,6 +172,8 @@ any data loss as of now, but I also wanted to give OpenZFS a shot:
 }
 ```
 
+</details>
+
 I had already configured our nix flake to include the modules for disko
 and our facter config with the nixosSystem builder in a previous blog [^1].
 
@@ -226,6 +231,10 @@ Here is the host attribute set entry:
 };
 ```
 And this is disk config:
+
+<details>
+  <summary>hosts/linux/bellatrix/disk-config.nix</summary>
+
 ```nix
 # Preserving the original fs layout
 {
@@ -262,6 +271,8 @@ And this is disk config:
   };
 }
 ```
+
+</details>
 
 I decided to not tinker with the original disk layout a lot.
 

@@ -11,6 +11,10 @@ install nix with flakes. Use the [determinate installer](https://github.com/Dete
 
 Once thats done, create a new directory in your development folder, lets
 say `nixhome`, and create a `flake.nix`:
+
+<details>
+  <summary>flake.nix</summary>
+
 ```nix
 {
   description = "Home Manager configuration";
@@ -38,7 +42,13 @@ say `nixhome`, and create a `flake.nix`:
 }
 ```
 
+</details>
+
 and a `home.nix` file:
+
+<details>
+  <summary>home.nix</summary>
+
 ```nix
 { config, pkgs, lib, ... }:
 
@@ -174,6 +184,8 @@ in
 }
 ```
 
+</details>
+
 ### Neovim
 
 In the `home.nix` file, you can see that we defined three functions which
@@ -194,7 +206,7 @@ aerc and alacritty through it.
 ## File tree
 
 This is the final state of my flake folder:
-```
+```plain
 ├── flake.nix
 ├── flake.lock
 ├── git

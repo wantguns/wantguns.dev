@@ -15,7 +15,7 @@ inside a docker container.
 
 #### Dockerfile
 
-```Dockerfile
+```dockerfile
 # Import info for 64-bit Qemu based build
 # There are also raspberry pi 4 and 64-bit images available so adjust as required
 FROM balenalib/raspberrypi4-64-python:latest-bullseye-build

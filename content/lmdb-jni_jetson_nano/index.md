@@ -13,7 +13,7 @@ it as an ad-hoc method for this instance.
 We will be compiling natively for arm64 in a qemu image which is running
 inside a docker container.
 
-```Dockerfile
+```dockerfile
 # Import info for 64-bit Qemu based build
 FROM balenalib/raspberrypi4-64-python:latest-bullseye-build
 

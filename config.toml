@@ -12,8 +12,14 @@ taxonomies = [
 [markdown]
 
 [markdown.highlighting]
-extra_themes = ["highlight_theme/base16-black-metal-bathory.json"]
-theme = "base16-black-metal-bathory"
+error_on_missing_language = true
+extra_themes = [
+    "themes/base16-black-metal-bathory.json",
+    "themes/ash.json",
+    "themes/ember.json",
+]
+
+theme = "vitesse-dark"
 
 [extra]
 author = "Gunwant Jain"
@@ -24,6 +30,7 @@ nav_links = [
   {url = "$BASE_URL/about", name = "about"},
   {url = "$BASE_URL", name = "blog"},
   {url = "$BASE_URL/tags", name = "tags"},
+  {url = "https://github.com/wantguns", name = "github"},
   {url = "https://bin.wantguns.dev/cv", name = "resume"},
   {url = "$BASE_URL/atom.xml", name = "rss"},
 ]
