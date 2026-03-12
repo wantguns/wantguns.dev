@@ -1,8 +1,9 @@
-@import url("/fonts/cmuserif_roman_macroman/stylesheet.css");
-@import url("/fonts/cmutypewritertext_light_macroman/stylesheet.css");
+// @import url("/fonts/cmuserif_roman_macroman/stylesheet.css");
+// @import url("/fonts/cmutypewritertext_light_macroman/stylesheet.css");
+@import url('https://iosevka-webfonts.github.io/iosevka/Iosevka.css');
 
 $bgColor: #000;
-$textColor: rgba(255, 255, 255, 0.9);
+$textColor: rgba(255, 255, 255, 0.85);
 $headColor: #e78a53;
 $uLinkColor: #fbcb97;
 $vLinkColor: $textColor;
@@ -12,9 +13,9 @@ $selectionColor: #333;
 $codeBGColor: rgba(251, 203, 151, 0.175);
 $codeColor: rgba(251, 203, 151, 0.9);
 
-$serifFontFamily:  cmu_serifroman, Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+$serifFontFamily: 'Iosevka Web', 'IBM Plex Mono', 'Libertinus Mono', 'IBM Plex Sans', cmu_serifroman, Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
 $sansSerifFontFamily: $serifFontFamily;
-$monospaceFontFamily:  cmu_typewriter_textlight, ui-monospace, 'SFMono-Regular', 'SF Mono', 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+$monospaceFontFamily: $serifFontFamily, cmu_typewriter_textlight, ui-monospace, 'SFMono-Regular', 'SF Mono', 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 $nonMonospaceFontFamily: $serifFontFamily;
 
 :root {
@@ -34,7 +35,7 @@ body {
 
 	font-family: $serifFontFamily;
 	// font-weight: 400;
-	font-size: 16.5px;
+	font-size: 14px;
 	// line-height: 1.6;
 }
 
@@ -151,7 +152,7 @@ hr {
 
 main {
 	margin: auto;
-	max-width: 650px;
+	max-width: 600px;
 }
 
 header {
@@ -163,9 +164,9 @@ header {
 code {
 	font-family: $monospaceFontFamily;
 	// letter-spacing: normal;
-	// background-color: $codeBGColor;
-	// padding-left: 0.25rem;
-	// padding-right: 0.25rem;
+	background-color: $codeBGColor;
+	padding-left: 0.25rem;
+	padding-right: 0.25rem;
 	// font-size: 14.5px;
 	color: $codeColor;
 	a {

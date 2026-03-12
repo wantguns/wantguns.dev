@@ -10,12 +10,10 @@ taxonomies = [
 ]
 
 [markdown]
-extra_syntaxes_and_themes = [
-  "highlight_theme",
-]
 
-highlight_code = true
-highlight_theme = "base16-black-metal-bathory"
+[markdown.highlighting]
+extra_themes = ["highlight_theme/base16-black-metal-bathory.json"]
+theme = "base16-black-metal-bathory"
 
 [extra]
 author = "Gunwant Jain"
