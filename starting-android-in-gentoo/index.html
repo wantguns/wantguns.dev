@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Starting System-as-Root Android in a LXC container &middot; Gunwant Jain - @wantguns</title>
+    <meta name="description" content="As I progress in my GSoC journey, my next task is to boot System-As-Root based Android in an LXC container inside Gentoo." />
+    <link rel="canonical" href="https://wantguns.dev/starting-android-in-gentoo/" />
+    <link rel="apple-touch-icon" sizes="180x180" href="https://wantguns.dev/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="https://wantguns.dev/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="https://wantguns.dev/favicon-16x16.png" />
+    <link rel="manifest" href="https://wantguns.dev/site.webmanifest" />
+    <link rel="alternate" type="application/atom+xml" title="RSS" href="https://wantguns.dev/atom.xml">
+
+    <style>@import url("https://iosevka-webfonts.github.io/iosevka/Iosevka.css");:root{color-scheme:dark}html,body{background:#000;color:rgba(255,255,255,.8);padding:.3rem;margin:.3rem;text-rendering:optimizeLegibility;font-variant-ligatures:contextual;font-family:"Iosevka Web","IBM Plex Mono","Libertinus Mono","IBM Plex Sans",cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;font-size:14px}h1,h2,h3,h4,h5,h6{color:#fbcb97;font-family:"Iosevka Web","IBM Plex Mono","Libertinus Mono","IBM Plex Sans",cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif}h1.page_title{font-size:200%;line-height:normal;color:#fbcb97;margin-bottom:1rem;line-height:1.1}a{text-decoration:underline;text-underline-offset:3px;color:rgba(255,255,255,.8)}a:active{color:#fbcb97}a:hover{color:rgba(251,203,151,.9)}a.site_title{text-decoration:none;color:#e78a53;list-style:1}a.site_title:hover{text-decoration:underline}a.site_nav{text-decoration:none;color:#e78a53}a.site_nav:hover{text-decoration:underline}a.homepage-list_title{flex:1;word-wrap:break-word;text-decoration:none;font-weight:bold;font-family:"Iosevka Web","IBM Plex Mono","Libertinus Mono","IBM Plex Sans",cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;color:#fbcb97}a.homepage-list_title:hover{text-decoration:underline}a code{text-decoration-color:rgba(251,203,151,.9)}a.footer{color:#888}a.footer:hover{color:#fbcb97}.pipe{color:#202020}time.site_time{font-size:90%;color:#888}span.page_time{padding:1.2rem auto;color:#888}:target{background-color:#000}hr{border:none;height:1px;background-color:#202020}::selection{background:#333}main{margin:auto;max-width:600px}header{padding-top:1rem;padding-bottom:0rem;font-weight:900}code{font-family:"Iosevka Web","IBM Plex Mono","Libertinus Mono","IBM Plex Sans",cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif,cmu_typewriter_textlight,ui-monospace,"SFMono-Regular","SF Mono","Cascadia Code","Source Code Pro",Menlo,Consolas,"DejaVu Sans Mono",monospace;background-color:rgba(251,203,151,.175);padding-left:.25rem;padding-right:.25rem;color:rgba(251,203,151,.9)}code a{text-decoration-color:rgba(251,203,151,.9)}pre{position:relative;font-family:"Iosevka Web","IBM Plex Mono","Libertinus Mono","IBM Plex Sans",cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif,cmu_typewriter_textlight,ui-monospace,"SFMono-Regular","SF Mono","Cascadia Code","Source Code Pro",Menlo,Consolas,"DejaVu Sans Mono",monospace;overflow:auto;border:thin solid #202020;margin:2rem 0rem;padding:1.5rem;background-color:#000}pre code{padding:initial;color:inherit;background-color:inherit}details:not(#toc-inline){border:thin solid #202020;margin:2rem 0rem;background-color:#000}details:not(#toc-inline) summary{padding:1rem 1.5rem;cursor:pointer;color:#fbcb97;font-family:"Iosevka Web","IBM Plex Mono","Libertinus Mono","IBM Plex Sans",cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif,cmu_typewriter_textlight,ui-monospace,"SFMono-Regular","SF Mono","Cascadia Code","Source Code Pro",Menlo,Consolas,"DejaVu Sans Mono",monospace;user-select:none}details:not(#toc-inline) summary:hover{color:#e78a53}details:not(#toc-inline) pre{margin:0;border:none;border-top:thin solid #202020}.giallo-l{display:inline-block;min-height:1lh;width:100%}.giallo-ln{display:inline-block;user-select:none;margin-right:.4em;padding:.4em;min-width:3ch;text-align:right;opacity:.8}table{border-collapse:collapse;width:100%}th,td{border:1px solid #202020;padding:1.1rem}img{height:auto;margin:2rem 0rem;max-width:100%}.homepage-list,.taxonomies__list{list-style:none;padding:1rem 0}.homepage-list li,.taxonomies__list li{align-items:center;display:flex;flex-wrap:nowrap;justify-content:space-between;margin-bottom:10px}.center{margin-left:auto;margin-right:auto;max-width:100%;text-align:center}.imageClass,.videoClass{padding:.5rem}.imageClass figure,.videoClass figure{display:table}.imageClass figure img,.videoClass figure img{user-select:none}.imageClass figure figcaption,.videoClass figure figcaption{display:table-caption;caption-side:bottom;padding:.2rem;margin:.2rem auto;background-color:#fbcb97;color:#000}.imageClass figure figcaption::selection,.videoClass figure figcaption::selection{background-color:#e78a53}@media (max-width: 38rem){.homepage-list li a{width:100%}}footer{margin-top:2rem;color:#888}.pagination_title{width:100%;text-align:center;border-bottom:1px solid #202020;line-height:.1em;margin:2.5rem auto}.pagination_title span{background:#000;font-size:.8rem;padding:0 10px}.post_nav{display:flex;align-items:center;justify-content:center;text-align:center;margin:2.5rem auto 4rem auto}.post_nav .button{position:relative;display:inline-flex;flex:1;align-items:center;justify-content:center;overflow:hidden;text-decoration:none;margin:auto 1.5rem;font-weight:bold}.post_nav .button .previous,.post_nav .button .next{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.time_tag_sep{padding:.5rem;color:#888;user-select:none}.post_tags a{padding:0 .5rem 0 0;color:#888;text-decoration:none}.post_tags a:hover{color:#fbcb97}.taxonomies__title{color:#888}.taxonomies__list a{text-decoration:none}#toc-inline,#toc-aside{font-size:90%;line-height:1.6;color:#888}#toc-inline a,#toc-aside a{color:#888;text-decoration:none}#toc-inline a:hover,#toc-aside a:hover{color:#fbcb97}#toc-inline ul,#toc-aside ul{padding-left:1rem}#toc-inline li li,#toc-aside li li{list-style:disc}#toc-inline li.active>a,#toc-aside li.active>a{color:#fbcb97;font-weight:bold}#toc-inline{font-family:"Iosevka Web","IBM Plex Mono","Libertinus Mono","IBM Plex Sans",cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;padding:1.25rem 0rem .5rem 0rem}#toc-inline summary:hover{cursor:pointer;color:#fbcb97}#toc-aside{font-family:"Iosevka Web","IBM Plex Mono","Libertinus Mono","IBM Plex Sans",cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;display:block;width:15rem;position:sticky;float:left;top:3.5rem;margin-top:-1.2rem;margin-left:-20rem}@media (max-width: 80rem){#toc-aside{display:none}}@media (min-width: 80rem){#toc-inline{display:none}}sup{line-height:0}.footnote-reference{color:#fbcb97}.footnote-reference:after{content:"]"}.footnote-reference:before{content:"["}.footnote-reference a{color:#fbcb97;text-decoration:none}hr{margin-top:2rem;margin-bottom:2rem}.footnote-definition{display:flex;flex-direction:row;font-size:.85rem}.footnote-definition sup{all:initial;color:rgba(255,255,255,.8);text-rendering:optimizeLegibility;font-variant-ligatures:contextual;font-family:"Iosevka Web","IBM Plex Mono","Libertinus Mono","IBM Plex Sans",cmu_serifroman,Charter,"Bitstream Charter","Sitka Text",Cambria,serif;font-weight:450;font-size:1rem;line-height:1.58;letter-spacing:-.02em;font-size:.7rem;margin:0rem;margin-right:.5rem}.footnote-definition p{margin:0rem;margin-bottom:1rem}.footnote-definition p .footnote-backlink{margin:0rem;margin-left:.5rem;color:#fbcb97;text-decoration:none}</style>
+
+    <meta property="og:site_name" content="Gunwant Jain - @wantguns">
+      <meta name="author" content="Gunwant Jain" />
+      <meta name="keywords" content="Gunwant Jain, wantguns, Gunwant, WantGuns" />
+      <meta property="og:title" content="Starting System-as-Root Android in a LXC container">
+      <meta property="og:description" content="As I progress in my GSoC journey, my next task is to boot System-As-Root based Android in an LXC container inside Gentoo.">
+      <meta property="og:url" content="https://wantguns.dev/starting-android-in-gentoo/">
+      
+      
+  <meta property="og:type" content="article" />
+  <meta property="article:published_time" content="2020-06-23T00:00:00+00:00" />
+  
+  <meta property="article:tag" content="android" />
+    <meta property="article:tag" content="gsoc2020" />
+    <meta property="article:tag" content="sharkbait" />
+    
+
+
+      <meta name="twitter:card" content="summary">
+      <meta name="twitter:title" content="Starting System-as-Root Android in a LXC container">
+      <meta name="twitter:description" content="As I progress in my GSoC journey, my next task is to boot System-As-Root based Android in an LXC container inside Gentoo.">
+
+      
+      
+    
+
+    
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Starting System-as-Root Android in a LXC container",
+  "description": "As I progress in my GSoC journey, my next task is to boot System-As-Root based Android in an LXC container inside Gentoo.",
+  "url": "https://wantguns.dev/starting-android-in-gentoo/",
+  "datePublished": "2020-06-23T00:00:00+00:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Gunwant Jain",
+    "url": "https://wantguns.dev/about/"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Gunwant Jain"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://wantguns.dev/starting-android-in-gentoo/"
+  }
+}
+</script>
+
+
+  </head>
+  
+
+  <body>
+    <main id="main" role="main">
+      
+      <header role="banner">
+          
+            
+            <nav style="margin-bottom:1rem;" role="navigation">
+              
+                <a class="site_nav" href="https://wantguns.dev/about">about</a>
+                
+                  <span>&nbsp;</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev">blog</a>
+                
+                  <span>&nbsp;</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev/tags">tags</a>
+                
+                  <span>&nbsp;</span>
+                
+              
+                <a class="site_nav" href="https://github.com/wantguns">github</a>
+                
+                  <span>&nbsp;</span>
+                
+              
+                <a class="site_nav" href="https://bin.wantguns.dev/cv">resume</a>
+                
+                  <span>&nbsp;</span>
+                
+              
+                <a class="site_nav" href="https://wantguns.dev/atom.xml">rss</a>
+                
+              
+            </nav>
+            
+          
+      </header>
+      
+
+
+    <div>
+
+      
+<article>
+  <h1 class="page_title">Starting System-as-Root Android in a LXC container</h1>
+
+  
+    <span class="page_time">Posted on <time datetime="2020-06-23T00:00:00+00:00">June 23, 2020</time></span>
+    
+    <span class="time_tag_sep">&middot;</span>
+    <span class="post_tags">
+        
+            <a href="https://wantguns.dev/tags/android/">#android</a>
+        
+            <a href="https://wantguns.dev/tags/gsoc2020/">#gsoc2020</a>
+        
+            <a href="https://wantguns.dev/tags/sharkbait/">#sharkbait</a>
+        
+    </span>
+    
+  
+
+  
+  
+    
+    <details id = "toc-inline">
+        <summary><b>Table of Contents</b></summary>
+        <ul>
+            <li>
+                <a href="#prerequisites">Prerequisites</a>
+                
+            </li><li>
+                <a href="#preparing-the-boot-image">Preparing the boot image</a>
+                
+            </li><li>
+                <a href="#preparing-the-bootstrap-init">Preparing the bootstrap-init</a>
+                
+            </li><li>
+                <a href="#preparing-gentoo-for-android">Preparing Gentoo for Android</a>
+                <ul>
+                    <li>
+                        <a href="#fstab">Fstab</a>
+                    </li><li>
+                        <a href="#install-lxc">Install LXC</a>
+                    </li>
+                </ul>
+            </li><li>
+                <a href="#final-steps">Final Steps</a>
+                
+            </li><li>
+                <a href="#final-thoughts-and-scopes-of-improvement">Final Thoughts and Scopes of Improvement</a>
+                
+            </li>
+        </ul>
+    </details>
+
+    
+  <aside id="toc-aside">
+          <h4>Table of Contents</h4>
+      <ul>
+          
+          <li>
+              <a href="#prerequisites">Prerequisites</a>
+              
+          </li>
+          <li>
+              <a href="#preparing-the-boot-image">Preparing the boot image</a>
+              
+          </li>
+          <li>
+              <a href="#preparing-the-bootstrap-init">Preparing the bootstrap-init</a>
+              
+          </li>
+          <li>
+              <a href="#preparing-gentoo-for-android">Preparing Gentoo for Android</a>
+              
+              <ul>
+                  
+                  <li>
+                      <a href="#fstab">Fstab</a>
+                  </li>
+                  
+                  <li>
+                      <a href="#install-lxc">Install LXC</a>
+                  </li>
+                  
+              </ul>
+              
+          </li>
+          <li>
+              <a href="#final-steps">Final Steps</a>
+              
+          </li>
+          <li>
+              <a href="#final-thoughts-and-scopes-of-improvement">Final Thoughts and Scopes of Improvement</a>
+              
+          </li>
+      </ul>
+  </aside>
+
+  
+  
+
+  <p>As I progress in my GSoC journey, my next task is to boot System-As-Root based Android in an LXC container inside Gentoo. As the name suggests, SAR devices use /system as their rootdir instead of /boot. SharkBait was based on the older booting mechanism.
+If you would want to know more about Android's Booting mechanism, I would recommend to have a look at this <a href="https://wantguns.dev/android-boot-high-jinks/">blog</a>.</p>
+<p>Basically if you own a device that <strong><em>shipped</em></strong> with Android 9 (even the ones which are updated to Android 10) you would want to follow this guide.</p>
+<hr />
+<h2 id="prerequisites">Prerequisites</h2>
+<p>This setup expects some prerequisites which are as follows:</p>
+<ol>
+<li>Have Gentoo installed as a chroot in your Android device. <a href="https://wantguns.dev/install-gentoo/">guide</a></li>
+<li>You should have a LXC enabled Kernel. <a rel="external" href="https://wiki.gentoo.org/wiki/LXC#Kernel_with_the_appropriate_LXC_options_enabled">guide</a></li>
+<li>You should have encryption disabled on your phone. <a rel="external" href="https://github.com/Zackptg5/Disable_Dm-Verity_ForceEncrypt">guide</a></li>
+<li>You should have SELinux disabled.</li>
+<li>You should have the <strong>schedtune</strong> cgroup disabled.</li>
+</ol>
+<p>The 4th and 5th prerequisites are addressed in the next section.</p>
+<h2 id="preparing-the-boot-image">Preparing the boot image</h2>
+<p>Clone the SAR-Preinit repository</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #80A665;">git</span><span style="color: #C98A7D;"> clone https://gitlab.com/WantGuns/sar-preinit.git</span><span style="color: #C99076;"> --depth</span><span style="color: #4C9A91;"> 1</span></span></code></pre>
+<p>Pull out your device's <code>boot.img</code> in the artifacts directory.</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #B8A965;">cd</span><span style="color: #C98A7D;"> sar-preinit</span></span>
+<span class="giallo-l"><span style="color: #80A665;">adb</span><span style="color: #C98A7D;"> root</span></span>
+<span class="giallo-l"><span style="color: #80A665;">adb</span><span style="color: #C98A7D;"> shell dd if=/dev/block/bootdevice/by-name/boot</span><span style="color: #CB7676;"> |</span><span style="color: #80A665;"> dd</span><span style="color: #C98A7D;"> of=artifacts/boot.img</span></span></code></pre>
+<p>Now unpack the boot.img using the Makefile provided and edit the <strong>bootimg.cfg</strong> file produced in <code>out/unpack</code> directory.</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #80A665;">make</span><span style="color: #C98A7D;"> unpack</span></span>
+<span class="giallo-l"><span style="color: #80A665;">nvim</span><span style="color: #C98A7D;"> out/unpack/bootimg.cfg</span></span></code></pre>
+<p>Add this string to the <code>cmdline</code> key, if not already present.</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="plain"><span class="giallo-l"><span>androidboot.selinux=permissive cgroup_disable=schedtune</span></span></code></pre>
+<p>This addresses the 4th and 5th prerequisites. If the kernel you are currently using is not LXC-enabled, you could swap the <strong>zImage</strong> inside the unpack directory with the LXC-enabled kernel image.</p>
+<p>Now we can finally repack and patch the boot image for the use of SharkBait.</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #80A665;">make</span><span style="color: #C98A7D;"> repack</span></span></code></pre>
+<p>The <code>boot-mod.img</code> under the out directory is the patched boot which we need. Just don't flash it yet.</p>
+<h2 id="preparing-the-bootstrap-init">Preparing the bootstrap-init</h2>
+<p>Since System-As-Root requires a special environment unlike Android's older iterations, we need a <strong>init</strong> to bootstrap Android in the container.
+Currently the <strong>bootstrap-init</strong> requires NDK for building, this is subject to change for native compilation later.</p>
+<p><em>People who are in a hurry could checkout the pre-built binaries provided <a rel="external" href="https://gitlab.com/WantGuns/bootstrap-init/-/jobs/608731821/artifacts/browse/libs/">here</a> and skip the hassle of manually setting up their environment and compiling it.</em></p>
+<p>If you're not one of them, continue following.
+Clone the repository and edit the Makefile's provided NDK path with your own NDK path.</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #80A665;">git</span><span style="color: #C98A7D;"> clone https://gitlab.com/WantGuns/bootstrap-init.git</span><span style="color: #C99076;"> --depth</span><span style="color: #4C9A91;"> 1</span></span>
+<span class="giallo-l"><span style="color: #B8A965;">cd</span><span style="color: #C98A7D;"> bootstrap-init</span></span>
+<span class="giallo-l"><span style="color: #80A665;">nvim</span><span style="color: #C98A7D;"> Makefile</span></span></code></pre>
+<p>Then call <code>make</code> in the bootstrap-init folder. This will build the required binary for different architechtures, we should focus on arm64-v8a inside the libs folder.</p>
+<p>Copy the downloaded/compiled <strong>bootstrap-init</strong> to Gentoo's home, we will need it later.</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #80A665;">adb</span><span style="color: #C98A7D;"> push libs/arm64-v8a/bootstrap-init /data/gnu/home/init</span></span></code></pre><h2 id="preparing-gentoo-for-android">Preparing Gentoo for Android</h2>
+<p>Chroot into Gentoo and start setting it up.</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #80A665;">adb</span><span style="color: #C98A7D;"> root</span></span>
+<span class="giallo-l"><span style="color: #80A665;">adb</span><span style="color: #C98A7D;"> shell</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #758575DD;">## Now switched to Android&#39;s shell</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #758575DD;"># Generate SSH key pairs, (will come in use later)</span></span>
+<span class="giallo-l"><span style="color: #80A665;">ssh-keygen</span><span style="color: #C99076;"> -t</span><span style="color: #C98A7D;"> ed25519</span><span style="color: #C99076;"> -C</span><span style="color: #C98A7D;"> android</span><span style="color: #C99076;"> -f</span><span style="color: #C98A7D;"> /data/ssh/id_ed25519</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #80A665;">mount</span><span style="color: #C99076;"> -t</span><span style="color: #C98A7D;"> proc /proc /data/gnu/proc</span></span>
+<span class="giallo-l"><span style="color: #80A665;">mount</span><span style="color: #C99076;"> --rbind</span><span style="color: #C98A7D;"> /dev /data/gnu/dev</span></span>
+<span class="giallo-l"><span style="color: #80A665;">mount</span><span style="color: #C99076;"> --rbind</span><span style="color: #C98A7D;"> /sys /data/gnu/sys</span></span>
+<span class="giallo-l"><span style="color: #80A665;">chroot</span><span style="color: #C98A7D;"> /data/gnu /bin/bash</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #758575DD;">## Now switched to Gentoo&#39;s root</span></span>
+<span class="giallo-l"><span style="color: #B8A965;">source</span><span style="color: #C98A7D;"> /etc/profile</span></span>
+<span class="giallo-l"><span style="color: #80A665;">mkdir</span><span style="color: #C99076;"> -p</span><span style="color: #C98A7D;"> /var/lib/android/{system,vendor,data,system,cache}</span></span>
+<span class="giallo-l"><span style="color: #80A665;">mkdir</span><span style="color: #C99076;"> -p</span><span style="color: #C98A7D;"> /var/lib/lxc/android/{rootfs,run,artifacts}</span></span></code></pre>
+<p><strong><em>All the commands henceforth are executed in the Gentoo chroot unless specified otherwise.</em></strong></p>
+<h3 id="fstab">Fstab</h3>
+<p>Edit Gentoo's fstab with mount entries for Android's partitions.</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #758575DD;">####/etc/fstab#####</span></span>
+<span class="giallo-l"><span style="color: #758575DD;"># Android mounts</span></span>
+<span class="giallo-l"><span style="color: #80A665;">/dev/mmcblk0p63</span><span style="color: #C98A7D;"> /var/lib/android/system ext4 ro,barrier=1,inode_readahead_blks=</span><span style="color: #4C9A91;">8 0 0</span></span>
+<span class="giallo-l"><span style="color: #80A665;">/dev/mmcblk0p55</span><span style="color: #C98A7D;"> /var/lib/android/persist ext4 noatime,nosuid,nodev,barrier=1,data=ordered,nomblk_io_submit</span><span style="color: #4C9A91;"> 0 0</span></span>
+<span class="giallo-l"><span style="color: #80A665;">/dev/mmcblk0p64</span><span style="color: #C98A7D;"> /var/lib/android/vendor ext4 ro,barrier=1,inode_readahead_blks=</span><span style="color: #4C9A91;">8 0 0</span></span>
+<span class="giallo-l"><span style="color: #80A665;">/dev/mmcblk0p62</span><span style="color: #C98A7D;"> /var/lib/android/cache ext4 noatime,nosuid,nodev,barrier=1,data=ordered,nomblk_io_submit,noauto_da_alloc</span><span style="color: #4C9A91;"> 0 0</span></span>
+<span class="giallo-l"><span style="color: #80A665;">/dev/mmcblk0p66</span><span style="color: #C98A7D;"> /var/lib/android/data ext4 noatime,nosuid,nodev,barrier=1,data=ordered,nomblk_io_submit,noauto_da_alloc,inode_readahead_blks=</span><span style="color: #4C9A91;">8 0 0</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #758575DD;"># Bind into container</span></span>
+<span class="giallo-l"><span style="color: #80A665;">/run</span><span style="color: #C98A7D;"> /var/lib/lxc/android/rootfs/run none bind</span><span style="color: #4C9A91;"> 0 0</span></span></code></pre><h3 id="install-lxc">Install LXC</h3>
+<p>At the time of writing this blog, LXC's version 4 does not work for the setup. I would recommend to install the version 3.</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #80A665;">emerge</span><span style="color: #C99076;"> -av --autounmask=y</span><span style="color: #C98A7D;"> =app-emulation/lxc-3.0.3</span></span></code></pre>
+<p>After this is done, setup the helper scripts for the container.</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #B8A965;">cd</span><span style="color: #C98A7D;"> /var/lib/lxc/android</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #758575DD;">## lxc&#39;s config</span></span>
+<span class="giallo-l"><span style="color: #80A665;">cat</span><span style="color: #CB7676;"> &gt;</span><span style="color: #C98A7D;"> config</span><span style="color: #CB7676;"> &lt;&lt;</span><span style="color: #C98A7D77;">EOF</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">lxc.uts.name = android</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">lxc.rootfs.path = /var/lib/lxc/android/rootfs/</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">lxc.init.cmd = /init</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">lxc.net.0.type = none</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">lxc.autodev = 0</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">lxc.log.level = 0</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">lxc.log.file = /var/log/lxc/hellalxc.log</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #C98A7D;">lxc.hook.pre-start = /var/lib/lxc/android/pre-start.sh</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">lxc.hook.post-stop = /var/lib/lxc/android/post-stop.sh</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">lxc.cgroup.cpu.rt_runtime_us = 950000</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #C98A7D;">lxc.console.path = none</span></span>
+<span class="giallo-l"><span style="color: #C98A7D77;">EOF</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #758575DD;">## pre-start.sh</span></span>
+<span class="giallo-l"><span style="color: #80A665;">cat</span><span style="color: #CB7676;"> &gt;</span><span style="color: #C98A7D;"> pre-start.sh</span><span style="color: #CB7676;"> &lt;&lt;</span><span style="color: #C98A7D77;">EOF</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">#!/bin/sh</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #C98A7D;">cp /var/lib/lxc/android/artifacts/init /var/lib/lxc/android/rootfs/init</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">mkdir -p /var/lib/lxc/android/rootfs/dev</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #C98A7D;">mkdir -p /run</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">if [ -f /run/.android-shutdown ]; then</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">        # we&#39;re shutting down; don&#39;t respawn</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">        echo &quot;Shutting down, won&#39;t restart.&quot;</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">        exit 1</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">fi</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #C98A7D;"># handle cgroup</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">mkdir /sys/fs/cgroup/cpu/lxc</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">echo 950000 &gt; /sys/fs/cgroup/cpu/lxc/cpu.rt_runtime_us</span></span>
+<span class="giallo-l"><span style="color: #C98A7D77;">EOF</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #758575DD;">## post-stop.sh</span></span>
+<span class="giallo-l"><span style="color: #80A665;">cat</span><span style="color: #CB7676;"> &gt;</span><span style="color: #C98A7D;"> post-stop.sh</span><span style="color: #CB7676;"> &lt;&lt;</span><span style="color: #C98A7D77;">EOF</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">#!/bin/bash</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #C98A7D;"># do not reboot / restart when debugging</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">if [ -f /run/.android-debug ]; then</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">        echo &quot;Debug mode, won&#39;t power off.&quot;</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">        exit 0</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">fi</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #C98A7D;"># clean rootfs for SAR-enabled devices.</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">rm -rf /var/lib/lxc/android/rootfs/*</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #C98A7D;"># leave mark to prevent container restart</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">touch /run/.android-shutdown</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #C98A7D;">if [ -f /run/.android-reboot ]; then</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">        echo &quot;Rebooting...&quot;</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">        reboot</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">else</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">        echo &quot;Powering off...&quot;</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">        poweroff</span></span>
+<span class="giallo-l"><span style="color: #C98A7D;">fi</span></span>
+<span class="giallo-l"><span style="color: #C98A7D77;">EOF</span></span></code></pre>
+<p>Copy the <strong>bootstrap-init</strong> binary to the <strong>artifacts</strong> folder.</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #80A665;">cp</span><span style="color: #C98A7D;"> /home/init /var/lib/lxc/android/artifacts/init</span></span></code></pre>
+<p>If it helps, this is the <code>/var/lib/lxc/android</code> tree :</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #80A665;">localhost</span><span style="color: #C98A7D;"> /var/lib/lxc/android</span><span> $</span><span style="color: #C98A7D;"> tree .</span></span>
+<span class="giallo-l"><span style="color: #B8A965;">.</span></span>
+<span class="giallo-l"><span style="color: #80A665;">├──</span><span style="color: #C98A7D;"> artifacts</span></span>
+<span class="giallo-l"><span style="color: #80A665;">│  </span><span style="color: #C98A7D;"> └── init</span></span>
+<span class="giallo-l"><span style="color: #80A665;">├──</span><span style="color: #C98A7D;"> config</span></span>
+<span class="giallo-l"><span style="color: #80A665;">├──</span><span style="color: #C98A7D;"> post-stop.sh</span></span>
+<span class="giallo-l"><span style="color: #80A665;">├──</span><span style="color: #C98A7D;"> pre-start.sh</span></span>
+<span class="giallo-l"><span style="color: #80A665;">├──</span><span style="color: #C98A7D;"> rootfs</span></span>
+<span class="giallo-l"><span style="color: #80A665;">└──</span><span style="color: #C98A7D;"> run</span></span></code></pre>
+<p>Check if the container is getting detected by Android using <code>lxc-info android</code>. If it is getting detected, we should be ready to go.</p>
+<p>Finally, setup the <strong>lxc.android</strong> service so that the container auto-starts on boot.</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #B8A965;">cd</span><span style="color: #C98A7D;"> /etc/init.d</span></span>
+<span class="giallo-l"><span style="color: #80A665;">ln</span><span style="color: #C99076;"> -s</span><span style="color: #C98A7D;"> lxc lxc.android</span></span>
+<span class="giallo-l"><span style="color: #80A665;">rc-update</span><span style="color: #C98A7D;"> add lxc.android boot</span></span></code></pre>
+<p>As a bonus, we can also setup SSH for accessing Gentoo when Android boots. The <strong>dialhome</strong> script mentioned below can be found <a rel="external" href="https://gitlab.com/sharkbaitOS/bootstrap/setup/-/blob/master/scripts/dialhome">here</a>.</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #B8A965;">umask</span><span style="color: #4C9A91;"> 077</span></span>
+<span class="giallo-l"><span style="color: #80A665;">mkdir</span><span style="color: #C99076;"> -p</span><span style="color: #C98A7D;"> ~/.ssh</span></span>
+<span class="giallo-l"><span style="color: #80A665;">mount</span><span style="color: #C98A7D;"> /dev/block/by-name/userdata /var/lib/android/data/</span></span>
+<span class="giallo-l"><span style="color: #80A665;">cat</span><span style="color: #C98A7D;"> /var/lib/android/data/ssh/id_ed25519.pub</span><span style="color: #CB7676;"> &gt;&gt;</span><span style="color: #C98A7D;"> ~/.ssh/authorized_keys</span></span>
+<span class="giallo-l"><span style="color: #80A665;">cp</span><span style="color: #C98A7D;"> dialhome /var/lib/android/data/ssh/</span></span>
+<span class="giallo-l"><span style="color: #80A665;">chmod</span><span style="color: #C98A7D;"> u+x /var/lib/android/data/ssh/dialhome</span></span>
+<span class="giallo-l"><span style="color: #80A665;">chown</span><span style="color: #C98A7D;"> 2000:2000 /var/lib/android/data/ssh/dialhome</span></span>
+<span class="giallo-l"><span style="color: #80A665;">umount</span><span style="color: #C98A7D;"> /var/lib/android/data</span></span>
+<span class="giallo-l"><span style="color: #80A665;">rc-update</span><span style="color: #C98A7D;"> add sshd default</span></span></code></pre>
+<p>We are done with Gentoo now, exit it and unmount its pseudofs</p>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #B8A965;">exit</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #758575DD;">## Now back in Android&#39;s Shell</span></span>
+<span class="giallo-l"><span style="color: #80A665;">umount</span><span style="color: #C99076;"> -f</span><span style="color: #C98A7D;"> /data/gnu/proc</span></span>
+<span class="giallo-l"><span style="color: #80A665;">umount</span><span style="color: #C99076;"> -l</span><span style="color: #C98A7D;"> /data/gnu/sys</span></span>
+<span class="giallo-l"><span style="color: #80A665;">umount</span><span style="color: #C99076;"> -l</span><span style="color: #C98A7D;"> /data/gnu/dev</span></span></code></pre><h2 id="final-steps">Final Steps</h2>
+<p>We are almost done now.</p>
+<ol>
+<li>Reboot to your Recovery and flash the <code>boot-mod.img</code> to the <code>boot</code> partition.
+Fastboot users could also flash it via</li>
+</ol>
+<pre class="giallo" style="color: #DBD7CAEE; background-color: #121212;"><code data-lang="shellscript"><span class="giallo-l"><span style="color: #80A665;">fastboot</span><span style="color: #C98A7D;"> flash boot boot-mod.img</span></span></code></pre>
+<ol>
+<li>While you're in the Recovery mode, fire up adb again and patch the <code>init.rc</code> present in <code>/system</code> according to the patch <a rel="external" href="https://gitlab.com/sharkbaitOS/bootstrap/setup/-/blob/master/devices/angler/patches/init.rc.patch">here</a>. Keep in mind that we <strong><em>do not</em></strong> need to patch Android's <code>fstab</code> if you're following this setup.</li>
+</ol>
+<p>And then finally cross your fingers and reboot. If Android boots, congrats, you just joined the SharkBait party. But it gets even better.</p>
+<hr />
+<h2 id="final-thoughts-and-scopes-of-improvement">Final Thoughts and Scopes of Improvement</h2>
+<p>If Android does not boot, check the logs at <code>/data/gnu/var/logs</code>. Check <code>dmesg</code> for kernel logs, <code>rc.log</code>, <code>messages</code> for Gentoo's logs, <code>lxc/hellalxc.log</code> and <code>lxc/android.log</code> for LXC logs.</p>
+<p>Currently SharkBait is at a very young stage. Encryption and SELinux are not supported right now. But this is subject to change once SharkBait matures.</p>
+<p>Also if this entire process seems a bit lengthy, I should inform that when the <strong>bootstrap-init</strong> and <strong>sar-preinit</strong> merges into the official SharkBait workflow, this install will take significantly lower efforts and would be a breeze to the porters as well as the users of SharkBait.</p>
+<p>Lastly I should give credits to the official <a rel="external" href="https://wiki.gentoo.org/wiki/Android/SharkBait/Starting_Android_in_LXC">guide</a> on which this install guide is based on. Please have a look at it as well as my other blogs to understand how this works under-the-hood.</p>
+<hr />
+<div  class=imageClass >
+    <figure  class=center >
+        <img src="neofetch.jpg" alt="neofetch"  
+            
+             class=center  />
+        
+            <figcaption  class=center  
+                >
+                Obligatory Neofetch
+            </figcaption>
+        
+    </figure>
+</div>
+</article>
+
+
+  <div class="pagination_title">
+    <span>Read other posts</span>
+  </div>
+  <div class="post_nav">
+      
+        <div class="button">
+          <a class="button" href="&#x2F;booting-gentoo-using-preinit&#x2F;">
+            ←&nbsp;
+            <span class="next">
+              Booting Gentoo from SAR-Preinit; or Debugging the init, the Hard Way
+            </span>
+          </a>
+        </div>
+      
+      
+        <div class="button">
+          <a class="button" href="&#x2F;build-android&#x2F;">
+            <span class="previous">Building Android: BTS</span>
+            &nbsp;→
+          </a>
+        </div>
+      
+    </div>
+
+
+
+    </div>
+    </main>
+
+    
+    
+
+    <footer class=center>
+      <sub>
+        <div>
+            &copy;
+            <span id="copyright">
+                <script>document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))</script>
+            </span>
+            &middot;
+            Gunwant Jain. Built <a class="footer" href="https://github.com/wantguns/wantguns.dev">openly</a> with <a class="footer" href="https://www.getzola.org">Zola</a>
+        </div>
+      </sub>
+    </footer>
+    <script data-goatcounter="https://stats.wantguns.dev/count"
+            async src="//stats.wantguns.dev/count.js"></script>
+  </body>
+  
+ <script src=https://wantguns.dev/js/page.js></script> 
+
+</html>
